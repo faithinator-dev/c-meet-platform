@@ -3,6 +3,7 @@
 let currentUser = null;
 let allRooms = [];
 let currentFilter = 'all';
+let currentView = 'feed'; // feed, rooms, pages, friends
 
 // Check authentication
 auth.onAuthStateChanged(async (user) => {
@@ -17,7 +18,16 @@ auth.onAuthStateChanged(async (user) => {
     const userSnapshot = await database.ref('users/' + user.uid).once('value');
     const userData = userSnapshot.val();
     
-    document.getElementById('userName').textContent = userData.name || user.displayName || 'User';
+    // Set user avatar in create post card
+    if (document.getElementById('userAvatarSmall')) {
+        document.getElementById('userAvatarSmall').src = userData.avatar || 'https://via.placeholder.com/40';
+    }
+    if (document.getElementById('postUserAvatar')) {
+        document.getElementById('postUserAvatar').src = userData.avatar || 'https://via.placeholder.com/40';
+    }
+    if (document.getElementById('postUserName')) {
+        document.getElementById('postUserName').textContent = userData.displayName || userData.name || 'User';
+    }
     
     // Request notification permission
     if (typeof requestNotificationPermission === 'function') {
@@ -34,13 +44,16 @@ auth.onAuthStateChanged(async (user) => {
         listenForPrivateMessages(user.uid);
     }
     
-    // Display friend requests
+    // Display friend requests in right sidebar
     if (typeof displayFriendRequests === 'function') {
         displayFriendRequests();
     }
     
-    // Load rooms
-    loadRooms();
+    // Load feed by default
+    loadPostsFeed();
+    
+    // Load online friends
+    loadOnlineFriends();
     
     // Listen for notifications
     listenForNotifications();
@@ -56,6 +69,15 @@ auth.onAuthStateChanged(async (user) => {
 
 // Make sure profile and message features are initialized after page load
 document.addEventListener('DOMContentLoaded', () => {
+    // Tab switching
+    setupTabSwitching();
+    
+    // Create menu dropdown
+    setupCreateMenu();
+    
+    // Search functionality
+    setupGlobalSearch();
+    
     // Ensure all modals can be closed with click outside
     document.querySelectorAll('.modal').forEach(modal => {
         modal.addEventListener('click', (e) => {
@@ -204,8 +226,50 @@ window.addEventListener('click', (e) => {
     }
 });
 
-// Create Room Form
-document.getElementById('createRoomForm').addEventListener('submit', async (e) => {
+// Update create room modal handling for new layout
+document.getElementById('submitCreateRoom')?.addEventListener('click', async () => {
+    const name = document.getElementById('roomNameInput').value.trim();
+    const description = document.getElementById('roomDescInput').value.trim();
+    const category = document.getElementById('roomCategoryInput').value;
+    const isPrivate = document.getElementById('roomPrivateCheck').checked;
+
+    if (!name || !description) {
+        alert('Please fill in all required fields');
+        return;
+    }
+
+    try {
+        const newRoomRef = database.ref('rooms').push();
+        await newRoomRef.set({
+            name: name,
+            description: description,
+            category: category,
+            isPrivate: isPrivate,
+            image: `https://via.placeholder.com/400x200?text=${encodeURIComponent(name)}`,
+            createdBy: currentUser.uid,
+            createdAt: new Date().toISOString(),
+            members: {
+                [currentUser.uid]: {
+                    name: currentUser.displayName,
+                    joinedAt: new Date().toISOString()
+                }
+            }
+        });
+
+        document.getElementById('createRoomModal').classList.add('hidden');
+        document.getElementById('roomNameInput').value = '';
+        document.getElementById('roomDescInput').value = '';
+        document.getElementById('roomPrivateCheck').checked = false;
+        
+        // Join the room
+        window.location.href = `room.html?id=${newRoomRef.key}`;
+    } catch (error) {
+        alert('Failed to create room: ' + error.message);
+    }
+});
+
+// Legacy Create Room Form (for old modal if exists)
+document.getElementById('createRoomForm')?.addEventListener('submit', async (e) => {
     e.preventDefault();
     
     const name = document.getElementById('roomName').value;
@@ -240,12 +304,17 @@ document.getElementById('createRoomForm').addEventListener('submit', async (e) =
     }
 });
 
+// Close modal buttons
+document.getElementById('closeCreateRoomModal')?.addEventListener('click', () => {
+    document.getElementById('createRoomModal').classList.add('hidden');
+});
+
 // Upload Room Image
-document.getElementById('uploadImageBtn').addEventListener('click', () => {
+document.getElementById('uploadImageBtn')?.addEventListener('click', () => {
     document.getElementById('imageUpload').click();
 });
 
-document.getElementById('imageUpload').addEventListener('change', async (e) => {
+document.getElementById('imageUpload')?.addEventListener('change', async (e) => {
     const file = e.target.files[0];
     if (file) {
         try {
@@ -408,6 +477,344 @@ function listenForNotifications() {
         
         if (notificationList.children.length === 0) {
             notificationList.innerHTML = '<p class="no-notifications">No new notifications</p>';
+        }
+    });
+}
+// Tab switching functionality
+function setupTabSwitching() {
+    const feedTab = document.getElementById('feedTab');
+    const roomsTab = document.getElementById('roomsTab');
+    const pagesTab = document.getElementById('pagesTab');
+    const friendsTab = document.getElementById('friendsTab');
+
+    const feedView = document.getElementById('feedView');
+    const roomsView = document.getElementById('roomsView');
+    const pagesView = document.getElementById('pagesView');
+    const friendsView = document.getElementById('friendsView');
+    const usersGrid = document.getElementById('usersGrid');
+
+    feedTab?.addEventListener('click', (e) => {
+        e.preventDefault();
+        document.querySelectorAll('.sidebar-item').forEach(item => item.classList.remove('active'));
+        feedTab.classList.add('active');
+        
+        feedView.classList.remove('hidden');
+        roomsView.classList.add('hidden');
+        pagesView.classList.add('hidden');
+        friendsView.classList.add('hidden');
+        usersGrid.classList.add('hidden');
+        
+        currentView = 'feed';
+        if (typeof loadPostsFeed === 'function') loadPostsFeed();
+    });
+
+    roomsTab?.addEventListener('click', (e) => {
+        e.preventDefault();
+        document.querySelectorAll('.sidebar-item').forEach(item => item.classList.remove('active'));
+        roomsTab.classList.add('active');
+        
+        feedView.classList.add('hidden');
+        roomsView.classList.remove('hidden');
+        pagesView.classList.add('hidden');
+        friendsView.classList.add('hidden');
+        usersGrid.classList.add('hidden');
+        
+        currentView = 'rooms';
+        loadRooms();
+    });
+
+    pagesTab?.addEventListener('click', (e) => {
+        e.preventDefault();
+        document.querySelectorAll('.sidebar-item').forEach(item => item.classList.remove('active'));
+        pagesTab.classList.add('active');
+        
+        feedView.classList.add('hidden');
+        roomsView.classList.add('hidden');
+        pagesView.classList.remove('hidden');
+        friendsView.classList.add('hidden');
+        usersGrid.classList.add('hidden');
+        
+        currentView = 'pages';
+        if (typeof loadPages === 'function') loadPages();
+    });
+
+    friendsTab?.addEventListener('click', (e) => {
+        e.preventDefault();
+        document.querySelectorAll('.sidebar-item').forEach(item => item.classList.remove('active'));
+        friendsTab.classList.add('active');
+        
+        feedView.classList.add('hidden');
+        roomsView.classList.add('hidden');
+        pagesView.classList.add('hidden');
+        friendsView.classList.remove('hidden');
+        usersGrid.classList.add('hidden');
+        
+        currentView = 'friends';
+        loadFriends();
+    });
+}
+
+// Create menu dropdown
+function setupCreateMenu() {
+    const createMenuBtn = document.getElementById('createMenuBtn');
+    const createDropdown = document.getElementById('createDropdown');
+    const createRoomBtnMenu = document.getElementById('createRoomBtnMenu');
+
+    createMenuBtn?.addEventListener('click', (e) => {
+        e.stopPropagation();
+        createDropdown.classList.toggle('hidden');
+    });
+
+    // Close dropdown when clicking outside
+    document.addEventListener('click', (e) => {
+        if (!createMenuBtn?.contains(e.target)) {
+            createDropdown.classList.add('hidden');
+        }
+    });
+
+    // Create room from menu
+    createRoomBtnMenu?.addEventListener('click', () => {
+        createDropdown.classList.add('hidden');
+        document.getElementById('createRoomModal').classList.remove('hidden');
+    });
+}
+
+// Global search functionality
+function setupGlobalSearch() {
+    const globalSearch = document.getElementById('globalSearch');
+    const searchFilter = document.getElementById('searchFilter');
+
+    globalSearch?.addEventListener('input', async (e) => {
+        const searchTerm = e.target.value.toLowerCase().trim();
+        const filter = searchFilter.value;
+
+        if (searchTerm.length === 0) {
+            // Return to current view
+            document.getElementById(currentView + 'View')?.classList.remove('hidden');
+            document.getElementById('usersGrid').classList.add('hidden');
+            return;
+        }
+
+        // Perform search
+        await performGlobalSearch(searchTerm, filter);
+    });
+}
+
+// Perform global search
+async function performGlobalSearch(searchTerm, filter) {
+    const feedView = document.getElementById('feedView');
+    const roomsView = document.getElementById('roomsView');
+    const pagesView = document.getElementById('pagesView');
+    const friendsView = document.getElementById('friendsView');
+    const usersGrid = document.getElementById('usersGrid');
+    const roomsGrid = document.getElementById('roomsGrid');
+    const pagesGrid = document.getElementById('pagesGrid');
+
+    // Hide all views
+    feedView.classList.add('hidden');
+    roomsView.classList.add('hidden');
+    pagesView.classList.add('hidden');
+    friendsView.classList.add('hidden');
+    usersGrid.classList.add('hidden');
+
+    if (filter === 'people' || filter === 'all') {
+        // Search users
+        const usersSnapshot = await database.ref('users').once('value');
+        const users = [];
+        usersSnapshot.forEach((childSnapshot) => {
+            const user = childSnapshot.val();
+            user.uid = childSnapshot.key;
+            if (user.displayName?.toLowerCase().includes(searchTerm) || 
+                user.name?.toLowerCase().includes(searchTerm)) {
+                users.push(user);
+            }
+        });
+
+        if (users.length > 0) {
+            usersGrid.classList.remove('hidden');
+            usersGrid.innerHTML = '<h3>People</h3>';
+            users.forEach(user => {
+                if (typeof displayUserCard === 'function') {
+                    displayUserCard(user);
+                }
+            });
+        }
+    }
+
+    if (filter === 'rooms' || filter === 'all') {
+        // Search rooms
+        const rooms = allRooms.filter(room => 
+            room.name.toLowerCase().includes(searchTerm) || 
+            room.description.toLowerCase().includes(searchTerm)
+        );
+
+        if (rooms.length > 0) {
+            roomsView.classList.remove('hidden');
+            roomsGrid.innerHTML = '';
+            rooms.forEach(room => {
+                const memberCount = room.members ? Object.keys(room.members).length : 0;
+                const roomCard = document.createElement('div');
+                roomCard.className = 'room-card';
+                roomCard.innerHTML = `
+                    <img src="${room.image || 'https://via.placeholder.com/400x200'}" alt="${room.name}" class="room-card-image">
+                    <div class="room-card-content">
+                        <h3>${room.name}</h3>
+                        <p>${room.description}</p>
+                        <span>${memberCount} members</span>
+                    </div>
+                `;
+                roomCard.addEventListener('click', () => requestJoinRoom(room.id, room.isPrivate));
+                roomsGrid.appendChild(roomCard);
+            });
+        }
+    }
+
+    if (filter === 'pages' || filter === 'all') {
+        // Search pages
+        const pagesSnapshot = await database.ref('pages').once('value');
+        const pages = [];
+        pagesSnapshot.forEach((childSnapshot) => {
+            const page = childSnapshot.val();
+            page.id = childSnapshot.key;
+            if (page.name?.toLowerCase().includes(searchTerm) || 
+                page.description?.toLowerCase().includes(searchTerm)) {
+                pages.push(page);
+            }
+        });
+
+        if (pages.length > 0) {
+            pagesView.classList.remove('hidden');
+            pagesGrid.innerHTML = '';
+            pages.forEach(page => {
+                if (typeof displayPageCard === 'function') {
+                    displayPageCard(page);
+                }
+            });
+        }
+    }
+}
+
+// Request to join room (with approval for private rooms)
+async function requestJoinRoom(roomId, isPrivate) {
+    const user = auth.currentUser;
+    if (!user) return;
+
+    if (isPrivate) {
+        // Send join request
+        const requestData = {
+            userId: user.uid,
+            userName: user.displayName || 'Anonymous',
+            userAvatar: user.photoURL || 'https://via.placeholder.com/40',
+            timestamp: Date.now(),
+            status: 'pending'
+        };
+
+        await database.ref(`roomJoinRequests/${roomId}/${user.uid}`).set(requestData);
+
+        // Notify room admin
+        const roomSnapshot = await database.ref(`rooms/${roomId}`).once('value');
+        const room = roomSnapshot.val();
+
+        if (room.createdBy) {
+            await database.ref(`notifications/${room.createdBy}`).push({
+                type: 'roomJoinRequest',
+                from: user.uid,
+                fromName: user.displayName || 'Someone',
+                roomId: roomId,
+                roomName: room.name,
+                timestamp: Date.now(),
+                read: false
+            });
+        }
+
+        showNotification('Join request sent! Waiting for approval.');
+    } else {
+        // Join directly
+        joinRoom(roomId);
+    }
+}
+
+// Load friends list
+async function loadFriends() {
+    const user = auth.currentUser;
+    if (!user) return;
+
+    const friendsGrid = document.getElementById('friendsGrid');
+    friendsGrid.innerHTML = '<div class="loading">Loading friends...</div>';
+
+    const friendsRef = database.ref(`friends/${user.uid}`);
+    friendsRef.on('value', async (snapshot) => {
+        const friendIds = [];
+        snapshot.forEach((childSnapshot) => {
+            friendIds.push(childSnapshot.key);
+        });
+
+        if (friendIds.length === 0) {
+            friendsGrid.innerHTML = '<div class="empty-state">No friends yet. Search for people to add!</div>';
+            return;
+        }
+
+        friendsGrid.innerHTML = '';
+        
+        for (const friendId of friendIds) {
+            const userSnapshot = await database.ref(`users/${friendId}`).once('value');
+            const friendData = userSnapshot.val();
+            if (friendData) {
+                friendData.uid = friendId;
+                if (typeof displayUserCard === 'function') {
+                    displayUserCard(friendData);
+                }
+            }
+        }
+    });
+}
+
+// Load online friends in right sidebar
+function loadOnlineFriends() {
+    const user = auth.currentUser;
+    if (!user) return;
+
+    const onlineFriendsList = document.getElementById('onlineFriendsList');
+    if (!onlineFriendsList) return;
+
+    database.ref(`friends/${user.uid}`).on('value', async (snapshot) => {
+        const friendIds = [];
+        snapshot.forEach((childSnapshot) => {
+            friendIds.push(childSnapshot.key);
+        });
+
+        onlineFriendsList.innerHTML = '';
+
+        if (friendIds.length === 0) {
+            onlineFriendsList.innerHTML = '<p style="font-size: 14px; color: var(--text-light);">No friends yet</p>';
+            return;
+        }
+
+        for (const friendId of friendIds) {
+            const userSnapshot = await database.ref(`users/${friendId}`).once('value');
+            const friendData = userSnapshot.val();
+            
+            if (friendData) {
+                const friendItem = document.createElement('div');
+                friendItem.className = 'friend-item';
+                friendItem.innerHTML = `
+                    <img src="${friendData.avatar || 'https://via.placeholder.com/32'}" alt="${friendData.displayName}" style="width: 32px; height: 32px; border-radius: 50%; margin-right: 8px;">
+                    <span>${friendData.displayName || friendData.name || 'User'}</span>
+                `;
+                friendItem.style.display = 'flex';
+                friendItem.style.alignItems = 'center';
+                friendItem.style.padding = '8px';
+                friendItem.style.cursor = 'pointer';
+                friendItem.style.borderRadius = '4px';
+                friendItem.addEventListener('mouseenter', () => friendItem.style.backgroundColor = '#f0f0f0');
+                friendItem.addEventListener('mouseleave', () => friendItem.style.backgroundColor = 'transparent');
+                friendItem.addEventListener('click', () => {
+                    if (typeof openPrivateMessage === 'function') {
+                        openPrivateMessage(friendId, friendData.displayName || friendData.name);
+                    }
+                });
+                onlineFriendsList.appendChild(friendItem);
+            }
         }
     });
 }

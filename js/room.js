@@ -23,7 +23,15 @@ auth.onAuthStateChanged(async (user) => {
     currentUser = user;
     
     // Load room data
-    loadRoom();
+    await loadRoom();
+    
+    // Check if user has permission to view room
+    const hasPermission = await checkRoomPermission();
+    if (!hasPermission) {
+        alert('You do not have permission to view this room. Please request to join first.');
+        window.location.href = 'dashboard.html';
+        return;
+    }
     
     // Load messages
     loadMessages();
@@ -47,7 +55,148 @@ auth.onAuthStateChanged(async (user) => {
         avatar: user.photoURL || 'https://via.placeholder.com/40',
         joinedAt: new Date().toISOString()
     });
+    
+    // If user is room admin, show join requests
+    if (currentRoom && currentRoom.createdBy === user.uid) {
+        displayJoinRequests();
+    }
 });
+
+// Check if user has permission to view room
+async function checkRoomPermission() {
+    const roomSnapshot = await database.ref(`rooms/${roomId}`).once('value');
+    const room = roomSnapshot.val();
+    
+    if (!room) return false;
+    
+    // If room is not private, allow access
+    if (!room.isPrivate) return true;
+    
+    // If user is room creator, allow access
+    if (room.createdBy === currentUser.uid) return true;
+    
+    // If user is already a member, allow access
+    if (room.members && room.members[currentUser.uid]) return true;
+    
+    // Check if user has approved join request
+    const requestSnapshot = await database.ref(`roomJoinRequests/${roomId}/${currentUser.uid}`).once('value');
+    const request = requestSnapshot.val();
+    
+    return request && request.status === 'approved';
+}
+
+// Display join requests (for room admin)
+function displayJoinRequests() {
+    database.ref(`roomJoinRequests/${roomId}`).on('value', (snapshot) => {
+        const requests = [];
+        snapshot.forEach((childSnapshot) => {
+            const request = childSnapshot.val();
+            if (request.status === 'pending') {
+                request.userId = childSnapshot.key;
+                requests.push(request);
+            }
+        });
+        
+        if (requests.length > 0) {
+            showJoinRequestsNotification(requests);
+        }
+    });
+}
+
+// Show join requests notification
+function showJoinRequestsNotification(requests) {
+    // Create notification banner
+    const banner = document.createElement('div');
+    banner.style.cssText = `
+        position: fixed;
+        top: 70px;
+        left: 50%;
+        transform: translateX(-50%);
+        background: #fff3cd;
+        border: 1px solid #ffc107;
+        padding: 16px;
+        border-radius: 8px;
+        z-index: 1000;
+        max-width: 500px;
+        box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+    `;
+    
+    banner.innerHTML = `
+        <div style="margin-bottom: 8px; font-weight: 600;">
+            ${requests.length} pending join ${requests.length === 1 ? 'request' : 'requests'}
+        </div>
+        <div id="joinRequestsList"></div>
+    `;
+    
+    document.body.appendChild(banner);
+    
+    const requestsList = document.getElementById('joinRequestsList');
+    requests.forEach(request => {
+        const requestDiv = document.createElement('div');
+        requestDiv.style.cssText = 'display: flex; align-items: center; justify-content: space-between; padding: 8px; border-top: 1px solid #dee2e6;';
+        requestDiv.innerHTML = `
+            <div style="display: flex; align-items: center; gap: 8px;">
+                <img src="${request.userAvatar}" style="width: 32px; height: 32px; border-radius: 50%;">
+                <span>${request.userName}</span>
+            </div>
+            <div style="display: flex; gap: 4px;">
+                <button onclick="approveJoinRequest('${request.userId}')" style="padding: 4px 12px; background: #28a745; color: white; border: none; border-radius: 4px; cursor: pointer;">
+                    Approve
+                </button>
+                <button onclick="rejectJoinRequest('${request.userId}')" style="padding: 4px 12px; background: #dc3545; color: white; border: none; border-radius: 4px; cursor: pointer;">
+                    Reject
+                </button>
+            </div>
+        `;
+        requestsList.appendChild(requestDiv);
+    });
+}
+
+// Approve join request
+async function approveJoinRequest(userId) {
+    await database.ref(`roomJoinRequests/${roomId}/${userId}`).update({
+        status: 'approved'
+    });
+    
+    // Add user to room members
+    const requestSnapshot = await database.ref(`roomJoinRequests/${roomId}/${userId}`).once('value');
+    const request = requestSnapshot.val();
+    
+    await database.ref(`rooms/${roomId}/members/${userId}`).set({
+        name: request.userName,
+        avatar: request.userAvatar,
+        joinedAt: new Date().toISOString()
+    });
+    
+    // Send notification to user
+    await database.ref(`notifications/${userId}`).push({
+        type: 'roomJoinApproved',
+        roomId: roomId,
+        roomName: currentRoom.name,
+        timestamp: Date.now(),
+        read: false
+    });
+    
+    alert('Join request approved!');
+}
+
+// Reject join request
+async function rejectJoinRequest(userId) {
+    await database.ref(`roomJoinRequests/${roomId}/${userId}`).update({
+        status: 'rejected'
+    });
+    
+    // Send notification to user
+    await database.ref(`notifications/${userId}`).push({
+        type: 'roomJoinRejected',
+        roomId: roomId,
+        roomName: currentRoom.name,
+        timestamp: Date.now(),
+        read: false
+    });
+    
+    alert('Join request rejected');
+}
 
 // Logout
 document.getElementById('logoutBtn').addEventListener('click', async () => {
