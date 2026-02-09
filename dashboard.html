@@ -1,0 +1,171 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Dashboard - C-meet</title>
+    <link rel="stylesheet" href="css/styles.css">
+    <link href="https://fonts.googleapis.com/css2?family=Open+Sans:wght@300;400;600;700&display=swap" rel="stylesheet">
+</head>
+<body>
+    <!-- Navigation Bar -->
+    <nav class="navbar">
+        <div class="nav-container">
+            <div class="nav-brand">
+                <h2>C-meet</h2>
+            </div>
+            <div class="nav-menu">
+                <a href="dashboard.html" class="nav-link active">Dashboard</a>
+                <a href="#" class="nav-link" id="messagesLink">Messages</a>
+                <a href="#" class="nav-link" id="profileLink">Profile</a>
+                <div class="notification-icon" id="notificationBell">
+                    <svg width="24" height="24" fill="none" stroke="currentColor" stroke-width="2">
+                        <path d="M18 8A6 6 0 0 0 6 8c0 7-3 9-3 9h18s-3-2-3-9"/>
+                        <path d="M13.73 21a2 2 0 0 1-3.46 0"/>
+                    </svg>
+                    <span class="notification-badge hidden" id="notificationCount">0</span>
+                </div>
+                <button class="btn btn-logout" id="logoutBtn">Logout</button>
+            </div>
+        </div>
+    </nav>
+
+    <!-- Notification Dropdown -->
+    <div class="notification-dropdown hidden" id="notificationDropdown">
+        <h3>Notifications</h3>
+        <div id="notificationList">
+            <p class="no-notifications">No new notifications</p>
+        </div>
+    </div>
+
+    <!-- Main Content -->
+    <div class="dashboard-container">
+        <div class="dashboard-header">
+            <h1>Welcome back, <span id="userName">User</span>!</h1>
+            <button class="btn btn-primary" id="createRoomBtn">
+                <svg width="20" height="20" fill="none" stroke="currentColor" stroke-width="2">
+                    <path d="M12 5v14M5 12h14"/>
+                </svg>
+                Create Room
+            </button>
+        </div>
+
+        <!-- Room Search -->
+        <div class="search-section">
+            <div class="search-tabs">
+                <button class="search-tab active" data-search="rooms">Rooms</button>
+                <button class="search-tab" data-search="users">Users</button>
+            </div>
+            <input type="text" id="searchRooms" class="search-input" placeholder="Search discussion rooms...">
+            <input type="text" id="searchUsers" class="search-input hidden" placeholder="Search users...">
+            <div class="filter-tags">
+                <button class="tag active" data-filter="all">All</button>
+                <button class="tag" data-filter="technology">Technology</button>
+                <button class="tag" data-filter="art">Art</button>
+                <button class="tag" data-filter="music">Music</button>
+                <button class="tag" data-filter="literature">Literature</button>
+                <button class="tag" data-filter="other">Other</button>
+            </div>
+        </div>
+
+        <!-- Discussion Rooms Grid -->
+        <div class="rooms-grid" id="roomsGrid">
+            <!-- Rooms will be dynamically loaded here -->
+        </div>
+
+        <!-- Users Grid -->
+        <div class="users-grid hidden" id="usersGrid">
+            <!-- Users will be dynamically loaded here -->
+        </div>
+    </div>
+
+    <!-- Private Message Modal -->
+    <div class="modal hidden" id="privateMessageModal">
+        <div class="modal-content">
+            <span class="close-modal" id="closePrivateMessage">&times;</span>
+            <h2>Message <span id="recipientName"></span></h2>
+            <div class="private-messages-container" id="privateMessagesContainer">
+                <!-- Messages will be loaded here -->
+            </div>
+            <div class="message-input-container">
+                <input type="text" id="privateMessageInput" placeholder="Type your message..." class="message-input">
+                <button class="btn btn-primary" id="sendPrivateMessageBtn">Send</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Create Room Modal -->
+    <div class="modal hidden" id="createRoomModal">
+        <div class="modal-content">
+            <span class="close-modal" id="closeModal">&times;</span>
+            <h2>Create Discussion Room</h2>
+            <form id="createRoomForm">
+                <div class="form-group">
+                    <label for="roomName">Room Name</label>
+                    <input type="text" id="roomName" placeholder="Enter room name" required>
+                </div>
+                <div class="form-group">
+                    <label for="roomDescription">Description</label>
+                    <textarea id="roomDescription" placeholder="Describe your room" rows="3" required></textarea>
+                </div>
+                <div class="form-group">
+                    <label for="roomCategory">Category</label>
+                    <select id="roomCategory" required>
+                        <option value="">Select a category</option>
+                        <option value="technology">Technology</option>
+                        <option value="art">Art</option>
+                        <option value="music">Music</option>
+                        <option value="literature">Literature</option>
+                        <option value="other">Other</option>
+                    </select>
+                </div>
+                <div class="form-group">
+                    <label for="roomImage">Room Image URL (optional)</label>
+                    <input type="text" id="roomImage" placeholder="Enter image URL or upload via Imgur">
+                    <button type="button" class="btn btn-secondary" id="uploadImageBtn">Upload Image</button>
+                    <input type="file" id="imageUpload" accept="image/*" style="display: none;">
+                </div>
+                <button type="submit" class="btn btn-primary">Create Room</button>
+            </form>
+        </div>
+    </div>
+
+    <!-- Profile Modal -->
+    <div class="modal hidden" id="profileModal">
+        <div class="modal-content">
+            <span class="close-modal" id="closeProfileModal">&times;</span>
+            <h2>My Profile</h2>
+            <form id="profileForm">
+                <div class="profile-avatar">
+                    <img id="profileAvatar" src="https://via.placeholder.com/120" alt="Profile">
+                    <button type="button" class="btn btn-secondary" id="uploadAvatarBtn">Change Avatar</button>
+                    <input type="file" id="avatarUpload" accept="image/*" style="display: none;">
+                </div>
+                <div class="form-group">
+                    <label for="profileName">Display Name</label>
+                    <input type="text" id="profileName" required>
+                </div>
+                <div class="form-group">
+                    <label for="profileBio">Bio</label>
+                    <textarea id="profileBio" rows="3" placeholder="Tell us about yourself"></textarea>
+                </div>
+                <div class="form-group">
+                    <label for="profileInterests">Interests (comma separated)</label>
+                    <input type="text" id="profileInterests" placeholder="e.g., Technology, Music, Art">
+                </div>
+                <button type="submit" class="btn btn-primary">Save Profile</button>
+            </form>
+        </div>
+    </div>
+
+    <!-- Firebase SDKs -->
+    <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-app-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-auth-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-database-compat.js"></script>
+    
+    <script src="js/config.js"></script>
+    <script src="js/dashboard.js"></script>
+    <script src="js/imgur.js"></script>
+    <script src="js/messaging.js"></script>
+</body>
+</html>

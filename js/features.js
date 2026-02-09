@@ -1,0 +1,341 @@
+// Advanced Features: Emoji, Edit/Delete, Typing Indicators, File Attachments
+
+// ==================== EMOJI PICKER ====================
+let emojiPicker = null;
+let currentMessageElement = null;
+
+function initializeEmojiPicker() {
+    const emojiPickerBtn = document.getElementById('emojiPickerBtn');
+    emojiPicker = document.getElementById('emojiPicker');
+    
+    if (!emojiPickerBtn || !emojiPicker) return;
+    
+    emojiPickerBtn.addEventListener('click', () => {
+        emojiPicker.classList.toggle('hidden');
+    });
+    
+    // Add emoji to message input
+    emojiPicker.addEventListener('click', (e) => {
+        if (e.target.textContent.length === 2) { // Emoji is 2 characters
+            const messageInput = document.getElementById('messageInput');
+            messageInput.value += e.target.textContent;
+            messageInput.focus();
+            emojiPicker.classList.add('hidden');
+        }
+    });
+    
+    // Close emoji picker when clicking outside
+    document.addEventListener('click', (e) => {
+        if (!emojiPickerBtn.contains(e.target) && !emojiPicker.contains(e.target)) {
+            emojiPicker.classList.add('hidden');
+        }
+    });
+}
+
+// ==================== MESSAGE REACTIONS ====================
+async function addReaction(messageId, emoji, roomId) {
+    if (!currentUser || !roomId) return;
+    
+    const reactionRef = database.ref(`messages/${roomId}/${messageId}/reactions/${emoji}/${currentUser.uid}`);
+    
+    try {
+        await reactionRef.set({
+            userName: currentUser.displayName,
+            timestamp: new Date().toISOString()
+        });
+    } catch (error) {
+        console.error('Failed to add reaction:', error);
+    }
+}
+
+async function removeReaction(messageId, emoji, roomId) {
+    if (!currentUser || !roomId) return;
+    
+    const reactionRef = database.ref(`messages/${roomId}/${messageId}/reactions/${emoji}/${currentUser.uid}`);
+    
+    try {
+        await reactionRef.remove();
+    } catch (error) {
+        console.error('Failed to remove reaction:', error);
+    }
+}
+
+function displayReactions(messageElement, reactions, messageId, roomId) {
+    if (!reactions) return;
+    
+    let reactionsHTML = '';
+    const reactionEmojis = Object.keys(reactions);
+    
+    reactionEmojis.forEach(emoji => {
+        const users = reactions[emoji];
+        const count = Object.keys(users).length;
+        const hasReacted = currentUser && users[currentUser.uid];
+        
+        reactionsHTML += `
+            <span class="reaction ${hasReacted ? 'active' : ''}" 
+                  data-emoji="${emoji}" 
+                  data-message-id="${messageId}">
+                ${emoji} <span class="reaction-count">${count}</span>
+            </span>
+        `;
+    });
+    
+    reactionsHTML += `<button class="add-reaction-btn" data-message-id="${messageId}">➕</button>`;
+    
+    const reactionsContainer = messageElement.querySelector('.message-reactions') || 
+                              document.createElement('div');
+    reactionsContainer.className = 'message-reactions';
+    reactionsContainer.innerHTML = reactionsHTML;
+    
+    if (!messageElement.querySelector('.message-reactions')) {
+        messageElement.querySelector('.message-content').appendChild(reactionsContainer);
+    }
+    
+    // Add reaction click handlers
+    reactionsContainer.querySelectorAll('.reaction').forEach(reactionEl => {
+        reactionEl.addEventListener('click', async () => {
+            const emoji = reactionEl.dataset.emoji;
+            const hasReacted = reactionEl.classList.contains('active');
+            
+            if (hasReacted) {
+                await removeReaction(messageId, emoji, roomId);
+            } else {
+                await addReaction(messageId, emoji, roomId);
+            }
+        });
+    });
+    
+    // Add reaction button
+    reactionsContainer.querySelector('.add-reaction-btn').addEventListener('click', () => {
+        showReactionPicker(messageId, roomId);
+    });
+}
+
+function showReactionPicker(messageId, roomId) {
+    const commonEmojis = ['👍', '❤️', '😂', '😮', '😢', '🎉', '🔥', '👏'];
+    const emoji = prompt('Choose an emoji:\n' + commonEmojis.join(' '));
+    
+    if (emoji) {
+        addReaction(messageId, emoji, roomId);
+    }
+}
+
+// ==================== MESSAGE EDIT/DELETE ====================
+function addMessageActions(messageElement, message, messageId, roomId) {
+    if (!currentUser || message.userId !== currentUser.uid) return;
+    
+    const actionsHTML = `
+        <div class="message-actions">
+            <button class="message-action-btn" data-action="edit" data-message-id="${messageId}">✏️ Edit</button>
+            <button class="message-action-btn" data-action="delete" data-message-id="${messageId}">🗑️ Delete</button>
+        </div>
+    `;
+    
+    const contentDiv = messageElement.querySelector('.message-content');
+    if (contentDiv && !contentDiv.querySelector('.message-actions')) {
+        contentDiv.insertAdjacentHTML('beforebegin', actionsHTML);
+        
+        // Add event listeners
+        const editBtn = messageElement.querySelector('[data-action="edit"]');
+        const deleteBtn = messageElement.querySelector('[data-action="delete"]');
+        
+        editBtn.addEventListener('click', () => editMessage(messageId, message, roomId));
+        deleteBtn.addEventListener('click', () => deleteMessage(messageId, roomId));
+    }
+}
+
+async function editMessage(messageId, message, roomId) {
+    const newText = prompt('Edit your message:', message.text);
+    
+    if (newText && newText.trim() !== '') {
+        try {
+            await database.ref(`messages/${roomId}/${messageId}`).update({
+                text: newText.trim(),
+                edited: true,
+                editedAt: new Date().toISOString()
+            });
+        } catch (error) {
+            alert('Failed to edit message: ' + error.message);
+        }
+    }
+}
+
+async function deleteMessage(messageId, roomId) {
+    if (confirm('Are you sure you want to delete this message?')) {
+        try {
+            await database.ref(`messages/${roomId}/${messageId}`).remove();
+        } catch (error) {
+            alert('Failed to delete message: ' + error.message);
+        }
+    }
+}
+
+// ==================== TYPING INDICATORS ====================
+let typingTimeout = null;
+let isTyping = false;
+
+function initializeTypingIndicator(roomId) {
+    const messageInput = document.getElementById('messageInput');
+    const typingIndicator = document.getElementById('typingIndicator');
+    
+    if (!messageInput || !typingIndicator) return;
+    
+    messageInput.addEventListener('input', () => {
+        if (!isTyping && messageInput.value.trim() !== '') {
+            isTyping = true;
+            database.ref(`rooms/${roomId}/typing/${currentUser.uid}`).set({
+                name: currentUser.displayName,
+                timestamp: new Date().toISOString()
+            });
+        }
+        
+        clearTimeout(typingTimeout);
+        typingTimeout = setTimeout(() => {
+            isTyping = false;
+            database.ref(`rooms/${roomId}/typing/${currentUser.uid}`).remove();
+        }, 2000);
+    });
+    
+    // Listen for typing indicators from other users
+    database.ref(`rooms/${roomId}/typing`).on('value', (snapshot) => {
+        const typing = snapshot.val();
+        const typingUsers = [];
+        
+        if (typing) {
+            Object.keys(typing).forEach(uid => {
+                if (uid !== currentUser.uid) {
+                    typingUsers.push(typing[uid].name);
+                }
+            });
+        }
+        
+        if (typingUsers.length > 0) {
+            typingIndicator.querySelector('span').textContent = 
+                typingUsers.length === 1 
+                    ? typingUsers[0] 
+                    : `${typingUsers.length} people`;
+            typingIndicator.classList.remove('hidden');
+        } else {
+            typingIndicator.classList.add('hidden');
+        }
+    });
+}
+
+// ==================== FILE ATTACHMENTS ====================
+function initializeFileUpload() {
+    const fileUploadBtn = document.getElementById('fileUploadBtn');
+    const fileUpload = document.getElementById('chatFileUpload');
+    
+    if (!fileUploadBtn || !fileUpload) return;
+    
+    fileUploadBtn.addEventListener('click', () => {
+        fileUpload.click();
+    });
+    
+    fileUpload.addEventListener('change', async (e) => {
+        const file = e.target.files[0];
+        if (file) {
+            await uploadFile(file);
+            e.target.value = '';
+        }
+    });
+}
+
+async function uploadFile(file) {
+    if (file.size > 10 * 1024 * 1024) {
+        alert('File size must be less than 10MB');
+        return;
+    }
+    
+    try {
+        // For images, use Imgur
+        if (file.type.startsWith('image/')) {
+            const imageUrl = await uploadToImgur(file);
+            await sendFileMessage({
+                type: 'image',
+                url: imageUrl,
+                name: file.name,
+                size: file.size
+            });
+        } else {
+            // For other files, convert to base64 and store in Firebase
+            const base64 = await fileToBase64(file);
+            await sendFileMessage({
+                type: 'file',
+                data: base64,
+                name: file.name,
+                size: file.size,
+                mimeType: file.type
+            });
+        }
+    } catch (error) {
+        alert('Failed to upload file: ' + error.message);
+    }
+}
+
+async function sendFileMessage(fileData) {
+    const roomId = new URLSearchParams(window.location.search).get('id');
+    if (!roomId) return;
+    
+    try {
+        const messagesRef = database.ref(`messages/${roomId}`);
+        await messagesRef.push({
+            userId: currentUser.uid,
+            userName: currentUser.displayName,
+            userAvatar: currentUser.photoURL || 'https://via.placeholder.com/40',
+            file: fileData,
+            timestamp: new Date().toISOString()
+        });
+        
+        await sendNotificationToMembers(`shared a file: ${fileData.name}`);
+    } catch (error) {
+        throw error;
+    }
+}
+
+function displayFileMessage(message) {
+    const file = message.file;
+    
+    if (file.type === 'image') {
+        return `<img src="${file.url}" alt="${file.name}" class="message-image" onclick="window.open('${file.url}', '_blank')">`;
+    } else {
+        const sizeInKB = (file.size / 1024).toFixed(2);
+        return `
+            <div class="message-file" onclick="downloadFile('${file.data}', '${file.name}', '${file.mimeType}')">
+                <div class="file-icon">📄</div>
+                <div class="file-info">
+                    <div class="file-name">${file.name}</div>
+                    <div class="file-size">${sizeInKB} KB</div>
+                </div>
+                <svg width="20" height="20" fill="currentColor">
+                    <path d="M4 12v8h16v-8M12 2v14M5 9l7 7 7-7"/>
+                </svg>
+            </div>
+        `;
+    }
+}
+
+function downloadFile(base64Data, fileName, mimeType) {
+    const link = document.createElement('a');
+    link.href = base64Data;
+    link.download = fileName;
+    link.click();
+}
+
+function fileToBase64(file) {
+    return new Promise((resolve, reject) => {
+        const reader = new FileReader();
+        reader.onload = () => resolve(reader.result);
+        reader.onerror = error => reject(error);
+        reader.readAsDataURL(file);
+    });
+}
+
+// ==================== INITIALIZATION ====================
+if (typeof initializeRoomFeatures === 'undefined') {
+    window.initializeRoomFeatures = function(roomId) {
+        initializeEmojiPicker();
+        initializeTypingIndicator(roomId);
+        initializeFileUpload();
+    };
+}
