@@ -1,8 +1,9 @@
-// Imgur API Integration
-// You need to register your app at https://api.imgur.com/oauth2/addclient
-// and get a Client ID
+// Cloudinary Image Upload
+// Simple setup: Just sign up at cloudinary.com and get your cloud name
+// Enable "unsigned uploads" in Settings > Upload
 
-const IMGUR_CLIENT_ID = 'YOUR_IMGUR_CLIENT_ID'; // Replace with your Imgur Client ID
+const CLOUDINARY_CLOUD_NAME = 'dizrufnkw'; // Your Cloudinary cloud name
+const CLOUDINARY_UPLOAD_PRESET = 'unsigned_preset'; // Replace with your upload preset name
 
 async function uploadToImgur(file) {
     // Validate file
@@ -10,7 +11,7 @@ async function uploadToImgur(file) {
         throw new Error('No file provided');
     }
 
-    // Check file size (max 10MB for free Imgur)
+    // Check file size (max 10MB)
     if (file.size > 10 * 1024 * 1024) {
         throw new Error('File size must be less than 10MB');
     }
@@ -20,37 +21,29 @@ async function uploadToImgur(file) {
         throw new Error('File must be an image');
     }
 
-    // Convert to base64
-    const base64 = await fileToBase64(file);
-    const base64Data = base64.split(',')[1]; // Remove data:image/...;base64, prefix
-
     try {
-        const response = await fetch('https://api.imgur.com/3/image', {
+        const formData = new FormData();
+        formData.append('file', file);
+        formData.append('upload_preset', CLOUDINARY_UPLOAD_PRESET);
+
+        const response = await fetch(`https://api.cloudinary.com/v1_1/${CLOUDINARY_CLOUD_NAME}/image/upload`, {
             method: 'POST',
-            headers: {
-                'Authorization': `Client-ID ${IMGUR_CLIENT_ID}`,
-                'Content-Type': 'application/json'
-            },
-            body: JSON.stringify({
-                image: base64Data,
-                type: 'base64'
-            })
+            body: formData
         });
 
         if (!response.ok) {
-            const errorData = await response.json();
-            throw new Error(errorData.data?.error || 'Failed to upload to Imgur');
+            throw new Error('Failed to upload to Cloudinary');
         }
 
         const data = await response.json();
-        return data.data.link; // Returns the direct link to the image
+        return data.secure_url; // Returns the HTTPS URL of the uploaded image
     } catch (error) {
-        console.error('Imgur upload error:', error);
-        throw new Error('Failed to upload image to Imgur: ' + error.message);
+        console.error('Cloudinary upload error:', error);
+        throw new Error('Failed to upload image: ' + error.message);
     }
 }
 
-// Helper function to convert file to base64
+// Helper function to convert file to base64 (for other uses)
 function fileToBase64(file) {
     return new Promise((resolve, reject) => {
         const reader = new FileReader();
@@ -58,47 +51,4 @@ function fileToBase64(file) {
         reader.onerror = error => reject(error);
         reader.readAsDataURL(file);
     });
-}
-
-// Optional: Delete image from Imgur
-async function deleteFromImgur(deleteHash) {
-    try {
-        const response = await fetch(`https://api.imgur.com/3/image/${deleteHash}`, {
-            method: 'DELETE',
-            headers: {
-                'Authorization': `Client-ID ${IMGUR_CLIENT_ID}`
-            }
-        });
-
-        if (!response.ok) {
-            throw new Error('Failed to delete from Imgur');
-        }
-
-        return true;
-    } catch (error) {
-        console.error('Imgur delete error:', error);
-        throw error;
-    }
-}
-
-// Optional: Get image info
-async function getImgurImageInfo(imageId) {
-    try {
-        const response = await fetch(`https://api.imgur.com/3/image/${imageId}`, {
-            method: 'GET',
-            headers: {
-                'Authorization': `Client-ID ${IMGUR_CLIENT_ID}`
-            }
-        });
-
-        if (!response.ok) {
-            throw new Error('Failed to get image info from Imgur');
-        }
-
-        const data = await response.json();
-        return data.data;
-    } catch (error) {
-        console.error('Imgur get info error:', error);
-        throw error;
-    }
 }

@@ -34,6 +34,18 @@ auth.onAuthStateChanged(async (user) => {
     }
 });
 
+// Make sure profile and message features are initialized after page load
+document.addEventListener('DOMContentLoaded', () => {
+    // Ensure all modals can be closed with click outside
+    document.querySelectorAll('.modal').forEach(modal => {
+        modal.addEventListener('click', (e) => {
+            if (e.target === modal) {
+                modal.classList.add('hidden');
+            }
+        });
+    });
+});
+
 // Logout
 document.getElementById('logoutBtn').addEventListener('click', async () => {
     try {
@@ -231,30 +243,37 @@ const profileModal = document.getElementById('profileModal');
 const profileLink = document.getElementById('profileLink');
 const closeProfileModal = document.getElementById('closeProfileModal');
 
-profileLink.addEventListener('click', async (e) => {
-    e.preventDefault();
-    
-    // Load user profile
-    const userSnapshot = await database.ref('users/' + currentUser.uid).once('value');
-    const userData = userSnapshot.val();
-    
-    document.getElementById('profileName').value = userData.name || '';
-    document.getElementById('profileBio').value = userData.bio || '';
-    document.getElementById('profileInterests').value = userData.interests ? userData.interests.join(', ') : '';
-    document.getElementById('profileAvatar').src = userData.avatar || 'https://via.placeholder.com/120';
-    
-    profileModal.classList.remove('hidden');
-});
+if (profileLink && profileModal && closeProfileModal) {
+    profileLink.addEventListener('click', async (e) => {
+        e.preventDefault();
+        
+        if (!currentUser) {
+            alert('Please log in first');
+            return;
+        }
+        
+        // Load user profile
+        const userSnapshot = await database.ref('users/' + currentUser.uid).once('value');
+        const userData = userSnapshot.val();
+        
+        document.getElementById('profileName').value = userData.name || '';
+        document.getElementById('profileBio').value = userData.bio || '';
+        document.getElementById('profileInterests').value = userData.interests ? userData.interests.join(', ') : '';
+        document.getElementById('profileAvatar').src = userData.avatar || 'https://via.placeholder.com/120';
+        
+        profileModal.classList.remove('hidden');
+    });
 
-closeProfileModal.addEventListener('click', () => {
-    profileModal.classList.add('hidden');
-});
-
-window.addEventListener('click', (e) => {
-    if (e.target === profileModal) {
+    closeProfileModal.addEventListener('click', () => {
         profileModal.classList.add('hidden');
-    }
-});
+    });
+
+    window.addEventListener('click', (e) => {
+        if (e.target === profileModal) {
+            profileModal.classList.add('hidden');
+        }
+    });
+}
 
 // Upload Avatar
 document.getElementById('uploadAvatarBtn').addEventListener('click', () => {

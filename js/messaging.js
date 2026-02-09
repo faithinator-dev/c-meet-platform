@@ -117,10 +117,17 @@ function initializePrivateMessaging() {
     const sendPrivateMessageBtn = document.getElementById('sendPrivateMessageBtn');
     const privateMessageInput = document.getElementById('privateMessageInput');
     
-    if (!messagesLink) return;
+    if (!messagesLink || !privateMessageModal) {
+        console.log('Private messaging elements not found');
+        return;
+    }
     
     messagesLink.addEventListener('click', (e) => {
         e.preventDefault();
+        if (!currentUser) {
+            alert('Please log in first');
+            return;
+        }
         showConversationsList();
     });
     

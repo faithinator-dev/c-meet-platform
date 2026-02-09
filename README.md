@@ -20,19 +20,21 @@ A community-driven platform for connecting people worldwide through discussion r
 
 
 
-### 2. Imgur API Configuration
+### 2. Cloudinary Configuration (Image Uploads)
 
-1. Go to [Imgur API](https://api.imgur.com/oauth2/addclient)
-2. Register your application:
-   - Application name: C-meet
-   - Authorization type: Anonymous usage without user authorization
-   - Email: Your email
-   - Description: Image uploads for C-meet platform
-3. Copy your **Client ID**
-4. Update `js/imgur.js`:
+1. Go to [Cloudinary](https://cloudinary.com/users/register/free) and sign up (free)
+2. Go to **Settings** → **Upload**
+3. Scroll to **Upload presets**
+4. Click **Add upload preset**
+   - Signing Mode: **Unsigned**
+   - Upload preset name: `unsigned_preset` (or your choice)
+   - Save
+5. Go to **Dashboard** and copy your **Cloud name**
+6. Update `js/imgur.js`:
 
 ```javascript
-const IMGUR_CLIENT_ID = 'YOUR_IMGUR_CLIENT_ID';
+const CLOUDINARY_CLOUD_NAME = 'your_cloud_name';
+const CLOUDINARY_UPLOAD_PRESET = 'unsigned_preset';
 ```
 
 ### 3. Firebase Security Rules (Optional - Production)

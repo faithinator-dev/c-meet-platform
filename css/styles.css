@@ -726,10 +726,17 @@ body {
     cursor: pointer;
     font-size: 12px;
     transition: background-color 0.3s ease;
+    display: flex;
+    align-items: center;
+    gap: 4px;
 }
 
 .message-action-btn:hover {
     background-color: var(--background-color);
+}
+
+.message-action-btn svg {
+    flex-shrink: 0;
 }
 
 .message-avatar {
@@ -832,6 +839,9 @@ body {
     cursor: pointer;
     font-size: 14px;
     transition: all 0.3s ease;
+    display: flex;
+    align-items: center;
+    justify-content: center;
 }
 
 .add-reaction-btn:hover {
