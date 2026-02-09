@@ -37,9 +37,20 @@ const CLOUDINARY_CLOUD_NAME = 'your_cloud_name';
 const CLOUDINARY_UPLOAD_PRESET = 'unsigned_preset';
 ```
 
-### 3. Firebase Security Rules (Optional - Production)
+### 3. Firebase Security Rules (Important!)
 
-Update your Firebase Realtime Database rules for production:
+**For testing, use these permissive rules:**
+
+```json
+{
+  "rules": {
+    ".read": true,
+    ".write": "auth != null"
+  }
+}
+```
+
+**For production, use these secure rules:**
 
 ```json
 {
@@ -52,9 +63,7 @@ Update your Firebase Realtime Database rules for production:
     },
     "rooms": {
       ".read": true,
-      "$roomId": {
-        ".write": "auth != null"
-      }
+      ".write": "auth != null"
     },
     "messages": {
       "$roomId": {
@@ -67,10 +76,22 @@ Update your Firebase Realtime Database rules for production:
         ".read": "$uid === auth.uid",
         ".write": "auth != null"
       }
+    },
+    "conversations": {
+      "$uid": {
+        ".read": "$uid === auth.uid",
+        ".write": "auth != null"
+      }
+    },
+    "privateMessages": {
+      ".read": "auth != null",
+      ".write": "auth != null"
     }
   }
 }
 ```
+
+⚠️ **Important:** In Firebase Console → Realtime Database → Rules, paste the testing rules first to make sure everything works!
 
 ## File Structure
 
