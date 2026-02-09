@@ -1053,6 +1053,22 @@ body {
     display: flex;
     gap: 8px;
     justify-content: center;
+    flex-wrap: wrap;
+}
+
+.user-card-actions .btn {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    font-size: 13px;
+    padding: 8px 12px;
+}
+
+.friend-request-item {
+    display: flex;
+    align-items: flex-start;
+    padding: 12px !important;
+    border-left: 3px solid var(--primary-color);
 }
 
 .search-tabs {

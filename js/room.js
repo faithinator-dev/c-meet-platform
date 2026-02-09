@@ -36,6 +36,11 @@ auth.onAuthStateChanged(async (user) => {
         initializeRoomFeatures(roomId);
     }
     
+    // Initialize group message notifications
+    if (typeof listenForGroupMessages === 'function') {
+        listenForGroupMessages(roomId, user.uid);
+    }
+    
     // Add user to room if not already member
     await database.ref(`rooms/${roomId}/members/${user.uid}`).set({
         name: user.displayName,

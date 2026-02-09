@@ -19,6 +19,26 @@ auth.onAuthStateChanged(async (user) => {
     
     document.getElementById('userName').textContent = userData.name || user.displayName || 'User';
     
+    // Request notification permission
+    if (typeof requestNotificationPermission === 'function') {
+        requestNotificationPermission();
+    }
+    
+    // Initialize browser notifications
+    if (typeof initializeNotifications === 'function') {
+        initializeNotifications(user.uid);
+    }
+    
+    // Listen for private messages
+    if (typeof listenForPrivateMessages === 'function') {
+        listenForPrivateMessages(user.uid);
+    }
+    
+    // Display friend requests
+    if (typeof displayFriendRequests === 'function') {
+        displayFriendRequests();
+    }
+    
     // Load rooms
     loadRooms();
     
