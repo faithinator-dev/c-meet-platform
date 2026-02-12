@@ -924,6 +924,7 @@ async function loadPeopleYouMayKnow() {
         
         picks.forEach(userData => {
             const card = document.createElement("div");
+<<<<<<< HEAD
             card.className = "glass-panel p-4 rounded-xl border border-slate-700/50 flex flex-col items-center text-center hover:bg-slate-800/50 transition-colors relative group animate-fade-in-up cursor-pointer";
             
             // Make the whole card clickable to view profile
@@ -933,6 +934,9 @@ async function loadPeopleYouMayKnow() {
                     window.location.href = `profile.html?id=${userData.uid}`;
                 }
             });
+=======
+            card.className = "glass-panel p-4 rounded-xl border border-slate-700/50 flex flex-col items-center text-center hover:bg-slate-800/50 transition-colors relative group animate-fade-in-up";
+>>>>>>> bdc18b8c12fef0de66f2cd96eb3ca6d54327ade0
             
             // Default avatar if missing
             const avatarUrl = userData.avatar || "https://via.placeholder.com/150";
@@ -956,7 +960,11 @@ async function loadPeopleYouMayKnow() {
             // Add click listener for "Add Friend" button
             const btn = card.querySelector(".add-friend-btn");
             btn.addEventListener("click", (e) => {
+<<<<<<< HEAD
                 e.stopPropagation(); // Prevent card click
+=======
+                e.stopPropagation();
+>>>>>>> bdc18b8c12fef0de66f2cd96eb3ca6d54327ade0
                 // We assume sendFriendRequest function exists or we implement a simple version
                 if(typeof sendFriendRequest === "function") {
                     sendFriendRequest(userData.uid, btn);
@@ -990,6 +998,7 @@ async function loadPeopleYouMayKnow() {
     }
 }
 
+<<<<<<< HEAD
 // Setup mobile navigation
 function setupMobileNavigation() {
     const mobileFeedTab = document.getElementById('mobileFeedTab');
@@ -1059,3 +1068,5 @@ function updateMobileNavActive(activeId) {
     });
 }
 
+=======
+>>>>>>> bdc18b8c12fef0de66f2cd96eb3ca6d54327ade0
