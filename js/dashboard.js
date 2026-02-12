@@ -588,9 +588,10 @@ function setupCreateMenu() {
 // Global search functionality
 function setupGlobalSearch() {
     const globalSearch = document.getElementById('globalSearch');
+    const mobileSearch = document.getElementById('mobileSearch');
     const searchFilter = document.getElementById('searchFilter');
 
-    globalSearch?.addEventListener('input', async (e) => {
+    const handleSearch = async (e) => {
         const searchTerm = e.target.value.toLowerCase().trim();
         const filter = searchFilter.value;
 
@@ -603,7 +604,10 @@ function setupGlobalSearch() {
 
         // Perform search
         await performGlobalSearch(searchTerm, filter);
-    });
+    };
+
+    globalSearch?.addEventListener('input', handleSearch);
+    mobileSearch?.addEventListener('input', handleSearch);
 }
 
 // Perform global search
@@ -742,6 +746,9 @@ async function requestJoinRoom(roomId, isPrivate) {
 
 // Load friends list
 async function loadFriends() {
+    // Load recommendations
+    loadPeopleYouMayKnow();
+
     const user = auth.currentUser;
     if (!user) return;
 
@@ -824,3 +831,105 @@ function loadOnlineFriends() {
         }
     });
 }
+// Function to load recommendations (People You May Know)
+async function loadPeopleYouMayKnow() {
+    const user = auth.currentUser;
+    if (!user) return;
+
+    const grid = document.getElementById("peopleYouMayKnowGrid");
+    if (!grid) return;
+    
+    // Add loading state if empty
+    if(grid.children.length === 0) {
+        grid.innerHTML = `<div class="col-span-full text-center text-slate-500 py-4 animate-pulse">Finding people you may know...</div>`;
+    }
+
+    try {
+        // 1. Get current user"s friends
+        const friendsSnapshot = await database.ref(`friends/${user.uid}`).once("value");
+        const friendIds = new Set();
+        friendsSnapshot.forEach((child) => friendIds.add(child.key));
+        friendIds.add(user.uid); // Exclude self
+
+        // 2. Get all users (Limit to recent 50)
+        const usersSnapshot = await database.ref("users").limitToLast(50).once("value");
+        const suggestions = [];
+
+        usersSnapshot.forEach((child) => {
+            // Exclude already friends & self
+            if (!friendIds.has(child.key)) {
+                 suggestions.push({ uid: child.key, ...child.val() });
+            }
+        });
+
+        // 3. Randomize and pick top 6
+        // Simple shuffle
+        const picks = suggestions.sort(() => 0.5 - Math.random()).slice(0, 6);
+
+        if (picks.length === 0) {
+            grid.innerHTML = `<div class="text-slate-500 col-span-full text-center py-4 text-sm bg-slate-800/20 rounded-lg">No new recommendations right now.</div>`;
+            return;
+        }
+
+        grid.innerHTML = "";
+        
+        picks.forEach(userData => {
+            const card = document.createElement("div");
+            card.className = "glass-panel p-4 rounded-xl border border-slate-700/50 flex flex-col items-center text-center hover:bg-slate-800/50 transition-colors relative group animate-fade-in-up";
+            
+            // Default avatar if missing
+            const avatarUrl = userData.avatar || "https://via.placeholder.com/150";
+            const displayName = userData.displayName || userData.name || "User";
+            const email = userData.email || "";
+
+            card.innerHTML = `
+                <div class="relative mb-3">
+                    <img src="${avatarUrl}" class="w-16 h-16 rounded-full object-cover ring-2 ring-slate-700 group-hover:ring-brand-blue/50 transition-all">
+                    <div class="absolute bottom-0 right-0 w-3 h-3 bg-green-500 border-2 border-slate-900 rounded-full"></div>
+                </div>
+                <h3 class="font-bold text-white text-sm mb-0.5 truncate w-full px-2" title="${displayName}">${displayName}</h3>
+                <p class="text-xs text-slate-400 mb-3 truncate w-full px-2">${email}</p>
+                
+                <button class="add-friend-btn w-full py-2 rounded-lg bg-brand-blue/10 text-brand-blue hover:bg-brand-blue hover:text-white text-xs font-semibold transition-all flex items-center justify-center gap-1" data-uid="${userData.uid}">
+                    <svg class="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4"/></svg>
+                    Add Friend
+                </button>
+            `;
+            
+            // Add click listener for "Add Friend" button
+            const btn = card.querySelector(".add-friend-btn");
+            btn.addEventListener("click", (e) => {
+                e.stopPropagation();
+                // We assume sendFriendRequest function exists or we implement a simple version
+                if(typeof sendFriendRequest === "function") {
+                    sendFriendRequest(userData.uid, btn);
+                } else {
+                    // Fallback implementation
+                    btn.textContent = "Sent";
+                    btn.disabled = true;
+                    btn.classList.add("opacity-50", "cursor-not-allowed");
+                    // Real logic to send request in Firebase would go here
+                    database.ref(`friend_requests/${userData.uid}/${user.uid}`).set({
+                        from: user.uid,
+                        fromName: user.displayName || user.email,
+                        timestamp: firebase.database.ServerValue.TIMESTAMP
+                    });
+                }
+            });
+
+            // Add card click to view profile -> navigate to profile
+            card.addEventListener("click", (e) => {
+                 if(e.target !== btn && !btn.contains(e.target)) {
+                     window.location.href = `profile.html?id=${userData.uid}`;
+                 }
+            });
+
+            grid.appendChild(card);
+        });
+
+    } catch (error) {
+        console.error("Error loading recommendations:", error);
+        grid.innerHTML = `<div class="text-red-400 text-xs col-span-full text-center">Failed to load suggestions</div>`;
+    }
+}
+
