@@ -642,11 +642,30 @@ async function performGlobalSearch(searchTerm, filter) {
 
         if (users.length > 0) {
             usersGrid.classList.remove('hidden');
-            usersGrid.innerHTML = '<h3>People</h3>';
+            usersGrid.innerHTML = '<h3 class="text-white text-lg font-semibold mb-4">People</h3><div id="searchUsersGrid" class="grid grid-cols-1 gap-4"></div>';
+            const searchUsersContainer = document.getElementById('searchUsersGrid');
             users.forEach(user => {
-                if (typeof displayUserCard === 'function') {
-                    displayUserCard(user);
-                }
+                const userCard = document.createElement('div');
+                userCard.className = 'bg-slate-800/50 border border-slate-700 rounded-xl p-4 hover:border-brand-blue transition-all cursor-pointer';
+                userCard.onclick = () => {
+                    window.location.href = `profile.html?id=${user.uid}`;
+                };
+
+                userCard.innerHTML = `
+                    <div class="flex items-center gap-3">
+                        <img src="${user.avatar || 'https://via.placeholder.com/48'}" 
+                             alt="${user.displayName || user.name || 'User'}" 
+                             class="w-12 h-12 rounded-full object-cover border-2 border-slate-700">
+                        <div class="flex-1 min-w-0">
+                            <h4 class="text-white font-semibold truncate">${user.displayName || user.name || 'User'}</h4>
+                            <p class="text-slate-400 text-sm truncate">${user.bio || user.email || 'C-meet user'}</p>
+                        </div>
+                        <svg class="w-5 h-5 text-slate-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"/>
+                        </svg>
+                    </div>
+                `;
+                searchUsersContainer.appendChild(userCard);
             });
         }
     }
@@ -744,6 +763,35 @@ async function requestJoinRoom(roomId, isPrivate) {
     }
 }
 
+// Display user card (for friends list)
+function displayUserCard(userData) {
+    const friendsGrid = document.getElementById('friendsGrid');
+    if (!friendsGrid) return;
+
+    const userCard = document.createElement('div');
+    userCard.className = 'bg-slate-800/50 border border-slate-700 rounded-xl p-4 hover:border-brand-blue transition-all cursor-pointer';
+    userCard.onclick = () => {
+        window.location.href = `profile.html?id=${userData.uid}`;
+    };
+
+    userCard.innerHTML = `
+        <div class="flex items-center gap-3">
+            <img src="${userData.avatar || 'https://via.placeholder.com/48'}" 
+                 alt="${userData.displayName || userData.name || 'User'}" 
+                 class="w-12 h-12 rounded-full object-cover border-2 border-slate-700">
+            <div class="flex-1 min-w-0">
+                <h4 class="text-white font-semibold truncate">${userData.displayName || userData.name || 'User'}</h4>
+                <p class="text-slate-400 text-sm truncate">${userData.bio || 'C-meet user'}</p>
+            </div>
+            <svg class="w-5 h-5 text-slate-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"/>
+            </svg>
+        </div>
+    `;
+
+    friendsGrid.appendChild(userCard);
+}
+
 // Load friends list
 async function loadFriends() {
     // Load recommendations
@@ -774,9 +822,7 @@ async function loadFriends() {
             const friendData = userSnapshot.val();
             if (friendData) {
                 friendData.uid = friendId;
-                if (typeof displayUserCard === 'function') {
-                    displayUserCard(friendData);
-                }
+                displayUserCard(friendData);
             }
         }
     });
@@ -875,7 +921,15 @@ async function loadPeopleYouMayKnow() {
         
         picks.forEach(userData => {
             const card = document.createElement("div");
-            card.className = "glass-panel p-4 rounded-xl border border-slate-700/50 flex flex-col items-center text-center hover:bg-slate-800/50 transition-colors relative group animate-fade-in-up";
+            card.className = "glass-panel p-4 rounded-xl border border-slate-700/50 flex flex-col items-center text-center hover:bg-slate-800/50 transition-colors relative group animate-fade-in-up cursor-pointer";
+            
+            // Make the whole card clickable to view profile
+            card.addEventListener("click", (e) => {
+                // Don't navigate if clicking the Add Friend button
+                if (!e.target.closest('.add-friend-btn')) {
+                    window.location.href = `profile.html?id=${userData.uid}`;
+                }
+            });
             
             // Default avatar if missing
             const avatarUrl = userData.avatar || "https://via.placeholder.com/150";
@@ -899,7 +953,7 @@ async function loadPeopleYouMayKnow() {
             // Add click listener for "Add Friend" button
             const btn = card.querySelector(".add-friend-btn");
             btn.addEventListener("click", (e) => {
-                e.stopPropagation();
+                e.stopPropagation(); // Prevent card click
                 // We assume sendFriendRequest function exists or we implement a simple version
                 if(typeof sendFriendRequest === "function") {
                     sendFriendRequest(userData.uid, btn);
