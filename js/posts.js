@@ -265,42 +265,53 @@ async function addComment(postId, text) {
     const user = auth.currentUser;
     if (!user || !text.trim()) return;
 
-    // Get user info
-    const userRef = database.ref(`users/${user.uid}`);
-    const userSnapshot = await userRef.once('value');
-    const userData = userSnapshot.val();
+    try {
+        // Get user info
+        const userRef = database.ref(`users/${user.uid}`);
+        const userSnapshot = await userRef.once('value');
+        const userData = userSnapshot.val();
 
-    const commentData = {
-        text: text,
-        authorId: user.uid,
-        authorName: userData.displayName || 'Anonymous',
-        authorAvatar: userData.avatar || 'https://via.placeholder.com/32',
-        timestamp: Date.now()
-    };
+        const commentData = {
+            text: text.trim(),
+            authorId: user.uid,
+            authorName: userData.displayName || 'Anonymous',
+            authorAvatar: userData.avatar || 'https://via.placeholder.com/32',
+            timestamp: Date.now()
+        };
 
-    await database.ref(`posts/${postId}/comments`).push(commentData);
+        await database.ref(`posts/${postId}/comments`).push(commentData);
 
-    // Play message sound
-    if (typeof sounds !== 'undefined') sounds.message();
+        // Play message sound
+        if (typeof sounds !== 'undefined') sounds.message();
 
-    // Send notification to post author
-    const postRef = database.ref(`posts/${postId}`);
-    const postSnapshot = await postRef.once('value');
-    const post = postSnapshot.val();
-    
-    if (post.authorId !== user.uid) {
-        await database.ref(`notifications/${post.authorId}`).push({
-            type: 'comment',
-            from: user.uid,
-            fromName: userData.displayName || 'Someone',
-            postId: postId,
-            timestamp: Date.now(),
-            read: false
-        });
+        // Send notification to post author
+        const postRef = database.ref(`posts/${postId}`);
+        const postSnapshot = await postRef.once('value');
+        const post = postSnapshot.val();
+        
+        if (post && post.authorId !== user.uid) {
+            await database.ref(`notifications/${post.authorId}`).push({
+                type: 'comment',
+                from: user.uid,
+                fromName: userData.displayName || 'Someone',
+                postId: postId,
+                timestamp: Date.now(),
+                read: false
+            });
+        }
+
+        // Clear input
+        const commentInput = document.getElementById('commentInput');
+        if (commentInput) {
+            commentInput.value = '';
+        }
+        
+        // Show success feedback
+        showToast('💬 Comment posted!', 'success');
+    } catch (error) {
+        console.error('Error adding comment:', error);
+        showToast('❌ Failed to post comment. Please try again.', 'error');
     }
-
-    // Clear input
-    document.getElementById('commentInput').value = '';
 }
 
 // Delete comment
@@ -509,20 +520,40 @@ document.addEventListener('DOMContentLoaded', () => {
     }
 
     if (submitComment) {
-        submitComment.addEventListener('click', () => {
+        submitComment.addEventListener('click', async () => {
             const text = document.getElementById('commentInput').value.trim();
             if (text && currentPostId) {
-                addComment(currentPostId, text);
+                // Disable button during submission
+                submitComment.disabled = true;
+                submitComment.textContent = 'Posting...';
+                
+                await addComment(currentPostId, text);
+                
+                // Re-enable button
+                submitComment.disabled = false;
+                submitComment.textContent = 'Post';
             }
         });
     }
 
     // Enter key to submit comment
-    document.getElementById('commentInput')?.addEventListener('keypress', (e) => {
-        if (e.key === 'Enter') {
+    document.getElementById('commentInput')?.addEventListener('keypress', async (e) => {
+        if (e.key === 'Enter' && !e.shiftKey) {
+            e.preventDefault();
             const text = e.target.value.trim();
             if (text && currentPostId) {
-                addComment(currentPostId, text);
+                const submitBtn = document.getElementById('submitComment');
+                if (submitBtn) {
+                    submitBtn.disabled = true;
+                    submitBtn.textContent = 'Posting...';
+                }
+                
+                await addComment(currentPostId, text);
+                
+                if (submitBtn) {
+                    submitBtn.disabled = false;
+                    submitBtn.textContent = 'Post';
+                }
             }
         }
     });
