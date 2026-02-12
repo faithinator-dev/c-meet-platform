@@ -10,6 +10,9 @@ async function loadPostsFeed() {
     const postsFeed = document.getElementById('postsFeed');
     postsFeed.innerHTML = '<div class="loading">Loading posts...</div>';
 
+    // Create default posts if none exist (first time setup)
+    await createDefaultPostsIfNeeded();
+
     // Get user's friends list
     const friendsRef = database.ref(`friends/${user.uid}`);
     const friendsSnapshot = await friendsRef.once('value');
@@ -316,11 +319,28 @@ async function deleteComment(postId, commentId) {
 }
 
 // Share post (copy link)
-function sharePost(postId) {
+async function sharePost(postId) {
     const link = `${window.location.origin}/dashboard.html?post=${postId}`;
-    navigator.clipboard.writeText(link).then(() => {
-        showNotification('Link copied to clipboard!');
-    });
+    
+    try {
+        await navigator.clipboard.writeText(link);
+        showToast('🔗 Link copied to clipboard! Share it anywhere.');
+    } catch (err) {
+        // Fallback for older browsers
+        const textArea = document.createElement('textarea');
+        textArea.value = link;
+        textArea.style.position = 'fixed';
+        textArea.style.opacity = '0';
+        document.body.appendChild(textArea);
+        textArea.select();
+        try {
+            document.execCommand('copy');
+            showToast('🔗 Link copied! Share it anywhere.');
+        } catch (err2) {
+            showToast('❌ Failed to copy link', 'error');
+        }
+        document.body.removeChild(textArea);
+    }
 }
 
 // Format timestamp
@@ -349,14 +369,42 @@ function escapeHtml(text) {
 
 // Show notification
 function showNotification(message) {
-    // Create notification element
-    const notification = document.createElement('div');
-    notification.className = 'toast-notification';
-    notification.textContent = message;
-    document.body.appendChild(notification);
+    showToast(message);
+}
 
+// Enhanced toast notification system
+function showToast(message, type = 'success') {
+    // Remove any existing toasts
+    const existingToasts = document.querySelectorAll('.toast-notification');
+    existingToasts.forEach(t => t.remove());
+
+    // Create notification element
+    const toast = document.createElement('div');
+    toast.className = `toast-notification ${type}`;
+    toast.style.cssText = `
+        position: fixed;
+        bottom: 2rem;
+        right: 2rem;
+        background: ${type === 'error' ? '#ef4444' : '#3B82F6'};
+        color: white;
+        padding: 1rem 1.5rem;
+        border-radius: 0.75rem;
+        box-shadow: 0 10px 25px rgba(0,0,0,0.3);
+        font-size: 0.875rem;
+        font-weight: 500;
+        z-index: 9999;
+        opacity: 0;
+        transform: translateY(1rem);
+        transition: all 0.3s ease;
+        max-width: 400px;
+    `;
+    toast.textContent = message;
+    document.body.appendChild(toast);
+
+    // Animate in
     setTimeout(() => {
-        notification.classList.add('show');
+        toast.style.opacity = '1';
+        toast.style.transform = 'translateY(0)';
     }, 100);
 
     setTimeout(() => {
@@ -486,3 +534,60 @@ function resetPostForm() {
     document.getElementById('postImagePreview').classList.add('hidden');
     document.getElementById('postImageInput').value = '';
 }
+
+
+// Create default welcome posts if database is empty
+async function createDefaultPostsIfNeeded() {
+    try {
+        const postsSnapshot = await database.ref("posts").limitToFirst(1).once("value");
+        
+        // If posts already exist, skip
+        if (postsSnapshot.exists()) return;
+
+        const user = auth.currentUser;
+        if (!user) return;
+
+        const userSnapshot = await database.ref(`users/${user.uid}`).once("value");
+        const userData = userSnapshot.val();
+
+        const defaultPosts = [
+            {
+                content: "Welcome to C-meet! \ud83c\udf89\n\nThis is a modern social platform where you can connect with people, share ideas, join discussion rooms, and build meaningful connections.\n\nFeel free to like, comment, and share posts with your network!",
+                privacy: "public",
+                authorId: user.uid,
+                authorName: userData?.displayName || "C-meet Team",
+                authorAvatar: userData?.avatar || "https://via.placeholder.com/150",
+                timestamp: Date.now() - 7200000, // 2 hours ago
+                imageUrl: null
+            },
+            {
+                content: "\ud83d\ude80 Getting Started Tips:\n\n1. Complete your profile with a photo\n2. Search for people you may know\n3. Join interesting discussion rooms\n4. Create your first post and share your thoughts\n5. Connect with friends and start chatting!\n\nWhat will you share today?",
+                privacy: "public",
+                authorId: user.uid,
+                authorName: userData?.displayName || "C-meet Guide",
+                authorAvatar: userData?.avatar || "https://via.placeholder.com/150",
+                timestamp: Date.now() - 3600000, // 1 hour ago
+                imageUrl: null
+            },
+            {
+                content: "\ud83d\udcac Did you know?\n\nYou can share any post by clicking the Share button! The link is automatically copied to your clipboard, so you can paste it anywhere - in messages, emails, or other social platforms.\n\nTry it out! Click the share button below. \ud83d\udc47",
+                privacy: "public",
+                authorId: user.uid,
+                authorName: userData?.displayName || "Community Tips",
+                authorAvatar: userData?.avatar || "https://via.placeholder.com/150",
+                timestamp: Date.now() - 1800000, // 30 minutes ago
+                imageUrl: null
+            }
+        ];
+
+        // Add default posts to Firebase
+        for (const post of defaultPosts) {
+            await database.ref("posts").push(post);
+        }
+
+        console.log("Default posts created successfully");
+    } catch (error) {
+        console.error("Error creating default posts:", error);
+    }
+}
+

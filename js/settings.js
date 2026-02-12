@@ -29,6 +29,7 @@ async function loadUserSettings() {
             document.getElementById('settingsPhone').value = userData.phone || '';
             document.getElementById('settingsBirthday').value = userData.birthday || '';
             document.getElementById('settingsGender').value = userData.gender || '';
+            document.getElementById('settingsFavoriteQuote').value = userData.favoriteQuote || '';
             
             // Privacy settings
             document.getElementById('profileVisibility').value = userData.profileVisibility || 'public';
@@ -68,6 +69,7 @@ async function saveUserSettings() {
             phone: document.getElementById('settingsPhone').value.trim(),
             birthday: document.getElementById('settingsBirthday').value,
             gender: document.getElementById('settingsGender').value,
+            favoriteQuote: document.getElementById('settingsFavoriteQuote').value.trim(),
             profileVisibility: document.getElementById('profileVisibility').value,
             showEmail: document.getElementById('showEmail').checked,
             showPhone: document.getElementById('showPhone').checked,
@@ -85,9 +87,13 @@ async function saveUserSettings() {
         }
 
         if (typeof sounds !== 'undefined') sounds.success();
-        showNotification('Settings saved successfully!');
+        showNotification('✅ Settings saved successfully!');
         
-        document.getElementById('settingsModal').classList.add('hidden');
+        // Refresh the page to show updated info
+        setTimeout(() => {
+            document.getElementById('settingsModal').classList.add('hidden');
+            window.location.reload();
+        }, 1000);
     } catch (error) {
         console.error('Failed to save settings:', error);
         if (typeof sounds !== 'undefined') sounds.error();
@@ -317,9 +323,14 @@ document.addEventListener('DOMContentLoaded', () => {
         saveUserSettings();
     });
 
-    // Upload avatar button
+    // Upload avatar button - trigger file input
     document.getElementById('uploadSettingsAvatarBtn')?.addEventListener('click', () => {
         document.getElementById('settingsAvatarInput').click();
+    });
+    
+    // Prevent default form submission when clicking upload button inside form
+    document.getElementById('uploadSettingsAvatarBtn')?.addEventListener('click', (e) => {
+        e.preventDefault();
     });
 
     // Avatar file input
