@@ -78,6 +78,12 @@ document.addEventListener('DOMContentLoaded', () => {
     // Search functionality
     setupGlobalSearch();
     
+    // Check for hash parameters (e.g., #settings, #messages)
+    const hash = window.location.hash.substring(1);
+    if (hash === 'settings' && typeof openSettings === 'function') {
+        openSettings();
+    }
+    
     // Ensure all modals can be closed with click outside
     document.querySelectorAll('.modal').forEach(modal => {
         modal.addEventListener('click', (e) => {

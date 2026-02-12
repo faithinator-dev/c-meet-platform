@@ -367,6 +367,9 @@ async function sendMessage() {
             timestamp: new Date().toISOString()
         });
         
+        // Play message sound
+        if (typeof sounds !== 'undefined') sounds.message();
+        
         // Send notifications to other members
         await sendNotificationToMembers(text);
         

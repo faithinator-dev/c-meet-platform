@@ -65,9 +65,9 @@ function displayPost(post) {
 
     postCard.innerHTML = `
         <div class="post-header">
-            <img src="${post.authorAvatar || 'https://via.placeholder.com/40'}" alt="${post.authorName}" class="post-avatar">
+            <img src="${post.authorAvatar || 'https://via.placeholder.com/40'}" alt="${post.authorName}" class="post-avatar" style="cursor: pointer;" onclick="viewUserProfile('${post.authorId}')">
             <div class="post-info">
-                <div class="post-author">${post.authorName}</div>
+                <div class="post-author" style="cursor: pointer;" onclick="viewUserProfile('${post.authorId}')">${post.authorName}</div>
                 <div class="post-time">${privacyIcon} ${formatTimestamp(post.timestamp)}</div>
             </div>
             ${post.authorId === user.uid ? `
@@ -149,6 +149,9 @@ async function toggleLike(postId) {
     } else {
         // Like
         await likeRef.set(true);
+        
+        // Play like sound
+        if (typeof sounds !== 'undefined') sounds.like();
         
         // Send notification to post author
         const postRef = database.ref(`posts/${postId}`);
@@ -273,6 +276,9 @@ async function addComment(postId, text) {
     };
 
     await database.ref(`posts/${postId}/comments`).push(commentData);
+
+    // Play message sound
+    if (typeof sounds !== 'undefined') sounds.message();
 
     // Send notification to post author
     const postRef = database.ref(`posts/${postId}`);
@@ -439,6 +445,7 @@ document.addEventListener('DOMContentLoaded', () => {
             
             document.getElementById('createPostModal').classList.add('hidden');
             resetPostForm();
+            if (typeof sounds !== 'undefined') sounds.success();
             showNotification('Post created successfully!');
             
             submitPost.disabled = false;

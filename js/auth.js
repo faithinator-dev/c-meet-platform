@@ -75,12 +75,26 @@ document.getElementById('signupForm').addEventListener('submit', async (e) => {
         // Create user profile in database
         await database.ref('users/' + user.uid).set({
             name: name,
+            displayName: name,
             email: email,
             avatar: 'https://via.placeholder.com/120',
             bio: '',
-            interests: [],
+            interests: '',
+            location: '',
+            website: '',
+            phone: '',
+            birthday: '',
+            gender: '',
+            profileVisibility: 'public',
+            showEmail: true,
+            showPhone: false,
+            showBirthday: false,
             createdAt: new Date().toISOString()
         });
+
+        // Ensure default general room exists and join user
+        await ensureGeneralRoomExists();
+        await joinGeneralRoom(user.uid, name);
 
         window.location.href = 'dashboard.html';
     } catch (error) {
@@ -102,12 +116,26 @@ document.getElementById('googleLogin').addEventListener('click', async () => {
             // Create new user profile
             await userRef.set({
                 name: user.displayName,
+                displayName: user.displayName,
                 email: user.email,
                 avatar: user.photoURL || 'https://via.placeholder.com/120',
                 bio: '',
-                interests: [],
+                interests: '',
+                location: '',
+                website: '',
+                phone: '',
+                birthday: '',
+                gender: '',
+                profileVisibility: 'public',
+                showEmail: true,
+                showPhone: false,
+                showBirthday: false,
                 createdAt: new Date().toISOString()
             });
+
+            // Ensure default general room exists and join user
+            await ensureGeneralRoomExists();
+            await joinGeneralRoom(user.uid, user.displayName);
         }
 
         window.location.href = 'dashboard.html';
@@ -116,4 +144,49 @@ document.getElementById('googleLogin').addEventListener('click', async () => {
     }
 });
 
+// Ensure the General Room exists
+async function ensureGeneralRoomExists() {
+    const generalRoomRef = database.ref('rooms').orderByChild('isGeneral').equalTo(true);
+    const snapshot = await generalRoomRef.once('value');
+    
+    if (!snapshot.exists()) {
+        // Create the general room
+        const newRoomRef = database.ref('rooms').push();
+        await newRoomRef.set({
+            name: '🌍 General Chat',
+            description: 'Welcome to the general chat room! This is a place for everyone to meet and chat.',
+            category: 'other',
+            image: 'https://via.placeholder.com/400x200?text=General+Chat',
+            createdBy: 'system',
+            createdAt: new Date().toISOString(),
+            isGeneral: true,
+            isPrivate: false,
+            members: {}
+        });
+        
+        return newRoomRef.key;
+    } else {
+        // Return existing general room ID
+        let roomId = null;
+        snapshot.forEach((childSnapshot) => {
+            roomId = childSnapshot.key;
+        });
+        return roomId;
+    }
+}
 
+// Join user to general room
+async function joinGeneralRoom(userId, userName) {
+    const generalRoomRef = database.ref('rooms').orderByChild('isGeneral').equalTo(true);
+    const snapshot = await generalRoomRef.once('value');
+    
+    if (snapshot.exists()) {
+        snapshot.forEach(async (childSnapshot) => {
+            const roomId = childSnapshot.key;
+            await database.ref(`rooms/${roomId}/members/${userId}`).set({
+                name: userName,
+                joinedAt: new Date().toISOString()
+            });
+        });
+    }
+}

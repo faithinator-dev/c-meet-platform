@@ -1,0 +1,522 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Profile - C-meet</title>
+    <link rel="stylesheet" href="css/styles.css">
+    <link href="https://fonts.googleapis.com/css2?family=Open+Sans:wght@300;400;600;700&display=swap" rel="stylesheet">
+    <style>
+        .profile-page {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 80px 24px 24px;
+        }
+
+        .profile-cover {
+            height: 300px;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            border-radius: 12px 12px 0 0;
+            position: relative;
+            cursor: pointer;
+        }
+
+        .profile-cover-edit-btn {
+            position: absolute;
+            bottom: 16px;
+            right: 16px;
+            padding: 8px 16px;
+            background: rgba(255, 255, 255, 0.9);
+            border: none;
+            border-radius: 8px;
+            cursor: pointer;
+            font-weight: 600;
+            display: none;
+            align-items: center;
+            gap: 6px;
+            box-shadow: var(--shadow);
+        }
+
+        .profile-cover-edit-btn:hover {
+            background: white;
+        }
+
+        .profile-main {
+            background: var(--white);
+            border-radius: 12px;
+            box-shadow: var(--shadow);
+            margin-bottom: 24px;
+        }
+
+        .profile-header-section {
+            position: relative;
+            padding: 0 32px 24px;
+            border-bottom: 1px solid var(--border-color);
+        }
+
+        .profile-avatar-container {
+            position: relative;
+            margin-top: -60px;
+            margin-bottom: 16px;
+        }
+
+        .profile-avatar-main {
+            width: 160px;
+            height: 160px;
+            border-radius: 50%;
+            border: 5px solid var(--white);
+            object-fit: cover;
+            box-shadow: var(--shadow);
+        }
+
+        .profile-edit-btn {
+            position: absolute;
+            bottom: 8px;
+            right: 8px;
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            background: var(--primary-color);
+            border: 3px solid var(--white);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            box-shadow: var(--shadow);
+        }
+
+        .profile-info-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: start;
+        }
+
+        .profile-name-section h1 {
+            font-size: 32px;
+            margin-bottom: 8px;
+        }
+
+        .profile-username {
+            font-size: 16px;
+            color: var(--text-light);
+            margin-bottom: 16px;
+        }
+
+        .profile-bio {
+            font-size: 15px;
+            line-height: 1.6;
+            color: var(--text-dark);
+            margin-bottom: 16px;
+        }
+
+        .profile-meta {
+            display: flex;
+            gap: 24px;
+            flex-wrap: wrap;
+            font-size: 14px;
+            color: var(--text-light);
+        }
+
+        .profile-meta-item {
+            display: flex;
+            align-items: center;
+            gap: 6px;
+        }
+
+        .profile-stats-bar {
+            display: flex;
+            padding: 24px 32px;
+            border-bottom: 1px solid var(--border-color);
+        }
+
+        .profile-stat-item {
+            flex: 1;
+            text-align: center;
+            cursor: pointer;
+            padding: 8px;
+            border-radius: 8px;
+            transition: background 0.2s ease;
+        }
+
+        .profile-stat-item:hover {
+            background: #f9f9f9;
+        }
+
+        .profile-stat-value {
+            font-size: 24px;
+            font-weight: 700;
+            color: var(--text-dark);
+            margin-bottom: 4px;
+        }
+
+        .profile-stat-label {
+            font-size: 13px;
+            color: var(--text-light);
+        }
+
+        .profile-content-section {
+            display: grid;
+            grid-template-columns: 1fr 350px;
+            gap: 24px;
+        }
+
+        .profile-posts {
+            min-height: 400px;
+        }
+
+        .profile-sidebar {
+            background: var(--white);
+            border-radius: 12px;
+            padding: 24px;
+            box-shadow: var(--shadow);
+            height: fit-content;
+            position: sticky;
+            top: 80px;
+        }
+
+        .profile-sidebar h3 {
+            font-size: 18px;
+            margin-bottom: 16px;
+            color: var(--text-dark);
+        }
+
+        .profile-info-item {
+            margin-bottom: 16px;
+            padding-bottom: 16px;
+            border-bottom: 1px solid var(--border-color);
+        }
+
+        .profile-info-item:last-child {
+            border-bottom: none;
+        }
+
+        .profile-info-label {
+            font-size: 13px;
+            color: var(--text-light);
+            margin-bottom: 4px;
+        }
+
+        .profile-info-value {
+            font-size: 15px;
+            color: var(--text-dark);
+            font-weight: 500;
+        }
+
+        .profile-info-value a {
+            color: var(--primary-color);
+            text-decoration: none;
+        }
+
+        .profile-info-value a:hover {
+            text-decoration: underline;
+        }
+
+        .profile-action-buttons {
+            display: flex;
+            gap: 12px;
+        }
+
+        .profile-tabs {
+            display: flex;
+            gap: 8px;
+            padding: 0 32px;
+            border-bottom: 2px solid var(--border-color);
+        }
+
+        .profile-tab {
+            padding: 16px 24px;
+            background: none;
+            border: none;
+            border-bottom: 3px solid transparent;
+            cursor: pointer;
+            font-size: 15px;
+            font-weight: 600;
+            color: var(--text-light);
+            transition: all 0.2s ease;
+            margin-bottom: -2px;
+        }
+
+        .profile-tab:hover {
+            color: var(--text-dark);
+        }
+
+        .profile-tab.active {
+            color: var(--primary-color);
+            border-bottom-color: var(--primary-color);
+        }
+
+        .profile-tab-content {
+            padding: 24px 32px;
+        }
+
+        .profile-tab-panel {
+            display: none;
+        }
+
+        .profile-tab-panel.active {
+            display: block;
+        }
+
+        .friends-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(150px, 1fr));
+            gap: 16px;
+            margin-top: 16px;
+        }
+
+        .friend-card {
+            background: var(--white);
+            border: 1px solid var(--border-color);
+            border-radius: 12px;
+            padding: 16px;
+            text-align: center;
+            cursor: pointer;
+            transition: all 0.2s ease;
+        }
+
+        .friend-card:hover {
+            transform: translateY(-2px);
+            box-shadow: var(--shadow);
+        }
+
+        .friend-card img {
+            width: 80px;
+            height: 80px;
+            border-radius: 50%;
+            object-fit: cover;
+            margin-bottom: 12px;
+        }
+
+        .friend-card-name {
+            font-size: 14px;
+            font-weight: 600;
+            color: var(--text-dark);
+        }
+
+        @media (max-width: 992px) {
+            .profile-content-section {
+                grid-template-columns: 1fr;
+            }
+
+            .profile-sidebar {
+                position: static;
+            }
+        }
+
+        @media (max-width: 768px) {
+            .profile-cover {
+                height: 200px;
+            }
+
+            .profile-avatar-main {
+                width: 120px;
+                height: 120px;
+            }
+
+            .profile-name-section h1 {
+                font-size: 24px;
+            }
+
+            .profile-stats-bar {
+                padding: 16px;
+            }
+
+            .profile-tabs {
+                overflow-x: auto;
+            }
+
+            .profile-tab {
+                white-space: nowrap;
+            }
+        }
+    </style>
+</head>
+<body>
+    <!-- Navigation Bar -->
+    <nav class="navbar">
+        <div class="nav-container">
+            <div class="nav-brand">
+                <h2>C-meet</h2>
+            </div>
+            <div class="nav-menu">
+                <a href="dashboard.html" class="nav-link">Dashboard</a>
+                <a href="#" class="nav-link" id="messagesLink">Messages</a>
+                <a href="profile.html" class="nav-link active">Profile</a>
+                <a href="#" class="nav-link" id="settingsBtn">
+                    <svg width="20" height="20" fill="currentColor" viewBox="0 0 24 24">
+                        <path d="M19.14,12.94c0.04-0.3,0.06-0.61,0.06-0.94c0-0.32-0.02-0.64-0.07-0.94l2.03-1.58c0.18-0.14,0.23-0.41,0.12-0.61 l-1.92-3.32c-0.12-0.22-0.37-0.29-0.59-0.22l-2.39,0.96c-0.5-0.38-1.03-0.7-1.62-0.94L14.4,2.81c-0.04-0.24-0.24-0.41-0.48-0.41 h-3.84c-0.24,0-0.43,0.17-0.47,0.41L9.25,5.35C8.66,5.59,8.12,5.92,7.63,6.29L5.24,5.33c-0.22-0.08-0.47,0-0.59,0.22L2.74,8.87 C2.62,9.08,2.66,9.34,2.86,9.48l2.03,1.58C4.84,11.36,4.8,11.69,4.8,12s0.02,0.64,0.07,0.94l-2.03,1.58 c-0.18,0.14-0.23,0.41-0.12,0.61l1.92,3.32c0.12,0.22,0.37,0.29,0.59,0.22l2.39-0.96c0.5,0.38,1.03,0.7,1.62,0.94l0.36,2.54 c0.05,0.24,0.24,0.41,0.48,0.41h3.84c0.24,0,0.44-0.17,0.47-0.41l0.36-2.54c0.59-0.24,1.13-0.56,1.62-0.94l2.39,0.96 c0.22,0.08,0.47,0,0.59-0.22l1.92-3.32c0.12-0.22,0.07-0.47-0.12-0.61L19.14,12.94z M12,15.6c-1.98,0-3.6-1.62-3.6-3.6 s1.62-3.6,3.6-3.6s3.6,1.62,3.6,3.6S13.98,15.6,12,15.6z"/>
+                    </svg>
+                </a>
+                <div class="notification-icon" id="notificationBell">
+                    <svg width="24" height="24" fill="none" stroke="currentColor" stroke-width="2">
+                        <path d="M18 8A6 6 0 0 0 6 8c0 7-3 9-3 9h18s-3-2-3-9"/>
+                        <path d="M13.73 21a2 2 0 0 1-3.46 0"/>
+                    </svg>
+                    <span class="notification-badge hidden" id="notificationCount">0</span>
+                </div>
+                <button class="btn btn-logout" id="logoutBtn">Logout</button>
+            </div>
+        </div>
+    </nav>
+
+    <!-- Notification Dropdown -->
+    <div class="notification-dropdown hidden" id="notificationDropdown">
+        <h3>Notifications</h3>
+        <div id="notificationList">
+            <p class="no-notifications">No new notifications</p>
+        </div>
+    </div>
+
+    <!-- Profile Page Content -->
+    <div class="profile-page">
+        <div class="profile-main">
+            <!-- Cover Photo -->
+            <div class="profile-cover" id="profileCover">
+                <button class="profile-cover-edit-btn" id="editCoverBtn" style="display: none;">
+                    <svg width="16" height="16" fill="currentColor" viewBox="0 0 24 24">
+                        <path d="M21 19V5c0-1.1-.9-2-2-2H5c-1.1 0-2 .9-2 2v14c0 1.1.9 2 2 2h14c1.1 0 2-.9 2-2zM8.5 13.5l2.5 3.01L14.5 12l4.5 6H5l3.5-4.5z"/>
+                    </svg>
+                    Change Cover
+                </button>
+                <input type="file" id="coverPhotoInput" accept="image/*" style="display: none;">
+            </div>
+
+            <!-- Profile Header -->
+            <div class="profile-header-section">
+                <div class="profile-avatar-container">
+                    <img src="https://via.placeholder.com/160" alt="Profile" id="profileAvatarMain" class="profile-avatar-main">
+                    <div class="profile-edit-btn" id="editAvatarBtn" style="display: none;">
+                        <svg width="20" height="20" fill="white" viewBox="0 0 24 24">
+                            <path d="M3 17.25V21h3.75L17.81 9.94l-3.75-3.75L3 17.25zM20.71 7.04c.39-.39.39-1.02 0-1.41l-2.34-2.34c-.39-.39-1.02-.39-1.41 0l-1.83 1.83 3.75 3.75 1.83-1.83z"/>
+                        </svg>
+                    </div>
+                </div>
+
+                <div class="profile-info-header">
+                    <div class="profile-name-section">
+                        <h1 id="profileDisplayName">Loading...</h1>
+                        <div class="profile-username" id="profileEmail"></div>
+                        <p class="profile-bio" id="profileBioText"></p>
+                        <div class="profile-meta">
+                            <div class="profile-meta-item" id="profileLocationMeta">
+                                <svg width="16" height="16" fill="currentColor" viewBox="0 0 24 24">
+                                    <path d="M12 2C8.13 2 5 5.13 5 9c0 5.25 7 13 7 13s7-7.75 7-13c0-3.87-3.13-7-7-7zm0 9.5c-1.38 0-2.5-1.12-2.5-2.5s1.12-2.5 2.5-2.5 2.5 1.12 2.5 2.5-1.12 2.5-2.5 2.5z"/>
+                                </svg>
+                                <span id="profileLocation"></span>
+                            </div>
+                            <div class="profile-meta-item" id="profileJoinedMeta">
+                                <svg width="16" height="16" fill="currentColor" viewBox="0 0 24 24">
+                                    <path d="M19 3h-1V1h-2v2H8V1H6v2H5c-1.11 0-1.99.9-1.99 2L3 19c0 1.1.89 2 2 2h14c1.1 0 2-.9 2-2V5c0-1.1-.9-2-2-2zm0 16H5V8h14v11zM7 10h5v5H7z"/>
+                                </svg>
+                                <span id="profileJoined"></span>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="profile-action-buttons" id="profileActions">
+                        <!-- Buttons will be added dynamically -->
+                    </div>
+                </div>
+            </div>
+
+            <!-- Stats Bar -->
+            <div class="profile-stats-bar">
+                <div class="profile-stat-item" onclick="switchTab('posts')">
+                    <div class="profile-stat-value" id="postsCount">0</div>
+                    <div class="profile-stat-label">Posts</div>
+                </div>
+                <div class="profile-stat-item" onclick="switchTab('friends')">
+                    <div class="profile-stat-value" id="friendsCount">0</div>
+                    <div class="profile-stat-label">Friends</div>
+                </div>
+                <div class="profile-stat-item">
+                    <div class="profile-stat-value" id="pagesCount">0</div>
+                    <div class="profile-stat-label">Pages</div>
+                </div>
+            </div>
+
+            <!-- Tabs -->
+            <div class="profile-tabs">
+                <button class="profile-tab active" data-tab="posts" onclick="switchTab('posts')">Posts</button>
+                <button class="profile-tab" data-tab="about" onclick="switchTab('about')">About</button>
+                <button class="profile-tab" data-tab="friends" onclick="switchTab('friends')">Friends</button>
+                <button class="profile-tab" data-tab="photos" onclick="switchTab('photos')">Photos</button>
+            </div>
+
+            <!-- Tab Content -->
+            <div class="profile-tab-content">
+                <!-- Posts Tab -->
+                <div class="profile-tab-panel active" id="postsTab">
+                    <div id="userPostsFeed">
+                        <div class="loading">Loading posts...</div>
+                    </div>
+                </div>
+
+                <!-- About Tab -->
+                <div class="profile-tab-panel" id="aboutTab">
+                    <div class="profile-sidebar" style="max-width: 600px; margin: 0;">
+                        <h3>About</h3>
+                        <div id="aboutContent">
+                            <!-- Will be populated dynamically -->
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Friends Tab -->
+                <div class="profile-tab-panel" id="friendsTab">
+                    <h3>Friends</h3>
+                    <div class="friends-grid" id="friendsGrid">
+                        <div class="loading">Loading friends...</div>
+                    </div>
+                </div>
+
+                <!-- Photos Tab -->
+                <div class="profile-tab-panel" id="photosTab">
+                    <h3>Photos</h3>
+                    <div class="friends-grid" id="photosGrid">
+                        <div class="loading">Loading photos...</div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Private Message Modal -->
+    <div class="modal hidden" id="privateMessageModal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h2>Send Message</h2>
+                <button class="close-modal" id="closePrivateMessageModal">&times;</button>
+            </div>
+            <div class="modal-body">
+                <div class="private-message-container">
+                    <div id="conversationMessages" class="conversation-messages">
+                        <!-- Messages will be loaded here -->
+                    </div>
+                    <div class="private-message-input-container">
+                        <input type="text" id="privateMessageInput" class="input-field" placeholder="Type a message...">
+                        <button class="btn btn-primary" id="sendPrivateMessageBtn">
+                            <svg width="20" height="20" fill="currentColor" viewBox="0 0 24 24">
+                                <path d="M2.01 21L23 12 2.01 3 2 10l15 2-15 2z"/>
+                            </svg>
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Firebase SDKs -->
+    <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-app-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-auth-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-database-compat.js"></script>
+    
+    <script src="js/config.js"></script>
+    <script src="js/sounds.js"></script>
+    <script src="js/notifications.js"></script>
+    <script src="js/imgur.js"></script>
+    <script src="js/settings.js"></script>
+    <script src="js/profile-page.js"></script>
+    <script src="js/messaging.js"></script>
+</body>
+</html>

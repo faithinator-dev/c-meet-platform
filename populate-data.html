@@ -1,0 +1,212 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Populate Fake Data - C-meet</title>
+    <link rel="stylesheet" href="css/styles.css">
+    <style>
+        body {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            min-height: 100vh;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            padding: 20px;
+        }
+
+        .populate-container {
+            background: white;
+            border-radius: 16px;
+            padding: 40px;
+            max-width: 600px;
+            box-shadow: 0 20px 60px rgba(0,0,0,0.3);
+            text-align: center;
+        }
+
+        .populate-container h1 {
+            margin-bottom: 16px;
+            color: #333;
+        }
+
+        .populate-container p {
+            color: #666;
+            line-height: 1.6;
+            margin-bottom: 24px;
+        }
+
+        .info-box {
+            background: #f0f7ff;
+            border: 1px solid #b3d9ff;
+            border-radius: 8px;
+            padding: 16px;
+            margin: 24px 0;
+            text-align: left;
+        }
+
+        .info-box h3 {
+            color: #0066cc;
+            margin-bottom: 12px;
+            font-size: 16px;
+        }
+
+        .info-box ul {
+            margin: 0;
+            padding-left: 20px;
+            color: #333;
+        }
+
+        .info-box li {
+            margin-bottom: 8px;
+        }
+
+        .warning-box {
+            background: #fff3cd;
+            border: 1px solid #ffc107;
+            border-radius: 8px;
+            padding: 16px;
+            margin: 24px 0;
+            color: #856404;
+        }
+
+        .btn-large {
+            padding: 16px 32px;
+            font-size: 18px;
+            font-weight: 600;
+            margin: 8px;
+        }
+
+        .success-message {
+            background: #d4edda;
+            border: 1px solid #c3e6cb;
+            color: #155724;
+            padding: 16px;
+            border-radius: 8px;
+            margin-top: 24px;
+            display: none;
+        }
+
+        .error-message {
+            background: #f8d7da;
+            border: 1px solid #f5c6cb;
+            color: #721c24;
+            padding: 16px;
+            border-radius: 8px;
+            margin-top: 24px;
+            display: none;
+        }
+
+        .loading {
+            display: none;
+            margin: 24px 0;
+            font-size: 16px;
+            color: #667eea;
+        }
+
+        .loading.active {
+            display: block;
+        }
+    </style>
+</head>
+<body>
+    <div class="populate-container">
+        <h1>🎭 Populate Fake Data</h1>
+        <p>Add realistic fake users and posts to your database for testing and demonstration purposes.</p>
+
+        <div class="info-box">
+            <h3>📦 What will be added:</h3>
+            <ul>
+                <li><strong>10 Fake Users</strong> with complete profiles (names, bios, avatars, cover photos)</li>
+                <li><strong>25+ Posts</strong> with realistic content and images</li>
+                <li><strong>Friend Connections</strong> between users</li>
+                <li><strong>Likes & Comments</strong> on posts</li>
+                <li>All users from various locations (San Francisco, New York, LA, etc.)</li>
+            </ul>
+        </div>
+
+        <div class="warning-box">
+            ⚠️ <strong>Note:</strong> This will add data to your Firebase database. Run this only once to avoid duplicates!
+        </div>
+
+        <button class="btn btn-primary btn-large" id="populateBtn" onclick="runPopulate()">
+            🚀 Add Fake Data Now
+        </button>
+
+        <button class="btn btn-secondary btn-large" onclick="window.location.href='dashboard.html'">
+            ← Back to Dashboard
+        </button>
+
+        <div class="loading" id="loadingMessage">
+            <p>⏳ Adding fake data to your database...</p>
+            <p>This may take a minute. Please wait...</p>
+        </div>
+
+        <div class="success-message" id="successMessage">
+            <strong>✅ Success!</strong>
+            <p>All fake data has been added successfully!</p>
+            <p>Refresh your dashboard to see the new users and posts.</p>
+        </div>
+
+        <div class="error-message" id="errorMessage">
+            <strong>❌ Error</strong>
+            <p id="errorText"></p>
+        </div>
+    </div>
+
+    <!-- Firebase SDKs -->
+    <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-app-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-auth-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-database-compat.js"></script>
+    
+    <script src="js/config.js"></script>
+    <script src="js/populate-fake-data.js"></script>
+
+    <script>
+        // Check if user is authenticated
+        firebase.auth().onAuthStateChanged((user) => {
+            if (!user) {
+                alert('Please login first!');
+                window.location.href = 'index.html';
+            }
+        });
+
+        async function runPopulate() {
+            const btn = document.getElementById('populateBtn');
+            const loading = document.getElementById('loadingMessage');
+            const success = document.getElementById('successMessage');
+            const error = document.getElementById('errorMessage');
+
+            // Disable button and show loading
+            btn.disabled = true;
+            btn.textContent = '⏳ Adding Data...';
+            loading.classList.add('active');
+            success.style.display = 'none';
+            error.style.display = 'none';
+
+            try {
+                await populateFakeData();
+                
+                // Show success
+                loading.classList.remove('active');
+                success.style.display = 'block';
+                btn.textContent = '✅ Data Added';
+                btn.classList.remove('btn-primary');
+                btn.classList.add('btn-secondary');
+
+                // Redirect after 3 seconds
+                setTimeout(() => {
+                    window.location.href = 'dashboard.html';
+                }, 3000);
+
+            } catch (err) {
+                // Show error
+                loading.classList.remove('active');
+                error.style.display = 'block';
+                document.getElementById('errorText').textContent = err.message;
+                btn.disabled = false;
+                btn.textContent = '🔄 Try Again';
+            }
+        }
+    </script>
+</body>
+</html>
