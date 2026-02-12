@@ -72,6 +72,9 @@ document.addEventListener('DOMContentLoaded', () => {
     // Tab switching
     setupTabSwitching();
     
+    // Setup mobile navigation
+    setupMobileNavigation();
+    
     // Create menu dropdown
     setupCreateMenu();
     
@@ -985,5 +988,74 @@ async function loadPeopleYouMayKnow() {
         console.error("Error loading recommendations:", error);
         grid.innerHTML = `<div class="text-red-400 text-xs col-span-full text-center">Failed to load suggestions</div>`;
     }
+}
+
+// Setup mobile navigation
+function setupMobileNavigation() {
+    const mobileFeedTab = document.getElementById('mobileFeedTab');
+    const mobileRoomsTab = document.getElementById('mobileRoomsTab');
+    const mobileFriendsTab = document.getElementById('mobileFriendsTab');
+    const mobileProfileTab = document.getElementById('mobileProfileTab');
+    const mobileCreateBtn = document.getElementById('mobileCreateBtn');
+    const mobileNotificationBtn = document.getElementById('mobileNotificationBtn');
+    
+    // Feed tab
+    if (mobileFeedTab) {
+        mobileFeedTab.addEventListener('click', () => {
+            document.getElementById('feedTab')?.click();
+            updateMobileNavActive('mobileFeedTab');
+        });
+    }
+    
+    // Rooms tab
+    if (mobileRoomsTab) {
+        mobileRoomsTab.addEventListener('click', () => {
+            document.getElementById('roomsTab')?.click();
+            updateMobileNavActive('mobileRoomsTab');
+        });
+    }
+    
+    // Friends tab
+    if (mobileFriendsTab) {
+        mobileFriendsTab.addEventListener('click', () => {
+            document.getElementById('friendsTab')?.click();
+            updateMobileNavActive('mobileFriendsTab');
+        });
+    }
+    
+    // Profile tab
+    if (mobileProfileTab) {
+        mobileProfileTab.addEventListener('click', () => {
+            window.location.href = 'profile.html';
+        });
+    }
+    
+    // Create button
+    if (mobileCreateBtn) {
+        mobileCreateBtn.addEventListener('click', () => {
+            document.getElementById('createPostInputBtn')?.click();
+        });
+    }
+    
+    // Mobile notification button
+    if (mobileNotificationBtn) {
+        mobileNotificationBtn.addEventListener('click', () => {
+            document.getElementById('notificationBell')?.click();
+        });
+    }
+}
+
+// Update active state for mobile nav
+function updateMobileNavActive(activeId) {
+    const mobileNavItems = document.querySelectorAll('.mobile-nav-item');
+    mobileNavItems.forEach(item => {
+        if (item.id === activeId) {
+            item.classList.remove('text-slate-400');
+            item.classList.add('text-brand-blue');
+        } else {
+            item.classList.remove('text-brand-blue');
+            item.classList.add('text-slate-400');
+        }
+    });
 }
 

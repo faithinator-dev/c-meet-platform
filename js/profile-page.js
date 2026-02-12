@@ -48,28 +48,31 @@ async function loadProfileData() {
         document.getElementById('profileAvatarMain').src = avatar;
 
         // Cover photo
-        const coverDiv = document.querySelector('.profile-cover');
-        if (userData.coverPhoto) {
+        const coverDiv = document.getElementById('profileCover');
+        if (coverDiv && userData.coverPhoto) {
             coverDiv.style.backgroundImage = `url(${userData.coverPhoto})`;
             coverDiv.style.backgroundSize = 'cover';
             coverDiv.style.backgroundPosition = 'center';
         }
 
         // Location
-        if (userData.location) {
-            document.getElementById('profileLocation').textContent = userData.location;
-            document.getElementById('profileLocationMeta').style.display = 'flex';
+        const locationElem = document.getElementById('profileLocation');
+        const locationMetaElem = document.getElementById('profileLocationMeta');
+        if (userData.location && locationElem) {
+            locationElem.textContent = userData.location;
+            if (locationMetaElem) locationMetaElem.style.display = 'flex';
         } else {
-            document.getElementById('profileLocationMeta').style.display = 'none';
+            if (locationMetaElem) locationMetaElem.style.display = 'none';
         }
 
         // Joined date
-        if (userData.createdAt) {
+        const joinedElem = document.getElementById('profileJoined');
+        if (userData.createdAt && joinedElem) {
             const joinedDate = new Date(userData.createdAt).toLocaleDateString('en-US', {
                 month: 'short',
                 year: 'numeric'
             });
-            document.getElementById('profileJoined').textContent = `Joined ${joinedDate}`;
+            joinedElem.textContent = `Joined ${joinedDate}`;
         }
 
         // Show action buttons
@@ -84,7 +87,12 @@ async function loadProfileData() {
 
     } catch (error) {
         console.error('Error loading profile:', error);
-        alert('Error loading profile');
+        console.error('Error details:', {
+            message: error.message,
+            stack: error.stack,
+            currentProfileUserId: currentProfileUserId
+        });
+        alert(`Error loading profile: ${error.message}\nCheck console for details`);
     }
 }
 
