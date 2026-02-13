@@ -670,22 +670,24 @@
                              </div>
                          </div>
                      </div>
+
+                     <div class="flex items-center justify-between p-6 border-t border-slate-700/50 bg-slate-900/30">
+                        <p class="text-sm text-slate-400">* Required fields</p>
+                        <div class="flex gap-3">
+                            <button onclick="document.getElementById('settingsModal').classList.add('hidden')" class="px-6 py-2.5 rounded-lg font-medium text-slate-300 hover:bg-slate-700/50 transition-colors">Cancel</button>
+                            <button id="saveSettingsBtn" class="px-6 py-2.5 rounded-lg font-medium bg-brand-blue hover:bg-blue-600 text-white transition-colors flex items-center gap-2">
+                                <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"/>
+                                </svg>
+                                Save Changes
+                            </button>
+                        </div>
+                    </div>
                  </div>
              </div>
              
              <!-- Footer -->
-             <div class="flex items-center justify-between p-6 border-t border-slate-700/50 bg-slate-900/30">
-                 <p class="text-sm text-slate-400">* Required fields</p>
-                 <div class="flex gap-3">
-                     <button onclick="document.getElementById('settingsModal').classList.add('hidden')" class="px-6 py-2.5 rounded-lg font-medium text-slate-300 hover:bg-slate-700/50 transition-colors">Cancel</button>
-                     <button id="saveSettingsBtn" class="px-6 py-2.5 rounded-lg font-medium bg-brand-blue hover:bg-blue-600 text-white transition-colors flex items-center gap-2">
-                         <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"/>
-                         </svg>
-                         Save Changes
-                     </button>
-                 </div>
-             </div>
+             
         </div>
     </div>
     

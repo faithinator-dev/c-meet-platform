@@ -3,27 +3,29 @@ let currentProfileUserId = null;
 let currentUser = null;
 
 // Initialize the profile page
-firebase.auth().onAuthStateChanged(async (user) => {
-    if (!user) {
-        window.location.href = 'index.html';
-        return;
-    }
+document.addEventListener('DOMContentLoaded', () => {
+    firebase.auth().onAuthStateChanged(async (user) => {
+        if (!user) {
+            window.location.href = 'index.html';
+            return;
+        }
 
-    currentUser = user;
+        currentUser = user;
 
-    // Check if viewing another user's profile (from URL parameter)
-    const urlParams = new URLSearchParams(window.location.search);
-    const viewUserId = urlParams.get('id');
+        // Check if viewing another user's profile (from URL parameter)
+        const urlParams = new URLSearchParams(window.location.search);
+        const viewUserId = urlParams.get('id');
 
-    if (viewUserId) {
-        currentProfileUserId = viewUserId;
-    } else {
-        // Viewing own profile
-        currentProfileUserId = user.uid;
-    }
+        if (viewUserId) {
+            currentProfileUserId = viewUserId;
+        } else {
+            // Viewing own profile
+            currentProfileUserId = user.uid;
+        }
 
-    await loadProfileData();
-    initializeEventListeners();
+        await loadProfileData();
+        initializeEventListeners();
+    });
 });
 
 // Load profile data
@@ -40,12 +42,17 @@ async function loadProfileData() {
         }
 
         // Update profile header
-        document.getElementById('profileDisplayName').textContent = userData.displayName || 'User';
-        document.getElementById('profileEmail').textContent = userData.email || '';
-        document.getElementById('profileBioText').textContent = userData.bio || 'No bio yet';
+        const displayNameElem = document.getElementById('profileDisplayName');
+        const emailElem = document.getElementById('profileEmail');
+        const bioElem = document.getElementById('profileBioText');
+        const avatarElem = document.getElementById('profileAvatarMain');
+        
+        if (displayNameElem) displayNameElem.textContent = userData.displayName || 'User';
+        if (emailElem) emailElem.textContent = userData.email || '';
+        if (bioElem) bioElem.textContent = userData.bio || 'No bio yet';
         
         const avatar = userData.avatar || 'https://via.placeholder.com/160';
-        document.getElementById('profileAvatarMain').src = avatar;
+        if (avatarElem) avatarElem.src = avatar;
 
         // Cover photo
         const coverDiv = document.getElementById('profileCover');
@@ -99,6 +106,11 @@ async function loadProfileData() {
 // Display action buttons based on whether viewing own or other's profile
 function displayActionButtons() {
     const actionsDiv = document.getElementById('profileActions');
+    if (!actionsDiv) {
+        console.error('profileActions element not found');
+        return;
+    }
+    
     actionsDiv.innerHTML = '';
 
     if (currentProfileUserId === currentUser.uid) {
@@ -112,10 +124,12 @@ function displayActionButtons() {
         actionsDiv.appendChild(editBtn);
 
         // Show avatar edit button
-        document.getElementById('editAvatarBtn').style.display = 'flex';
+        const editAvatarBtn = document.getElementById('editAvatarBtn');
+        if (editAvatarBtn) editAvatarBtn.style.display = 'flex';
         
         // Show cover photo edit button
-        document.getElementById('editCoverBtn').style.display = 'flex';
+        const editCoverBtn = document.getElementById('editCoverBtn');
+        if (editCoverBtn) editCoverBtn.style.display = 'flex';
     } else {
         // Other user's profile - show friend/message buttons
         checkFriendshipStatus();
@@ -224,13 +238,15 @@ async function loadStats() {
         const postsRef = firebase.database().ref('posts').orderByChild('userId').equalTo(currentProfileUserId);
         const postsSnapshot = await postsRef.once('value');
         const postsCount = postsSnapshot.numChildren();
-        document.getElementById('postsCount').textContent = postsCount;
+        const postsCountElem = document.getElementById('postsCount');
+        if (postsCountElem) postsCountElem.textContent = postsCount;
 
         // Count friends
         const friendsRef = firebase.database().ref(`friends/${currentProfileUserId}`);
         const friendsSnapshot = await friendsRef.once('value');
         const friendsCount = friendsSnapshot.numChildren();
-        document.getElementById('friendsCount').textContent = friendsCount;
+        const friendsCountElem = document.getElementById('friendsCount');
+        if (friendsCountElem) friendsCountElem.textContent = friendsCount;
 
         // Count pages (followed pages)
         const pagesRef = firebase.database().ref('pages');
@@ -244,7 +260,8 @@ async function loadStats() {
             }
         });
         
-        document.getElementById('pagesCount').textContent = followedPages;
+        const pagesCountElem = document.getElementById('pagesCount');
+        if (pagesCountElem) pagesCountElem.textContent = followedPages;
     } catch (error) {
         console.error('Error loading stats:', error);
     }
@@ -254,6 +271,10 @@ async function loadStats() {
 async function loadPosts() {
     try {
         const postsContainer = document.getElementById('userPostsFeed');
+        if (!postsContainer) {
+            console.error('userPostsFeed element not found');
+            return;
+        }
         postsContainer.innerHTML = '';
 
         const postsRef = firebase.database().ref('posts').orderByChild('userId').equalTo(currentProfileUserId);
@@ -282,7 +303,8 @@ async function loadPosts() {
         }
     } catch (error) {
         console.error('Error loading posts:', error);
-        document.getElementById('userPostsFeed').innerHTML = '<p style="text-align: center; color: #999;">Error loading posts</p>';
+        const postsContainer = document.getElementById('userPostsFeed');
+        if (postsContainer) postsContainer.innerHTML = '<p style="text-align: center; color: #999;">Error loading posts</p>';
     }
 }
 
@@ -364,6 +386,10 @@ function focusCommentFromProfile(postId) {
 // Load About section
 function loadAboutSection(userData) {
     const aboutContent = document.getElementById('aboutContent');
+    if (!aboutContent) {
+        console.error('aboutContent element not found');
+        return;
+    }
     aboutContent.innerHTML = '';
 
     const infoItems = [];
@@ -423,6 +449,10 @@ function loadAboutSection(userData) {
 async function loadFriends() {
     try {
         const friendsGrid = document.getElementById('friendsGrid');
+        if (!friendsGrid) {
+            console.error('friendsGrid element not found');
+            return;
+        }
         friendsGrid.innerHTML = '';
 
         const friendsRef = firebase.database().ref(`friends/${currentProfileUserId}`);
@@ -452,7 +482,8 @@ async function loadFriends() {
         });
     } catch (error) {
         console.error('Error loading friends:', error);
-        document.getElementById('friendsGrid').innerHTML = '<p style="color: #999;">Error loading friends</p>';
+        const friendsGrid = document.getElementById('friendsGrid');
+        if (friendsGrid) friendsGrid.innerHTML = '<p style="color: #999;">Error loading friends</p>';
     }
 }
 
@@ -460,6 +491,10 @@ async function loadFriends() {
 async function loadPhotos() {
     try {
         const photosGrid = document.getElementById('photosGrid');
+        if (!photosGrid) {
+            console.error('photosGrid element not found');
+            return;
+        }
         photosGrid.innerHTML = '';
 
         const postsRef = firebase.database().ref('posts').orderByChild('userId').equalTo(currentProfileUserId);
@@ -489,7 +524,8 @@ async function loadPhotos() {
         });
     } catch (error) {
         console.error('Error loading photos:', error);
-        document.getElementById('photosGrid').innerHTML = '<p style="color: #999;">Error loading photos</p>';
+        const photosGrid = document.getElementById('photosGrid');
+        if (photosGrid) photosGrid.innerHTML = '<p style="color: #999;">Error loading photos</p>';
     }
 }
 

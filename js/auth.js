@@ -27,98 +27,56 @@ document.addEventListener('DOMContentLoaded', function() {
             window.location.href = 'dashboard.html';
         }
     });
-});
 
-// Login Form Submission
-document.getElementById('loginForm').addEventListener('submit', async (e) => {
-    e.preventDefault();
-    
-    const email = document.getElementById('loginEmail').value;
-    const password = document.getElementById('loginPassword').value;
+    // Login Form Submission
+    document.getElementById('loginForm').addEventListener('submit', async (e) => {
+        e.preventDefault();
+        
+        const email = document.getElementById('loginEmail').value;
+        const password = document.getElementById('loginPassword').value;
 
-    try {
-        await auth.signInWithEmailAndPassword(email, password);
-        window.location.href = 'dashboard.html';
-    } catch (error) {
-        alert('Login failed: ' + error.message);
-    }
-});
+        try {
+            await auth.signInWithEmailAndPassword(email, password);
+            window.location.href = 'dashboard.html';
+        } catch (error) {
+            alert('Login failed: ' + error.message);
+        }
+    });
 
-// Sign Up Form Submission
-document.getElementById('signupForm').addEventListener('submit', async (e) => {
-    e.preventDefault();
-    
-    const name = document.getElementById('signupName').value;
-    const email = document.getElementById('signupEmail').value;
-    const password = document.getElementById('signupPassword').value;
-    const confirmPassword = document.getElementById('signupConfirmPassword').value;
+    // Sign Up Form Submission
+    document.getElementById('signupForm').addEventListener('submit', async (e) => {
+        e.preventDefault();
+        
+        const name = document.getElementById('signupName').value;
+        const email = document.getElementById('signupEmail').value;
+        const password = document.getElementById('signupPassword').value;
+        const confirmPassword = document.getElementById('signupConfirmPassword').value;
 
-    if (password !== confirmPassword) {
-        alert('Passwords do not match!');
-        return;
-    }
+        if (password !== confirmPassword) {
+            alert('Passwords do not match!');
+            return;
+        }
 
-    if (password.length < 6) {
-        alert('Password must be at least 6 characters long!');
-        return;
-    }
+        if (password.length < 6) {
+            alert('Password must be at least 6 characters long!');
+            return;
+        }
 
-    try {
-        const userCredential = await auth.createUserWithEmailAndPassword(email, password);
-        const user = userCredential.user;
+        try {
+            const userCredential = await auth.createUserWithEmailAndPassword(email, password);
+            const user = userCredential.user;
 
-        // Update user profile with display name
-        await user.updateProfile({
-            displayName: name
-        });
+            // Update user profile with display name
+            await user.updateProfile({
+                displayName: name
+            });
 
-        // Create user profile in database
-        await database.ref('users/' + user.uid).set({
-            name: name,
-            displayName: name,
-            email: email,
-            avatar: 'https://via.placeholder.com/120',
-            bio: '',
-            interests: '',
-            location: '',
-            website: '',
-            phone: '',
-            birthday: '',
-            gender: '',
-            profileVisibility: 'public',
-            showEmail: true,
-            showPhone: false,
-            showBirthday: false,
-            createdAt: new Date().toISOString()
-        });
-
-        // Ensure default general room exists and join user
-        await ensureGeneralRoomExists();
-        await joinGeneralRoom(user.uid, name);
-
-        window.location.href = 'dashboard.html';
-    } catch (error) {
-        alert('Sign up failed: ' + error.message);
-    }
-});
-
-// Google Login
-document.getElementById('googleLogin').addEventListener('click', async () => {
-    try {
-        const result = await auth.signInWithPopup(googleProvider);
-        const user = result.user;
-
-        // Check if user exists in database
-        const userRef = database.ref('users/' + user.uid);
-        const snapshot = await userRef.once('value');
-
-        if (!snapshot.exists()) {
-            // Create new user profile
-            await userRef.set({
-                name: user.displayName,
-                displayName: user.displayName,
-                email: user.email,
-                avatar: user.photoURL || 'https://via.placeholder.com/120',
+            // Create user profile in database
+            await database.ref('users/' + user.uid).set({
+                name: name,
+                displayName: name,
+                email: email,
+                avatar: 'https://via.placeholder.com/120',
                 bio: '',
                 interests: '',
                 location: '',
@@ -135,13 +93,55 @@ document.getElementById('googleLogin').addEventListener('click', async () => {
 
             // Ensure default general room exists and join user
             await ensureGeneralRoomExists();
-            await joinGeneralRoom(user.uid, user.displayName);
-        }
+            await joinGeneralRoom(user.uid, name);
 
-        window.location.href = 'dashboard.html';
-    } catch (error) {
-        alert('Google login failed: ' + error.message);
-    }
+            window.location.href = 'dashboard.html';
+        } catch (error) {
+            alert('Sign up failed: ' + error.message);
+        }
+    });
+
+    // Google Login
+    document.getElementById('googleLogin').addEventListener('click', async () => {
+        try {
+            const result = await auth.signInWithPopup(googleProvider);
+            const user = result.user;
+
+            // Check if user exists in database
+            const userRef = database.ref('users/' + user.uid);
+            const snapshot = await userRef.once('value');
+
+            if (!snapshot.exists()) {
+                // Create new user profile
+                await userRef.set({
+                    name: user.displayName,
+                    displayName: user.displayName,
+                    email: user.email,
+                    avatar: user.photoURL || 'https://via.placeholder.com/120',
+                    bio: '',
+                    interests: '',
+                    location: '',
+                    website: '',
+                    phone: '',
+                    birthday: '',
+                    gender: '',
+                    profileVisibility: 'public',
+                    showEmail: true,
+                    showPhone: false,
+                    showBirthday: false,
+                    createdAt: new Date().toISOString()
+                });
+
+                // Ensure default general room exists and join user
+                await ensureGeneralRoomExists();
+                await joinGeneralRoom(user.uid, user.displayName);
+            }
+
+            window.location.href = 'dashboard.html';
+        } catch (error) {
+            alert('Google login failed: ' + error.message);
+        }
+    });
 });
 
 // Ensure the General Room exists
