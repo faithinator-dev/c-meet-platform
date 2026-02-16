@@ -344,6 +344,8 @@ async function addComment(postId, text) {
         if (post && post.authorId !== user.uid) {
             await database.ref(`notifications/${post.authorId}`).push({
                 type: 'comment',
+                title: 'New Comment',
+                message: `${userData.displayName || 'Someone'} commented on your post`,
                 from: user.uid,
                 fromName: userData.displayName || 'Someone',
                 postId: postId,
@@ -950,8 +952,19 @@ async function toggleReaction(postId, reactionType) {
             const userSnapshot = await userRef.once('value');
             const userData = userSnapshot.val();
             
+            const reactionEmojis = {
+                'like': '👍',
+                'love': '❤️',
+                'laugh': '😂',
+                'wow': '😮',
+                'sad': '😢',
+                'angry': '😠'
+            };
+            
             await database.ref(`notifications/${post.authorId}`).push({
-                type: 'reaction',
+                type: 'like',
+                title: 'New Reaction',
+                message: `${userData.displayName || 'Someone'} reacted ${reactionEmojis[reactionType] || '👍'} to your post`,
                 reaction: reactionType,
                 from: user.uid,
                 fromName: userData.displayName || 'Someone',

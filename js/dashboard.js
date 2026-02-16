@@ -488,58 +488,269 @@ window.addEventListener("click", (e) => {
   }
 });
 
+// Current notification filter
+let currentNotificationTab = 'all';
+let previousNotificationCount = 0;
+
 function listenForNotifications() {
   const notificationsRef = database.ref(`notifications/${currentUser.uid}`);
+  const friendRequestsRef = database.ref(`friendRequests/${currentUser.uid}`);
+  
+  // Listen to both notifications and friend requests
   notificationsRef.on("value", (snapshot) => {
-    const notificationList = document.getElementById("notificationList");
-    notificationList.innerHTML = "";
+    displayNotifications();
+    
+    // Play sound for new notifications
+    let currentCount = 0;
+    snapshot.forEach(child => {
+      if (!child.val().read) currentCount++;
+    });
+    
+    if (currentCount > previousNotificationCount && previousNotificationCount > 0) {
+      if (typeof sounds !== 'undefined') sounds.notification();
+    }
+    previousNotificationCount = currentCount;
+  });
+  
+  friendRequestsRef.on("value", () => {
+    displayNotifications();
+  });
+}
 
-    let count = 0;
+async function displayNotifications() {
+  const notificationList = document.getElementById("notificationList");
+  if (!notificationList) return;
+  
+  notificationList.innerHTML = "";
 
-    snapshot.forEach((childSnapshot) => {
-      const notification = childSnapshot.val();
-      if (!notification.read) count++;
+  let allNotifications = [];
+  let unreadCount = 0;
+  let friendRequestCount = 0;
 
+  // Get regular notifications
+  const notifSnapshot = await database.ref(`notifications/${currentUser.uid}`).once('value');
+  notifSnapshot.forEach((childSnapshot) => {
+    const notification = childSnapshot.val();
+    notification.id = childSnapshot.key;
+    notification.notifType = 'regular';
+    if (!notification.read) unreadCount++;
+    allNotifications.push(notification);
+  });
+
+  // Get friend requests
+  const friendReqSnapshot = await database.ref(`friendRequests/${currentUser.uid}`).once('value');
+  if (friendReqSnapshot.exists()) {
+    for (const childSnapshot of friendReqSnapshot.children) {
+      const request = childSnapshot.val();
+      if (request.status === 'pending') {
+        friendRequestCount++;
+        unreadCount++;
+        
+        allNotifications.push({
+          id: childSnapshot.key,
+          notifType: 'friend_request',
+          title: 'Friend Request',
+          message: `${request.senderName} sent you a friend request`,
+          timestamp: request.timestamp,
+          senderAvatar: request.senderAvatar,
+          senderId: childSnapshot.key,
+          read: false
+        });
+      }
+    }
+  }
+
+  // Sort by timestamp (newest first)
+  allNotifications.sort((a, b) => new Date(b.timestamp) - new Date(a.timestamp));
+
+  // Filter based on current tab
+  let filteredNotifications = allNotifications;
+  if (currentNotificationTab === 'friends') {
+    filteredNotifications = allNotifications.filter(n => n.notifType === 'friend_request');
+  } else if (currentNotificationTab === 'activity') {
+    filteredNotifications = allNotifications.filter(n => n.notifType === 'regular');
+  }
+
+  // Display notifications
+  if (filteredNotifications.length === 0) {
+    notificationList.innerHTML = `
+      <div class="flex items-center justify-center py-12">
+        <div class="text-center">
+          <svg class="w-12 h-12 mx-auto text-slate-600 mb-3" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 17h5l-1.405-1.405A2.032 2.032 0 0118 14.158V11a6.002 6.002 0 00-4-5.659V5a2 2 0 10-4 0v.341C7.67 6.165 6 8.388 6 11v3.159c0 .538-.214 1.055-.595 1.436L4 17h5m6 0v1a3 3 0 11-6 0v-1m6 0H9"/></svg>
+          <p class="text-slate-500 text-sm">No notifications</p>
+        </div>
+      </div>
+    `;
+  } else {
+    filteredNotifications.forEach(notification => {
       const notifItem = document.createElement("div");
-      notifItem.className = "notification-item";
-      notifItem.innerHTML = `
-                <strong>${notification.title}</strong>
-                <p style="font-size: 12px; color: var(--text-light); margin-top: 4px;">
-                    ${notification.message}
-                </p>
-                <small style="font-size: 11px; color: var(--text-light);">
-                    ${new Date(notification.timestamp).toLocaleString()}
-                </small>
-            `;
+      notifItem.className = `notification-item p-4 hover:bg-slate-700/50 transition-all cursor-pointer border-b border-slate-700/50 ${!notification.read ? 'bg-slate-700/20' : ''}`;
+      
+      if (notification.notifType === 'friend_request') {
+        notifItem.innerHTML = `
+          <div class="flex items-start gap-3">
+            <img src="${notification.senderAvatar || 'data:image/svg+xml,%3Csvg xmlns=\'http://www.w3.org/2000/svg\' width=\'40\' height=\'40\'%3E%3Ccircle cx=\'20\' cy=\'20\' r=\'20\' fill=\'%23334155\'/%3E%3C/svg%3E'}" 
+                 class="w-10 h-10 rounded-full object-cover" />
+            <div class="flex-1 min-w-0">
+              <div class="flex items-start justify-between gap-2">
+                <div class="flex-1">
+                  <p class="text-white font-medium text-sm">${notification.title}</p>
+                  <p class="text-slate-400 text-xs mt-0.5">${notification.message}</p>
+                  <p class="text-slate-500 text-xs mt-1">${timeAgo(notification.timestamp)}</p>
+                </div>
+                ${!notification.read ? '<span class="w-2 h-2 bg-brand-blue rounded-full flex-shrink-0 mt-1"></span>' : ''}
+              </div>
+              <div class="flex gap-2 mt-2">
+                <button onclick="acceptFriendRequestFromNotif('${notification.senderId}', event)" 
+                        class="flex-1 bg-brand-blue hover:bg-blue-600 text-white text-xs py-1.5 px-3 rounded-lg font-medium transition-all">
+                  Accept
+                </button>
+                <button onclick="rejectFriendRequestFromNotif('${notification.senderId}', event)" 
+                        class="flex-1 bg-slate-600 hover:bg-slate-500 text-white text-xs py-1.5 px-3 rounded-lg font-medium transition-all">
+                  Decline
+                </button>
+              </div>
+            </div>
+          </div>
+        `;
+      } else {
+        const iconType = getNotificationIcon(notification.type);
+        notifItem.innerHTML = `
+          <div class="flex items-start gap-3">
+            <div class="w-10 h-10 rounded-full bg-slate-700 flex items-center justify-center flex-shrink-0">
+              ${iconType}
+            </div>
+            <div class="flex-1 min-w-0">
+              <div class="flex items-start justify-between gap-2">
+                <div class="flex-1">
+                  <p class="text-white font-medium text-sm">${notification.title}</p>
+                  <p class="text-slate-400 text-xs mt-0.5">${notification.message}</p>
+                  <p class="text-slate-500 text-xs mt-1">${timeAgo(notification.timestamp)}</p>
+                </div>
+                ${!notification.read ? '<span class="w-2 h-2 bg-brand-blue rounded-full flex-shrink-0 mt-1"></span>' : ''}
+              </div>
+            </div>
+          </div>
+        `;
+        
+        notifItem.addEventListener("click", async () => {
+          await database
+            .ref(`notifications/${currentUser.uid}/${notification.id}`)
+            .update({ read: true });
 
-      notifItem.addEventListener("click", async () => {
-        await database
-          .ref(`notifications/${currentUser.uid}/${childSnapshot.key}`)
-          .update({
-            read: true,
-          });
-
-        if (notification.roomId) {
-          window.location.href = `room.html?id=${notification.roomId}`;
-        }
-      });
+          if (notification.roomId) {
+            window.location.href = `room.html?id=${notification.roomId}`;
+          } else if (notification.postId) {
+            window.location.href = `dashboard.html#post-${notification.postId}`;
+          }
+        });
+      }
 
       notificationList.appendChild(notifItem);
     });
+  }
 
-    const notificationBadge = document.getElementById("notificationCount");
-    if (count > 0) {
-      notificationBadge.textContent = count;
-      notificationBadge.classList.remove("hidden");
+  // Update badges
+  const notificationBadge = document.getElementById("notificationCount");
+  const mobileNotificationBadge = document.getElementById("mobileNotificationCount");
+  const friendRequestBadge = document.getElementById("friendRequestNotifBadge");
+  
+  if (unreadCount > 0) {
+    notificationBadge?.classList.remove("hidden");
+    mobileNotificationBadge?.classList.remove("hidden");
+  } else {
+    notificationBadge?.classList.add("hidden");
+    mobileNotificationBadge?.classList.add("hidden");
+  }
+  
+  if (friendRequestCount > 0) {
+    friendRequestBadge?.classList.remove("hidden");
+    friendRequestBadge.textContent = friendRequestCount;
+  } else {
+    friendRequestBadge?.classList.add("hidden");
+  }
+}
+
+function getNotificationIcon(type) {
+  switch(type) {
+    case 'like':
+      return '<svg class="w-5 h-5 text-red-400" fill="currentColor" viewBox="0 0 20 20"><path d="M3.172 5.172a4 4 0 015.656 0L10 6.343l1.172-1.171a4 4 0 115.656 5.656L10 17.657l-6.828-6.829a4 4 0 010-5.656z"/></svg>';
+    case 'comment':
+      return '<svg class="w-5 h-5 text-blue-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M7 8h10M7 12h4m1 8l-4-4H5a2 2 0 01-2-2V6a2 2 0 012-2h14a2 2 0 012 2v8a2 2 0 01-2 2h-3l-4 4z"/></svg>';
+    case 'friend':
+      return '<svg class="w-5 h-5 text-green-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4.354a4 4 0 110 5.292M15 21H3v-1a6 6 0 0112 0v1zm0 0h6v-1a6 6 0 00-9-5.197M13 7a4 4 0 11-8 0 4 4 0 018 0z"/></svg>';
+    case 'mention':
+      return '<svg class="w-5 h-5 text-purple-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M16 12a4 4 0 10-8 0 4 4 0 008 0zm0 0v1.5a2.5 2.5 0 005 0V12a9 9 0 10-9 9m4.5-1.206a8.959 8.959 0 01-4.5 1.207"/></svg>';
+    default:
+      return '<svg class="w-5 h-5 text-brand-blue" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 17h5l-1.405-1.405A2.032 2.032 0 0118 14.158V11a6.002 6.002 0 00-4-5.659V5a2 2 0 10-4 0v.341C7.67 6.165 6 8.388 6 11v3.159c0 .538-.214 1.055-.595 1.436L4 17h5m6 0v1a3 3 0 11-6 0v-1m6 0H9"/></svg>';
+  }
+}
+
+function timeAgo(timestamp) {
+  const now = Date.now();
+  const diff = now - new Date(timestamp).getTime();
+  const seconds = Math.floor(diff / 1000);
+  const minutes = Math.floor(seconds / 60);
+  const hours = Math.floor(minutes / 60);
+  const days = Math.floor(hours / 24);
+  
+  if (days > 0) return `${days}d ago`;
+  if (hours > 0) return `${hours}h ago`;
+  if (minutes > 0) return `${minutes}m ago`;
+  return 'Just now';
+}
+
+function switchNotificationTab(tab) {
+  currentNotificationTab = tab;
+  
+  // Update tab styling
+  document.querySelectorAll('.notification-tab').forEach(t => {
+    const isActive = t.getAttribute('data-tab') === tab;
+    const underline = t.querySelector('span:last-child');
+    
+    if (isActive) {
+      t.classList.add('active', 'text-white');
+      t.classList.remove('text-slate-400');
+      underline.style.opacity = '1';
     } else {
-      notificationBadge.classList.add("hidden");
-    }
-
-    if (notificationList.children.length === 0) {
-      notificationList.innerHTML =
-        '<p class="no-notifications">No new notifications</p>';
+      t.classList.remove('active', 'text-white');
+      t.classList.add('text-slate-400');
+      underline.style.opacity = '0';
     }
   });
+  
+  displayNotifications();
+}
+
+async function acceptFriendRequestFromNotif(senderId, event) {
+  event.stopPropagation();
+  if (typeof acceptFriendRequest === 'function') {
+    await acceptFriendRequest(senderId);
+    displayNotifications();
+  }
+}
+
+async function rejectFriendRequestFromNotif(senderId, event) {
+  event.stopPropagation();
+  if (typeof rejectFriendRequest === 'function') {
+    await rejectFriendRequest(senderId);
+    displayNotifications();
+  }
+}
+
+async function markAllNotificationsAsRead() {
+  const updates = {};
+  const snapshot = await database.ref(`notifications/${currentUser.uid}`).once('value');
+  snapshot.forEach(child => {
+    updates[`notifications/${currentUser.uid}/${child.key}/read`] = true;
+  });
+  await database.ref().update(updates);
+  displayNotifications();
+}
+
+function viewAllNotifications() {
+  // You can implement a dedicated notifications page
+  alert('View all notifications - Feature coming soon!');
 }
 // Tab switching functionality
 function setupTabSwitching() {
