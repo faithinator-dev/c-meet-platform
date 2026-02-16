@@ -93,8 +93,8 @@ function displayUsers(users) {
             : '<span class="interest-tag">No interests yet</span>';
         
         userCard.innerHTML = `
-            <img src="${user.avatar || "data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='80' height='80'%3E%3Ccircle cx='40' cy='40' r='40' fill='%23334155'/%3E%3C/svg%3E"}" 
-                 alt="${user.name}" class="user-card-avatar">
+            <img src="${user.avatar || "data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='40' height='40'%3E%3Ccircle cx='20' cy='20' r='20' fill='%23334155'/%3E%3C/svg%3E"}" 
+                 alt="${user.name}" class="user-card-avatar" style="width: 48px; height: 48px; border-radius: 50%; object-fit: cover;">
             <h3 class="user-card-name">${user.name}</h3>
             <p class="user-card-bio">${user.bio || 'No bio yet'}</p>
             <div class="user-card-interests">${interests}</div>

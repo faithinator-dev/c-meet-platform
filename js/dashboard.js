@@ -59,6 +59,11 @@ auth.onAuthStateChanged(async (user) => {
   if (typeof displayFriendRequests === "function") {
     displayFriendRequests();
   }
+  
+  // Load friend requests for badge count (even if not on Friends view)
+  if (typeof loadFriendRequestsMain === "function") {
+    loadFriendRequestsMain();
+  }
 
   // Load feed by default
   loadPostsFeed();
@@ -892,8 +897,103 @@ function displayUserCard(userData) {
   friendsGrid.appendChild(userCard);
 }
 
+// Load friend requests in main Friends view
+async function loadFriendRequestsMain() {
+  const user = auth.currentUser;
+  if (!user) return;
+
+  const requestsGrid = document.getElementById("friendRequestsMainGrid");
+  const noRequestsMsg = document.getElementById("noRequestsMessage");
+  const requestsBadge = document.getElementById("friendRequestsBadge");
+  const navBadge = document.getElementById("friendRequestsNavBadge");
+  
+  if (!requestsGrid) return;
+
+  const friendRequestsRef = database.ref(`friendRequests/${user.uid}`);
+  
+  friendRequestsRef.on("value", async (snapshot) => {
+    requestsGrid.innerHTML = "";
+    let requestCount = 0;
+
+    if (!snapshot.exists()) {
+      noRequestsMsg?.classList.remove("hidden");
+      requestsBadge?.classList.add("hidden");
+      navBadge?.classList.add("hidden");
+      return;
+    }
+
+    noRequestsMsg?.classList.add("hidden");
+
+    for (const childSnapshot of snapshot.children) {
+      const request = childSnapshot.val();
+      const senderId = childSnapshot.key;
+
+      if (request.status === "pending") {
+        requestCount++;
+        
+        // Fetch sender details
+        const senderSnapshot = await database.ref(`users/${senderId}`).once("value");
+        const senderData = senderSnapshot.val();
+
+        if (senderData) {
+          const requestCard = document.createElement("div");
+          requestCard.className = "bg-slate-800/50 border border-slate-700 rounded-xl p-5 hover:border-brand-blue/50 transition-all";
+          requestCard.innerHTML = `
+            <div class="flex items-center gap-3 mb-4">
+              <img src="${senderData.avatar || 'data:image/svg+xml,%3Csvg xmlns=\'http://www.w3.org/2000/svg\' width=\'60\' height=\'60\'%3E%3Ccircle cx=\'30\' cy=\'30\' r=\'30\' fill=\'%23334155\'/%3E%3C/svg%3E'}" 
+                   alt="${senderData.displayName || 'User'}" 
+                   class="w-16 h-16 rounded-full object-cover border-2 border-slate-600">
+              <div class="flex-1 min-w-0">
+                <h4 class="text-white font-semibold truncate">${senderData.displayName || senderData.name || "User"}</h4>
+                <p class="text-slate-400 text-sm truncate">${senderData.bio || "C-meet user"}</p>
+                ${senderData.mutualFriends ? `<p class="text-xs text-slate-500 mt-1">${senderData.mutualFriends} mutual friends</p>` : ''}
+              </div>
+            </div>
+            <div class="flex gap-2">
+              <button onclick="acceptFriendRequest('${senderId}')" 
+                      class="flex-1 bg-brand-blue hover:bg-blue-600 text-white py-2 px-4 rounded-lg font-medium transition-all">
+                Accept
+              </button>
+              <button onclick="rejectFriendRequest('${senderId}')" 
+                      class="flex-1 bg-slate-700 hover:bg-slate-600 text-white py-2 px-4 rounded-lg font-medium transition-all">
+                Decline
+              </button>
+            </div>
+            <button onclick="window.location.href='profile.html?id=${senderId}'" 
+                    class="w-full mt-2 text-sm text-slate-400 hover:text-brand-blue transition-colors">
+              View Profile
+            </button>
+          `;
+          requestsGrid.appendChild(requestCard);
+        }
+      }
+    }
+
+    // Update badges
+    if (requestCount > 0) {
+      requestsBadge?.classList.remove("hidden");
+      requestsBadge.textContent = requestCount;
+      navBadge?.classList.remove("hidden");
+      navBadge.textContent = requestCount;
+    } else {
+      noRequestsMsg?.classList.remove("hidden");
+      requestsBadge?.classList.add("hidden");
+      navBadge?.classList.add("hidden");
+    }
+  });
+}
+
+// Mark all friend requests as read
+function markAllRequestsAsRead() {
+  // This is a placeholder - you can implement actual read status tracking if needed
+  alert("All requests marked as read");
+}
+
 // Load friends list
 async function loadFriends() {
+  // Load friend requests first (prominent)
+  loadFriendRequestsMain();
+  
   // Load recommendations
   loadPeopleYouMayKnow();
 
