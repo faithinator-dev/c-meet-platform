@@ -117,13 +117,53 @@ function displayReactions(messageElement, reactions, messageId, roomId) {
     });
 }
 
-function showReactionPicker(messageId, roomId) {
-    const commonEmojis = ['👍', '❤️', '😂', '😮', '😢', '🎉', '🔥', '👏'];
-    const emoji = prompt('Choose an emoji:\n' + commonEmojis.join(' '));
-    
-    if (emoji) {
-        addReaction(messageId, emoji, roomId);
+function showReactionPicker(messageId, roomId, event) {
+    // Remove any existing pickers
+    const existingPicker = document.querySelector('.reaction-picker-dropdown');
+    if (existingPicker) {
+        existingPicker.remove();
+        return;
     }
+    
+    const commonEmojis = ['👍', '❤️', '😂', '😮', '😢', '🎉', '🔥', '👏', '😎', '🤔'];
+    
+    // Create picker element
+    const picker = document.createElement('div');
+    picker.className = 'reaction-picker-dropdown';
+    picker.innerHTML = commonEmojis.map(emoji => 
+        `<button class="reaction-option" data-emoji="${emoji}">${emoji}</button>`
+    ).join('');
+    
+    // Position the picker near the message
+    const targetElement = event ? event.target : document.querySelector(`[data-message-id="${messageId}"]`);
+    if (targetElement) {
+        const rect = targetElement.getBoundingClientRect();
+        picker.style.position = 'fixed';
+        picker.style.left = `${rect.left}px`;
+        picker.style.top = `${rect.top - 50}px`;
+        picker.style.zIndex = '1000';
+    }
+    
+    // Add click handlers
+    picker.querySelectorAll('.reaction-option').forEach(btn => {
+        btn.addEventListener('click', async (e) => {
+            e.stopPropagation();
+            const emoji = btn.dataset.emoji;
+            await addReaction(messageId, emoji, roomId);
+            picker.remove();
+        });
+    });
+    
+    document.body.appendChild(picker);
+    
+    // Close picker when clicking outside
+    const closePicker = (e) => {
+        if (!picker.contains(e.target) && !e.target.closest('.add-reaction-btn')) {
+            picker.remove();
+            document.removeEventListener('click', closePicker);
+        }
+    };
+    setTimeout(() => document.addEventListener('click', closePicker), 0);
 }
 
 // ==================== MESSAGE EDIT/DELETE ====================
@@ -298,7 +338,7 @@ async function sendFileMessage(fileData) {
         await messagesRef.push({
             userId: currentUser.uid,
             userName: currentUser.displayName,
-            userAvatar: currentUser.photoURL || 'https://via.placeholder.com/40',
+            userAvatar: currentUser.photoURL || "data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='40' height='40'%3E%3Ccircle cx='20' cy='20' r='20' fill='%23334155'/%3E%3C/svg%3E",
             file: fileData,
             timestamp: new Date().toISOString()
         });

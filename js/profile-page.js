@@ -51,7 +51,7 @@ async function loadProfileData() {
         if (emailElem) emailElem.textContent = userData.email || '';
         if (bioElem) bioElem.textContent = userData.bio || 'No bio yet';
         
-        const avatar = userData.avatar || 'https://via.placeholder.com/160';
+        const avatar = userData.avatar || "data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='160' height='160'%3E%3Ccircle cx='80' cy='80' r='80' fill='%23334155'/%3E%3C/svg%3E";
         if (avatarElem) avatarElem.src = avatar;
 
         // Cover photo
@@ -138,6 +138,22 @@ function displayActionButtons() {
         messageBtn.className = 'btn btn-secondary';
         messageBtn.innerHTML = '💬 Message';
         messageBtn.onclick = () => openPrivateMessage(currentProfileUserId);
+        actionsDiv.appendChild(messageBtn);
+
+        // Report button
+        const reportBtn = document.createElement('button');
+        reportBtn.className = 'btn btn-secondary';
+        reportBtn.innerHTML = '⚠️ Report';
+        reportBtn.onclick = () => reportUser(currentProfileUserId);
+        actionsDiv.appendChild(reportBtn);
+
+        // Block button
+        const blockBtn = document.createElement('button');
+        blockBtn.className = 'btn btn-secondary';
+        blockBtn.style.background = '#dc2626';
+        blockBtn.innerHTML = '🚫 Block';
+        blockBtn.onclick = () => blockUserProfile(currentProfileUserId);
+        actionsDiv.appendChild(blockBtn);
         actionsDiv.appendChild(messageBtn);
     }
 }
@@ -323,7 +339,7 @@ async function createPostElement(post) {
     const userSnapshot = await userRef.once('value');
     const userData = userSnapshot.val();
 
-    const avatar = userData?.avatar || 'https://via.placeholder.com/40';
+    const avatar = userData?.avatar || "data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='40' height='40'%3E%3Ccircle cx='20' cy='20' r='20' fill='%23334155'/%3E%3C/svg%3E";
     const displayName = userData?.displayName || 'User';
     const timeAgo = getTimeAgo(post.timestamp);
 
@@ -474,7 +490,7 @@ async function loadFriends() {
             };
 
             friendCard.innerHTML = `
-                <img src="${friend.avatar || 'https://via.placeholder.com/80'}" alt="${friend.name}">
+                <img src="${friend.avatar || "data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='80' height='80'%3E%3Ccircle cx='40' cy='40' r='40' fill='%23334155'/%3E%3C/svg%3E"}" alt="${friend.name}">
                 <div class="friend-card-name">${friend.name}</div>
             `;
 
@@ -682,6 +698,48 @@ function initializeEventListeners() {
                 sendBtn.click();
             }
         });
+    }
+}
+
+// Report User
+async function reportUser(userId) {
+    const reason = prompt('Please describe the reason for reporting this user:');
+    if (!reason) return;
+
+    try {
+        const userRef = await firebase.database().ref(`users/${userId}`).once('value');
+        const userData = userRef.val();
+
+        const reportRef = firebase.database().ref('reports').push();
+        await reportRef.set({
+            type: 'user',
+            targetId: userId,
+            targetName: userData.displayName || userData.name || 'Unknown User',
+            reporterId: currentUser.uid,
+            reporterName: currentUser.displayName,
+            reason: reason,
+            status: 'pending',
+            timestamp: Date.now()
+        });
+
+        alert('Report submitted. Thank you for helping keep our community safe!');
+    } catch (error) {
+        console.error('Error reporting user:', error);
+        alert('Failed to submit report');
+    }
+}
+
+// Block User
+async function blockUserProfile(userId) {
+    if (!confirm('Are you sure you want to block this user? You won\'t see their posts or messages.')) return;
+
+    try {
+        await firebase.database().ref(`users/${currentUser.uid}/blockedUsers/${userId}`).set(true);
+        alert('User blocked successfully');
+        window.location.href = 'dashboard.html';
+    } catch (error) {
+        console.error('Error blocking user:', error);
+        alert('Failed to block user');
     }
 }
 

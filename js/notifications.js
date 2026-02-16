@@ -56,6 +56,15 @@ function initializeNotifications(userId) {
     notificationsRef.on('child_added', (snapshot) => {
         const notification = snapshot.val();
         
+        // Check preferences
+        const settings = window.userSettings || {};
+        if (notification.type === 'like' && settings.notifyLikes === false) return;
+        if (notification.type === 'comment' && settings.notifyComments === false) return;
+        if (notification.type === 'friend_request' && settings.notifyFriendRequests === false) return;
+        
+        // For legacy notifications without type, or other types, we allow them by default
+        // unless strictly filtered.
+        
         // Only show for new notifications (not on initial load)
         if (notification && !notification.read) {
             const timeDiff = Date.now() - new Date(notification.timestamp).getTime();
@@ -118,7 +127,7 @@ async function sendFriendRequest(recipientId, recipientName) {
     try {
         await database.ref(`friendRequests/${recipientId}/${currentUser.uid}`).set({
             senderName: currentUser.displayName,
-            senderAvatar: currentUser.photoURL || 'https://via.placeholder.com/40',
+            senderAvatar: currentUser.photoURL || "data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='40' height='40'%3E%3Ccircle cx='20' cy='20' r='20' fill='%23334155'/%3E%3C/svg%3E",
             timestamp: new Date().toISOString(),
             status: 'pending'
         });

@@ -1,0 +1,152 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>C-meet Admin Portal</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <style>
+        body { font-family: 'Inter', sans-serif; }
+        .glass-panel { background: rgba(30, 41, 59, 0.7); backdrop-filter: blur(12px); border: 1px solid rgba(255, 255, 255, 0.05); }
+        
+        /* Data Table Styling */
+        .data-table { width: 100%; border-collapse: collapse; }
+        .data-table th { text-align: left; padding: 12px 16px; color: #94a3b8; font-size: 0.75rem; text-transform: uppercase; letter-spacing: 0.05em; border-bottom: 1px solid #334155; }
+        .data-table td { padding: 16px; color: #e2e8f0; border-bottom: 1px solid #1e293b; font-size: 0.875rem; }
+        .data-table tr:hover { background: rgba(51, 65, 85, 0.3); }
+        
+        /* Status Badges */
+        .badge { padding: 4px 8px; border-radius: 9999px; font-size: 0.7rem; font-weight: 600; }
+        .badge-success { background: rgba(16, 185, 129, 0.2); color: #34d399; }
+        .badge-warning { background: rgba(245, 158, 11, 0.2); color: #fbbf24; }
+        .badge-danger { background: rgba(239, 68, 68, 0.2); color: #f87171; }
+    </style>
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    colors: {
+                        slate: { 850: "#151f32", 900: "#0f172a" },
+                        brand: { blue: "#3B82F6" }
+                    }
+                }
+            }
+        }
+    </script>
+</head>
+<body class="bg-slate-900 text-slate-300 h-screen flex overflow-hidden">
+
+    <!-- Sidebar -->
+    <aside class="w-64 bg-slate-800 border-r border-slate-700 flex flex-col shrink-0">
+        <div class="p-6 flex items-center gap-3">
+            <div class="w-8 h-8 rounded-lg bg-red-500 flex items-center justify-center text-white font-bold shadow-lg shadow-red-500/20">
+                A
+            </div>
+            <h1 class="font-bold text-white tracking-tight">Admin Panel</h1>
+        </div>
+
+        <nav class="flex-1 px-4 space-y-1">
+            <a href="#" class="flex items-center gap-3 px-4 py-3 bg-brand-blue/10 text-brand-blue rounded-xl font-medium">
+                <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2H6a2 2 0 01-2-2V6zM14 6a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2h-2a2 2 0 01-2-2V6zM4 16a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2H6a2 2 0 01-2-2v-2zM14 16a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2h-2a2 2 0 01-2-2v-2z"/></svg>
+                Dashboard
+            </a>
+            <a href="#" class="flex items-center gap-3 px-4 py-3 text-slate-400 hover:text-white hover:bg-slate-700/50 rounded-xl transition-colors">
+                <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4.354a4 4 0 110 5.292M15 21H3v-1a6 6 0 0112 0v1zm0 0h6v-1a6 6 0 00-9-5.197M13 7a4 4 0 11-8 0 4 4 0 018 0z"/></svg>
+                Users
+            </a>
+            <a href="#" class="flex items-center gap-3 px-4 py-3 text-slate-400 hover:text-white hover:bg-slate-700/50 rounded-xl transition-colors">
+                <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z"/></svg>
+                Reports <span class="ml-auto bg-red-500 text-white text-xs px-2 py-0.5 rounded-full" id="reportCount">0</span>
+            </a>
+            <a href="#" class="flex items-center gap-3 px-4 py-3 text-slate-400 hover:text-white hover:bg-slate-700/50 rounded-xl transition-colors">
+                <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10.325 4.317c.426-1.756 2.924-1.756 3.35 0a1.724 1.724 0 002.573 1.066c1.543-.94 3.31.826 2.37 2.37a1.724 1.724 0 001.065 2.572c1.756.426 1.756 2.924 0 3.35a1.724 1.724 0 00-1.066 2.573c.94 1.543-.826 3.31-2.37 2.37a1.724 1.724 0 00-2.572 1.065c-.426 1.756-2.924 1.756-3.35 0a1.724 1.724 0 00-2.573-1.066c-1.543.94-3.31-.826-2.37-2.37a1.724 1.724 0 00-1.065-2.572c-1.756-.426-1.756-2.924 0-3.35a1.724 1.724 0 001.066-2.573c-.94-1.543.826-3.31 2.37-2.37.996.608 2.296.07 2.572-1.065z"/><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"/></svg>
+                Settings
+            </a>
+        </nav>
+
+        <div class="p-4 border-t border-slate-700">
+            <a href="../dashboard.html" class="flex items-center gap-3 px-4 py-2 text-slate-400 hover:text-white transition-colors text-sm">
+                <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 16l4-4m0 0l-4-4m4 4H7m6 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h4a3 3 0 013 3v1"/></svg>
+                Exit to App
+            </a>
+        </div>
+    </aside>
+
+    <!-- Main Content -->
+    <main class="flex-1 flex flex-col min-w-0 overflow-hidden">
+        <!-- Top Bar -->
+        <header class="h-16 bg-slate-800/50 border-b border-slate-700 flex items-center justify-between px-8">
+            <div class="w-96">
+                <input type="text" placeholder="Search users, posts, logs..." class="w-full bg-slate-900 border border-slate-700 rounded-lg px-4 py-2 text-sm text-white focus:border-brand-blue outline-none">
+            </div>
+            <div class="flex items-center gap-4">
+                <div class="flex items-center gap-2">
+                    <div class="w-2 h-2 rounded-full bg-green-500"></div>
+                    <span class="text-xs text-slate-400">System Operational</span>
+                </div>
+                <img src="https://ui-avatars.com/api/?name=Admin&background=ef4444&color=fff" class="w-8 h-8 rounded-full">
+            </div>
+        </header>
+
+        <!-- Dashboard Content -->
+        <div class="flex-1 overflow-y-auto p-8">
+            
+            <!-- Stats Grid -->
+            <div class="grid grid-cols-1 md:grid-cols-4 gap-6 mb-8">
+                <div class="bg-slate-800 border border-slate-700 rounded-xl p-6">
+                    <h3 class="text-slate-400 text-sm font-medium uppercase mb-2">Total Users</h3>
+                    <p class="text-3xl font-bold text-white" id="statTotalUsers">--</p>
+                    <span class="text-green-400 text-xs font-medium">↑ 12% this week</span>
+                </div>
+                <div class="bg-slate-800 border border-slate-700 rounded-xl p-6">
+                    <h3 class="text-slate-400 text-sm font-medium uppercase mb-2">Active Today</h3>
+                    <p class="text-3xl font-bold text-white" id="statActiveUsers">--</p>
+                </div>
+                <div class="bg-slate-800 border border-slate-700 rounded-xl p-6">
+                    <h3 class="text-slate-400 text-sm font-medium uppercase mb-2">Total Posts</h3>
+                    <p class="text-3xl font-bold text-white" id="statTotalPosts">--</p>
+                </div>
+                <div class="bg-slate-800 border border-slate-700 rounded-xl p-6">
+                    <h3 class="text-slate-400 text-sm font-medium uppercase mb-2">Pending Reports</h3>
+                    <p class="text-3xl font-bold text-red-400" id="statReports">0</p>
+                </div>
+            </div>
+
+            <!-- Recent Users Table -->
+            <div class="bg-slate-800 border border-slate-700 rounded-xl overflow-hidden mb-8">
+                <div class="px-6 py-4 border-b border-slate-700 flex justify-between items-center">
+                    <h3 class="font-bold text-white">Recent Registrations</h3>
+                    <button class="text-brand-blue text-sm hover:underline">View All</button>
+                </div>
+                <div class="overflow-x-auto">
+                    <table class="data-table">
+                        <thead>
+                            <tr>
+                                <th>User</th>
+                                <th>Email</th>
+                                <th>Joined</th>
+                                <th>Status</th>
+                                <th>Actions</th>
+                            </tr>
+                        </thead>
+                        <tbody id="recentUsersTable">
+                            <!-- Populated by JS -->
+                            <tr><td colspan="5" class="text-center text-slate-500 py-8">Loading data...</td></tr>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+
+        </div>
+    </main>
+
+    <!-- Firebase SDKs -->
+    <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-app-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-auth-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-database-compat.js"></script>
+    
+    <script src="../js/config.js"></script>
+    <script src="../js/admin.js"></script>
+</body>
+</html>

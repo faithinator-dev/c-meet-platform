@@ -1,5 +1,22 @@
 // Settings and Enhanced Profile Management
 
+// Apply Theme & Accent Color
+function applyTheme(theme, accentColor) {
+    const root = document.documentElement;
+    
+    // Apply Accent Color
+    if (accentColor) {
+        root.style.setProperty('--global-blue', accentColor);
+    }
+    
+    // Apply Dark/Light Mode
+    if (theme === 'light') {
+        document.body.classList.add('light-mode');
+    } else {
+        document.body.classList.remove('light-mode');
+    }
+}
+
 // Open settings modal
 function openSettings() {
     const modal = document.getElementById('settingsModal');
@@ -37,9 +54,19 @@ async function loadUserSettings() {
             document.getElementById('showPhone').checked = userData.showPhone === true;
             document.getElementById('showBirthday').checked = userData.showBirthday === true;
             
+            // Notification settings
+            document.getElementById('notifyLikes').checked = userData.notifyLikes !== false;
+            document.getElementById('notifyComments').checked = userData.notifyComments !== false;
+            document.getElementById('notifyFriendRequests').checked = userData.notifyFriendRequests !== false;
+
             // Sound settings
             document.getElementById('soundToggle').checked = areSoundsEnabled();
             
+            // Theme settings
+            document.getElementById('themeSelect').value = userData.theme || 'dark';
+            document.getElementById('accentColorInput').value = userData.accentColor || '#3B82F6';
+            updateActiveAccentBtn(userData.accentColor || '#3B82F6');
+
             // Profile picture preview
             if (userData.avatar) {
                 document.getElementById('settingsAvatarPreview').src = userData.avatar;
@@ -50,6 +77,16 @@ async function loadUserSettings() {
     }
 }
 
+function updateActiveAccentBtn(color) {
+    document.querySelectorAll('.accent-btn').forEach(btn => {
+        if (btn.dataset.color === color) {
+            btn.classList.add('ring-white');
+        } else {
+            btn.classList.remove('ring-white');
+        }
+    });
+}
+
 // Save user settings
 async function saveUserSettings() {
     const user = auth.currentUser;
@@ -58,6 +95,9 @@ async function saveUserSettings() {
     const submitBtn = document.getElementById('saveSettingsBtn');
     submitBtn.disabled = true;
     submitBtn.textContent = 'Saving...';
+
+    const theme = document.getElementById('themeSelect').value;
+    const accentColor = document.getElementById('accentColorInput').value;
 
     try {
         const updates = {
@@ -74,6 +114,11 @@ async function saveUserSettings() {
             showEmail: document.getElementById('showEmail').checked,
             showPhone: document.getElementById('showPhone').checked,
             showBirthday: document.getElementById('showBirthday').checked,
+            notifyLikes: document.getElementById('notifyLikes').checked,
+            notifyComments: document.getElementById('notifyComments').checked,
+            notifyFriendRequests: document.getElementById('notifyFriendRequests').checked,
+            theme: theme,
+            accentColor: accentColor,
             updatedAt: Date.now()
         };
 
@@ -85,6 +130,10 @@ async function saveUserSettings() {
                 displayName: updates.displayName
             });
         }
+
+        // Apply theme immediately
+        applyTheme(theme, accentColor);
+        window.userSettings = { ...window.userSettings, ...updates };
 
         if (typeof sounds !== 'undefined') sounds.success();
         showNotification('✅ Settings saved successfully!');
@@ -196,6 +245,17 @@ document.addEventListener('DOMContentLoaded', () => {
         toggleSounds();
     });
 
+    // Accent color buttons
+    document.querySelectorAll('.accent-btn').forEach(btn => {
+        btn.addEventListener('click', () => {
+            const color = btn.dataset.color;
+            document.getElementById('accentColorInput').value = color;
+            updateActiveAccentBtn(color);
+            // Preview
+            document.documentElement.style.setProperty('--global-blue', color);
+        });
+    });
+
     // Close user profile modal
     document.getElementById('closeUserProfileModal')?.addEventListener('click', () => {
         document.getElementById('userProfileModal').classList.add('hidden');
@@ -225,3 +285,6 @@ document.addEventListener('DOMContentLoaded', () => {
         });
     });
 });
+
+// Expose globally
+window.applyTheme = applyTheme;

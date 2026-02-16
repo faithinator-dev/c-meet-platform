@@ -1,0 +1,111 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Group Details - C-meet</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="css/styles.css">
+    <style>
+        * { font-family: 'Inter', sans-serif; }
+        body { margin: 0; background: #0f172a; color: #fff; }
+        .glass-panel { background: rgba(30, 41, 59, 0.5); backdrop-filter: blur(10px); }
+        .badge { padding: 0.25rem 0.75rem; border-radius: 9999px; font-size: 0.75rem; font-weight: 600; }
+        .badge-admin { background: #ef4444; color: white; }
+        .badge-moderator { background: #f59e0b; color: white; }
+        .badge-member { background: #3b82f6; color: white; }
+    </style>
+</head>
+<body>
+    <div class="min-h-screen">
+        <!-- Header -->
+        <div class="glass-panel border-b border-slate-800 px-6 py-4">
+            <div class="max-w-7xl mx-auto flex items-center justify-between">
+                <a href="groups.html" class="flex items-center gap-2 text-slate-400 hover:text-white">
+                    <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 19l-7-7 7-7"/></svg>
+                    Back to Groups
+                </a>
+                <div id="groupActions" class="flex gap-2">
+                    <!-- Action buttons will be added here -->
+                </div>
+            </div>
+        </div>
+
+        <!-- Main Content -->
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+            <!-- Group Header -->
+            <div class="glass-panel rounded-2xl p-8 mb-8">
+                <div class="flex items-start justify-between mb-6">
+                    <div>
+                        <h1 id="groupName" class="text-4xl font-bold mb-2">Loading...</h1>
+                        <p id="groupDescription" class="text-slate-400 text-lg mb-4"></p>
+                        <div class="flex items-center gap-4 text-sm">
+                            <span id="memberCount" class="text-slate-300">0 members</span>
+                            <span id="groupCategory" class="text-slate-500 uppercase"></span>
+                        </div>
+                    </div>
+                    <span id="userRole" class="badge badge-member">Member</span>
+                </div>
+            </div>
+
+            <div class="grid grid-cols-1 lg:grid-cols-3 gap-8">
+                <!-- Members List -->
+                <div class="lg:col-span-2">
+                    <div class="glass-panel rounded-2xl p-6">
+                        <h2 class="text-2xl font-bold mb-6">Members</h2>
+                        <div id="membersList" class="space-y-3">
+                            <!-- Members will be loaded here -->
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Sidebar -->
+                <div class="space-y-6">
+                    <!-- Admins -->
+                    <div class="glass-panel rounded-xl p-6">
+                        <h3 class="text-lg font-bold mb-4">Group Admins</h3>
+                        <div id="adminsList" class="space-y-3">
+                            <!-- Admins will be loaded here -->
+                        </div>
+                    </div>
+
+                    <!-- Moderators -->
+                    <div class="glass-panel rounded-xl p-6">
+                        <h3 class="text-lg font-bold mb-4">Moderators</h3>
+                        <div id="moderatorsList" class="space-y-3">
+                            <!-- Moderators will be loaded here -->
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Change Role Modal -->
+    <div id="roleModal" class="hidden fixed inset-0 bg-black/50 backdrop-blur-sm flex items-center justify-center z-50 p-4">
+        <div class="glass-panel rounded-2xl p-6 max-w-md w-full">
+            <h3 class="text-xl font-bold mb-4">Change User Role</h3>
+            <p class="text-slate-400 mb-4">Select a new role for <span id="roleUserName" class="text-white font-semibold"></span></p>
+            <select id="newRoleSelect" class="w-full bg-slate-800 border border-slate-700 rounded-lg px-4 py-3 text-white mb-4">
+                <option value="member">Member</option>
+                <option value="moderator">Moderator</option>
+                <option value="admin">Admin</option>
+            </select>
+            <div class="flex gap-2">
+                <button id="confirmRoleChange" class="flex-1 bg-blue-600 hover:bg-blue-700 text-white py-2 rounded-lg font-semibold">Confirm</button>
+                <button id="cancelRoleChange" class="flex-1 bg-slate-700 hover:bg-slate-600 text-white py-2 rounded-lg font-semibold">Cancel</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Firebase SDKs -->
+    <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-app-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-auth-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-database-compat.js"></script>
+    
+    <script src="js/config.js"></script>
+    <script src="js/groups.js"></script>
+    <script src="js/group-detail.js"></script>
+</body>
+</html>

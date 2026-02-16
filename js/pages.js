@@ -36,7 +36,7 @@ function displayPageCard(page) {
     const pageCard = document.createElement('div');
     pageCard.className = 'page-card';
     pageCard.innerHTML = `
-        <div class="page-image" style="background-image: url('${page.imageUrl || 'https://via.placeholder.com/300x150'}')"></div>
+        <div class="page-image" style="background-image: url('${page.imageUrl || "data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='300' height='150'%3E%3Crect width='300' height='150' fill='%23334155'/%3E%3C/svg%3E"}')"></div>
         <div class="page-content">
             <h3 class="page-name">${escapeHtml(page.name)}</h3>
             <p class="page-category">${page.category}</p>
@@ -72,7 +72,7 @@ async function createPage(name, description, category, imageUrl) {
         name: name,
         description: description,
         category: category,
-        imageUrl: imageUrl || 'https://via.placeholder.com/300x150',
+        imageUrl: imageUrl || "data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='300' height='150'%3E%3Crect width='300' height='150' fill='%23334155'/%3E%3C/svg%3E",
         adminId: user.uid,
         adminName: userData.displayName || 'Anonymous',
         createdAt: Date.now(),

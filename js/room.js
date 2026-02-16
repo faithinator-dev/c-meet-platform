@@ -52,7 +52,7 @@ auth.onAuthStateChanged(async (user) => {
     // Add user to room if not already member
     await database.ref(`rooms/${roomId}/members/${user.uid}`).set({
         name: user.displayName,
-        avatar: user.photoURL || 'https://via.placeholder.com/40',
+        avatar: user.photoURL || "data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='40' height='40'%3E%3Ccircle cx='20' cy='20' r='20' fill='%23334155'/%3E%3C/svg%3E",
         joinedAt: new Date().toISOString()
     });
     
@@ -223,7 +223,7 @@ function loadRoom() {
         document.getElementById('roomName').textContent = currentRoom.name;
         document.getElementById('roomDescription').textContent = currentRoom.description;
         document.getElementById('roomCategory').textContent = currentRoom.category;
-        document.getElementById('roomImage').src = currentRoom.image || 'https://via.placeholder.com/300x150';
+        document.getElementById('roomImage').src = currentRoom.image || "data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='300' height='150'%3E%3Crect width='300' height='150' fill='%23334155'/%3E%3C/svg%3E";
     });
 }
 
@@ -243,7 +243,7 @@ function loadMembers() {
             const memberItem = document.createElement('div');
             memberItem.className = 'member-item';
             memberItem.innerHTML = `
-                <img src="${member.avatar || 'https://via.placeholder.com/40'}" 
+                <img src="${member.avatar || "data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='40' height='40'%3E%3Ccircle cx='20' cy='20' r='20' fill='%23334155'/%3E%3C/svg%3E"}" 
                      alt="${member.name}" class="member-avatar">
                 <div class="member-info">
                     <div class="member-name">${member.name}</div>
@@ -302,7 +302,7 @@ function displayMessage(message, messageId) {
     messageDiv.setAttribute('data-message-id', messageId);
     
     let messageContent = `
-        <img src="${message.userAvatar || 'https://via.placeholder.com/40'}" 
+        <img src="${message.userAvatar || "data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='40' height='40'%3E%3Ccircle cx='20' cy='20' r='20' fill='%23334155'/%3E%3C/svg%3E"}" 
              alt="${message.userName}" class="message-avatar">
         <div class="message-content">
             <div class="message-header">
@@ -362,7 +362,7 @@ async function sendMessage() {
         await messagesRef.push({
             userId: currentUser.uid,
             userName: currentUser.displayName,
-            userAvatar: currentUser.photoURL || 'https://via.placeholder.com/40',
+            userAvatar: currentUser.photoURL || "data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='40' height='40'%3E%3Ccircle cx='20' cy='20' r='20' fill='%23334155'/%3E%3C/svg%3E",
             text: text,
             timestamp: new Date().toISOString()
         });
@@ -404,7 +404,7 @@ document.getElementById('chatImageUpload').addEventListener('change', async (e) 
             await messagesRef.push({
                 userId: currentUser.uid,
                 userName: currentUser.displayName,
-                userAvatar: currentUser.photoURL || 'https://via.placeholder.com/40',
+                userAvatar: currentUser.photoURL || "data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='40' height='40'%3E%3Ccircle cx='20' cy='20' r='20' fill='%23334155'/%3E%3C/svg%3E",
                 imageUrl: imageUrl,
                 timestamp: new Date().toISOString()
             });

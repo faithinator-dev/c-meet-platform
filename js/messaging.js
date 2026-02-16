@@ -93,7 +93,7 @@ function displayUsers(users) {
             : '<span class="interest-tag">No interests yet</span>';
         
         userCard.innerHTML = `
-            <img src="${user.avatar || 'https://via.placeholder.com/80'}" 
+            <img src="${user.avatar || "data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='80' height='80'%3E%3Ccircle cx='40' cy='40' r='40' fill='%23334155'/%3E%3C/svg%3E"}" 
                  alt="${user.name}" class="user-card-avatar">
             <h3 class="user-card-name">${user.name}</h3>
             <p class="user-card-bio">${user.bio || 'No bio yet'}</p>

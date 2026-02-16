@@ -76,7 +76,7 @@ document.addEventListener('DOMContentLoaded', function() {
                 name: name,
                 displayName: name,
                 email: email,
-                avatar: 'https://via.placeholder.com/120',
+                avatar: "data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='120' height='120'%3E%3Ccircle cx='60' cy='60' r='60' fill='%23334155'/%3E%3C/svg%3E",
                 bio: '',
                 interests: '',
                 location: '',
@@ -88,6 +88,7 @@ document.addEventListener('DOMContentLoaded', function() {
                 showEmail: true,
                 showPhone: false,
                 showBirthday: false,
+                isVerified: false,
                 createdAt: new Date().toISOString()
             });
 
@@ -117,7 +118,7 @@ document.addEventListener('DOMContentLoaded', function() {
                     name: user.displayName,
                     displayName: user.displayName,
                     email: user.email,
-                    avatar: user.photoURL || 'https://via.placeholder.com/120',
+                    avatar: user.photoURL || "data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='120' height='120'%3E%3Ccircle cx='60' cy='60' r='60' fill='%23334155'/%3E%3C/svg%3E",
                     bio: '',
                     interests: '',
                     location: '',
@@ -129,6 +130,7 @@ document.addEventListener('DOMContentLoaded', function() {
                     showEmail: true,
                     showPhone: false,
                     showBirthday: false,
+                    isVerified: false,
                     createdAt: new Date().toISOString()
                 });
 
@@ -156,7 +158,7 @@ async function ensureGeneralRoomExists() {
             name: '🌍 General Chat',
             description: 'Welcome to the general chat room! This is a place for everyone to meet and chat.',
             category: 'other',
-            image: 'https://via.placeholder.com/400x200?text=General+Chat',
+            image: "data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='400' height='200'%3E%3Crect width='400' height='200' fill='%23334155'/%3E%3Ctext fill='%23ffffff' font-size='24' font-family='Arial' x='50%25' y='50%25' text-anchor='middle' dominant-baseline='middle'%3EGeneral Chat%3C/text%3E%3C/svg%3E",
             createdBy: 'system',
             createdAt: new Date().toISOString(),
             isGeneral: true,
