@@ -116,6 +116,19 @@ window.displayPost = function(post) {
         </div>
         <div class="post-content">${formattedContent}</div>
         ${post.imageUrl ? `<img src="${post.imageUrl}" alt="Post image" class="post-image">` : ''}
+        ${post.fileAttachment ? `
+            <div class="file-attachment mt-3 p-4 bg-slate-800/50 rounded-lg border border-slate-700 flex items-center gap-3 hover:bg-slate-800/70 transition-colors">
+                <div class="text-4xl">${typeof getFileIcon === 'function' ? getFileIcon(post.fileAttachment.name) : '📎'}</div>
+                <div class="flex-1 min-w-0">
+                    <h4 class="text-white font-medium truncate">${escapeHtml(post.fileAttachment.name)}</h4>
+                    <p class="text-slate-400 text-sm">${typeof formatFileSize === 'function' ? formatFileSize(post.fileAttachment.size) : (Math.round(post.fileAttachment.size / 1024) + ' KB')}</p>
+                </div>
+                <a href="${post.fileAttachment.url}" target="_blank" download="${post.fileAttachment.name}" class="bg-blue-600 hover:bg-blue-700 text-white px-4 py-2 rounded-lg font-medium flex items-center gap-2 transition-colors">
+                    <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4"/></svg>
+                    Download
+                </a>
+            </div>
+        ` : ''}
         ${pollHTML}
         <div class="post-stats">
             ${reactionSummary}

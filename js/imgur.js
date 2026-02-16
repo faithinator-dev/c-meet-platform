@@ -1,4 +1,4 @@
-// Cloudinary Image Upload
+// Cloudinary Upload (Images & Files)
 // Simple setup: Just sign up at cloudinary.com and get your cloud name
 // Enable "unsigned uploads" in Settings > Upload
 
@@ -11,12 +11,12 @@ async function uploadToImgur(file) {
         throw new Error('No file provided');
     }
 
-    // Check file size (max 10MB)
+    // Check file size (max 10MB for images)
     if (file.size > 10 * 1024 * 1024) {
         throw new Error('File size must be less than 10MB');
     }
 
-    // Check file type
+    // Check file type (images only)
     if (!file.type.startsWith('image/')) {
         throw new Error('File must be an image');
     }

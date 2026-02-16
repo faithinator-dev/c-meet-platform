@@ -192,6 +192,19 @@ function displayPost(post) {
         </div>
         <div class="post-content">${escapeHtml(post.content)}</div>
         ${post.imageUrl ? `<img src="${post.imageUrl}" alt="Post image" class="post-image" loading="lazy">` : ''}
+        ${post.fileAttachment ? `
+            <div class="file-attachment mt-3 p-4 bg-slate-800/50 rounded-lg border border-slate-700 flex items-center gap-3 hover:bg-slate-800/70 transition-colors">
+                <div class="text-4xl">${getFileIcon(post.fileAttachment.name)}</div>
+                <div class="flex-1 min-w-0">
+                    <h4 class="text-white font-medium truncate">${escapeHtml(post.fileAttachment.name)}</h4>
+                    <p class="text-slate-400 text-sm">${formatFileSize(post.fileAttachment.size)}</p>
+                </div>
+                <a href="${post.fileAttachment.url}" target="_blank" download="${post.fileAttachment.name}" class="bg-blue-600 hover:bg-blue-700 text-white px-4 py-2 rounded-lg font-medium flex items-center gap-2 transition-colors">
+                    <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4"/></svg>
+                    Download
+                </a>
+            </div>
+        ` : ''}
         ${pollHTML}
         <div class="post-stats">
             <span>${likeCount} ${likeCount === 1 ? 'like' : 'likes'}</span>
@@ -223,7 +236,7 @@ function displayPost(post) {
 }
 
 // Create new post
-async function createPost(content, privacy, imageUrl = null, pollData = null) {
+async function createPost(content, privacy, imageUrl = null, pollData = null, fileAttachment = null) {
     const user = auth.currentUser;
     if (!user) return;
 
@@ -247,6 +260,7 @@ async function createPost(content, privacy, imageUrl = null, pollData = null) {
         privacy: privacy,
         timestamp: Date.now(),
         imageUrl: imageUrl,
+        fileAttachment: fileAttachment,
         hashtags: hashtags.length > 0 ? hashtags : null,
         mentions: mentions.length > 0 ? mentions : null,
         poll: pollData
@@ -661,16 +675,38 @@ document.addEventListener('DOMContentLoaded', () => {
             submitPost.textContent = 'Posting...';
 
             let imageUrl = null;
+            let fileAttachment = null;
+            
+            // Upload image if present
             const fileInput = document.getElementById('postImageInput');
             if (fileInput.files.length > 0) {
                 try {
                     imageUrl = await uploadToImgur(fileInput.files[0]);
                 } catch (error) {
                     console.error('Image upload failed:', error);
+                    alert('Image upload failed: ' + error.message);
+                    submitPost.disabled = false;
+                    submitPost.textContent = 'Post';
+                    return;
+                }
+            }
+            
+            // Upload file attachment if present
+            const attachmentInput = document.getElementById('postFileInput');
+            if (attachmentInput && attachmentInput.files.length > 0) {
+                try {
+                    submitPost.textContent = 'Uploading file...';
+                    fileAttachment = await uploadFileToCloudinary(attachmentInput.files[0]);
+                } catch (error) {
+                    console.error('File upload failed:', error);
+                    alert('File upload failed: ' + error.message);
+                    submitPost.disabled = false;
+                    submitPost.textContent = 'Post';
+                    return;
                 }
             }
 
-            await createPost(content, privacy, imageUrl, pollData);
+            await createPost(content, privacy, imageUrl, pollData, fileAttachment);
             
             document.getElementById('createPostModal').classList.add('hidden');
             resetPostForm();
@@ -733,6 +769,33 @@ document.addEventListener('DOMContentLoaded', () => {
     const removePollBtn = document.getElementById('removePollBtn');
     const addPollOption = document.getElementById('addPollOption');
     const pollCreationSection = document.getElementById('pollCreationSection');
+    const postFileInput = document.getElementById('postFileInput');
+    const removePostFile = document.getElementById('removePostFile');
+    
+    // Handle file attachment preview
+    if (postFileInput) {
+        postFileInput.addEventListener('change', (e) => {
+            const file = e.target.files[0];
+            if (file) {
+                const preview = document.getElementById('postFilePreview');
+                const icon = document.getElementById('filePreviewIcon');
+                const name = document.getElementById('filePreviewName');
+                const size = document.getElementById('filePreviewSize');
+                
+                icon.textContent = typeof getFileIcon === 'function' ? getFileIcon(file.name) : '📎';
+                name.textContent = file.name;
+                size.textContent = typeof formatFileSize === 'function' ? formatFileSize(file.size) : (Math.round(file.size / 1024) + ' KB');
+                preview.classList.remove('hidden');
+            }
+        });
+    }
+    
+    if (removePostFile) {
+        removePostFile.addEventListener('click', () => {
+            document.getElementById('postFilePreview').classList.add('hidden');
+            if (postFileInput) postFileInput.value = '';
+        });
+    }
     
     if (addPollBtn) {
         addPollBtn.addEventListener('click', () => {
@@ -741,6 +804,11 @@ document.addEventListener('DOMContentLoaded', () => {
             const imagePreview = document.getElementById('postImagePreview');
             if (!imagePreview.classList.contains('hidden')) {
                 removePostImage.click();
+            }
+            // Hide file attachment when poll is active
+            const filePreview = document.getElementById('postFilePreview');
+            if (filePreview && !filePreview.classList.contains('hidden')) {
+                removePostFile.click();
             }
         });
     }
@@ -790,6 +858,14 @@ function resetPostForm() {
     document.getElementById('postPrivacy').value = 'public';
     document.getElementById('postImagePreview').classList.add('hidden');
     document.getElementById('postImageInput').value = '';
+    
+    // Reset file attachment
+    const fileInput = document.getElementById('postFileInput');
+    if (fileInput) {
+        fileInput.value = '';
+        const filePreview = document.getElementById('postFilePreview');
+        if (filePreview) filePreview.classList.add('hidden');
+    }
     
     // Reset poll section
     const pollSection = document.getElementById('pollCreationSection');
