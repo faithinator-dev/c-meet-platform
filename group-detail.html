@@ -12,6 +12,8 @@
         body { margin: 0; background: #0f172a; color: #fff; }
         .glass-panel { background: rgba(30, 41, 59, 0.5); backdrop-filter: blur(10px); }
         .badge { padding: 0.25rem 0.75rem; border-radius: 9999px; font-size: 0.75rem; font-weight: 600; }
+        .badge-owner { background: #dc2626; color: white; }
+        .badge-subadmin { background: #f59e0b; color: white; }
         .badge-admin { background: #ef4444; color: white; }
         .badge-moderator { background: #f59e0b; color: white; }
         .badge-member { background: #3b82f6; color: white; }
@@ -69,14 +71,6 @@
                             <!-- Admins will be loaded here -->
                         </div>
                     </div>
-
-                    <!-- Moderators -->
-                    <div class="glass-panel rounded-xl p-6">
-                        <h3 class="text-lg font-bold mb-4">Moderators</h3>
-                        <div id="moderatorsList" class="space-y-3">
-                            <!-- Moderators will be loaded here -->
-                        </div>
-                    </div>
                 </div>
             </div>
         </div>
@@ -89,12 +83,34 @@
             <p class="text-slate-400 mb-4">Select a new role for <span id="roleUserName" class="text-white font-semibold"></span></p>
             <select id="newRoleSelect" class="w-full bg-slate-800 border border-slate-700 rounded-lg px-4 py-3 text-white mb-4">
                 <option value="member">Member</option>
-                <option value="moderator">Moderator</option>
-                <option value="admin">Admin</option>
+                <option value="subadmin">Sub-Admin</option>
             </select>
             <div class="flex gap-2">
                 <button id="confirmRoleChange" class="flex-1 bg-blue-600 hover:bg-blue-700 text-white py-2 rounded-lg font-semibold">Confirm</button>
                 <button id="cancelRoleChange" class="flex-1 bg-slate-700 hover:bg-slate-600 text-white py-2 rounded-lg font-semibold">Cancel</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Add Member Modal -->
+    <div id="addMemberModal" class="hidden fixed inset-0 bg-black/50 backdrop-blur-sm flex items-center justify-center z-50 p-4">
+        <div class="glass-panel rounded-2xl p-6 max-w-2xl w-full max-h-[80vh] overflow-hidden flex flex-col">
+            <div class="flex items-center justify-between mb-4">
+                <h3 class="text-xl font-bold">Add Members</h3>
+                <button id="cancelAddMember" class="text-slate-400 hover:text-white">
+                    <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"/></svg>
+                </button>
+            </div>
+            
+            <input 
+                type="text" 
+                placeholder="Search users..." 
+                class="w-full bg-slate-800 border border-slate-700 rounded-lg px-4 py-3 text-white mb-4"
+                oninput="searchAvailableUsers(this.value)"
+            >
+            
+            <div id="availableUsersList" class="space-y-3 overflow-y-auto flex-1">
+                <!-- Available users will be loaded here -->
             </div>
         </div>
     </div>

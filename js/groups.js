@@ -78,11 +78,12 @@ async function createGroup() {
             category: category,
             privacy: privacy,
             createdBy: currentUser.uid,
+            owner: currentUser.uid, // Main admin who created the group
             createdAt: Date.now(),
             memberCount: 1,
             members: {
                 [currentUser.uid]: {
-                    role: 'admin',
+                    role: 'owner', // Creator is the owner
                     joinedAt: Date.now(),
                     reputation: 0
                 }
@@ -170,11 +171,12 @@ async function loadMyGroups() {
 
         myGroups.forEach(group => {
             const userRole = group.members[currentUser.uid].role;
+            const roleDisplay = userRole === 'owner' ? 'Owner' : userRole === 'subadmin' ? 'Sub-Admin' : userRole;
             const groupCard = document.createElement('div');
             groupCard.className = 'group-card';
             groupCard.innerHTML = `
                 <div class="flex items-center justify-between mb-3">
-                    <span class="badge badge-${userRole}">${userRole}</span>
+                    <span class="badge badge-${userRole}">${roleDisplay}</span>
                     <span class="text-sm text-slate-400">${group.memberCount || 0} members</span>
                 </div>
                 <h3 class="text-xl font-bold mb-2">${group.name}</h3>
@@ -373,13 +375,13 @@ async function getUserReputation(userId) {
 // Role Management
 async function updateUserRole(groupId, userId, newRole) {
     try {
-        // Check if current user has permission
+        // Check if current user has permission (only owner can change roles)
         const groupRef = await firebase.database().ref(`groups/${groupId}`).once('value');
         const group = groupRef.val();
         const currentUserRole = group.members[currentUser.uid]?.role;
 
-        if (currentUserRole !== 'admin') {
-            alert('You don\'t have permission to change roles');
+        if (currentUserRole !== 'owner') {
+            alert('Only the group owner can change member roles');
             return;
         }
 
@@ -399,9 +401,9 @@ async function hasPermission(groupId, userId, action) {
         const userRole = group.members[userId]?.role;
 
         const permissions = {
-            'admin': ['all'],
-            'moderator': ['delete_posts', 'delete_comments', 'kick_users'],
-            'member': ['create_posts', 'create_comments']
+            'owner': ['all'], // Owner can do everything
+            'subadmin': ['add_members', 'remove_members'], // Sub-admin can only manage members
+            'member': ['create_posts', 'create_comments'] // Members can only create content
         };
 
         return permissions[userRole]?.includes(action) || permissions[userRole]?.includes('all');
@@ -416,9 +418,9 @@ async function kickUser(groupId, userId) {
     if (!confirm('Are you sure you want to remove this user from the group?')) return;
 
     try {
-        const hasPerms = await hasPermission(groupId, currentUser.uid, 'kick_users');
+        const hasPerms = await hasPermission(groupId, currentUser.uid, 'remove_members');
         if (!hasPerms) {
-            alert('You don\'t have permission to kick users');
+            alert('You don\'t have permission to remove members');
             return;
         }
 
