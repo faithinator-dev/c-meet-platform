@@ -491,15 +491,22 @@ window.addEventListener("click", (e) => {
 // Current notification filter
 let currentNotificationTab = 'all';
 let previousNotificationCount = 0;
+let notificationDebounceTimer = null;
 
 function listenForNotifications() {
   const notificationsRef = database.ref(`notifications/${currentUser.uid}`);
   const friendRequestsRef = database.ref(`friendRequests/${currentUser.uid}`);
   
+  // Debounced display function to reduce updates
+  function debouncedDisplay() {
+    clearTimeout(notificationDebounceTimer);
+    notificationDebounceTimer = setTimeout(() => {
+      displayNotifications();
+    }, 500); // Wait 500ms before updating
+  }
+  
   // Listen to both notifications and friend requests
   notificationsRef.on("value", (snapshot) => {
-    displayNotifications();
-    
     // Play sound for new notifications
     let currentCount = 0;
     snapshot.forEach(child => {
@@ -510,10 +517,12 @@ function listenForNotifications() {
       if (typeof sounds !== 'undefined') sounds.notification();
     }
     previousNotificationCount = currentCount;
+    
+    debouncedDisplay();
   });
   
   friendRequestsRef.on("value", () => {
-    displayNotifications();
+    debouncedDisplay();
   });
 }
 

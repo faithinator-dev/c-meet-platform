@@ -1361,3 +1361,90 @@ ul {
 .mb-4 { margin-bottom: 16px; }
 .mt-4 { margin-top: 16px; }
 .w-full { width: 100%; }
+/* ==================== PERFORMANCE OPTIMIZATIONS ==================== */
+
+/* Lazy loading images with blur-up effect */
+img[loading="lazy"] {
+    filter: blur(5px);
+    transition: filter 0.3s ease-in;
+}
+
+img[loading="lazy"].loaded {
+    filter: blur(0);
+}
+
+/* Skeleton loading animation */
+@keyframes shimmer {
+    0% {
+        background-position: -1000px 0;
+    }
+    100% {
+        background-position: 1000px 0;
+    }
+}
+
+.skeleton {
+    background: linear-gradient(
+        90deg,
+        #1e293b 0%,
+        #334155 50%,
+        #1e293b 100%
+    );
+    background-size: 1000px 100%;
+    animation: shimmer 2s infinite;
+    border-radius: 8px;
+}
+
+.skeleton-text {
+    height: 16px;
+    margin-bottom: 8px;
+}
+
+.skeleton-avatar {
+    width: 40px;
+    height: 40px;
+    border-radius: 50%;
+}
+
+.skeleton-post {
+    padding: 20px;
+    background: #1e293b;
+    border-radius: 12px;
+    margin-bottom: 16px;
+}
+
+/* Loading spinner */
+.loading-spinner {
+    display: inline-block;
+    width: 20px;
+    height: 20px;
+    border: 3px solid rgba(255, 255, 255, 0.3);
+    border-top-color: #3B82F6;
+    border-radius: 50%;
+    animation: spin 0.8s linear infinite;
+}
+
+@keyframes spin {
+    to { transform: rotate(360deg); }
+}
+
+/* Optimize post images */
+.post-image {
+    content-visibility: auto;
+    contain: layout style paint;
+}
+
+/* Smooth scroll for main content */
+.main-content {
+    scroll-behavior: smooth;
+    will-change: scroll-position;
+}
+
+/* Reduce animation on low-end devices */
+@media (prefers-reduced-motion: reduce) {
+    *, *::before, *::after {
+        animation-duration: 0.01ms !important;
+        animation-iteration-count: 1 !important;
+        transition-duration: 0.01ms !important;
+    }
+}

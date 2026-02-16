@@ -1,55 +1,63 @@
 // Discovery & Matching System
 
-// Load Trending Topics (Hashtags)
-function loadTrendingTopics() {
+// Load Trending Topics (Hashtags) - Optimized to prevent constant updates
+let lastTrendingUpdate = 0;
+const TRENDING_UPDATE_INTERVAL = 60000; // Update every 60 seconds
+
+async function loadTrendingTopics() {
     const trendingList = document.getElementById('trendingList');
     if (!trendingList) return;
 
-    // In a real app, this would be a server-side aggregation.
-    // Here we'll scan the last 50 posts for hashtags.
-    database.ref('posts').limitToLast(50).on('value', (snapshot) => {
-        const hashtags = {};
-        
-        snapshot.forEach((child) => {
-            const post = child.val();
-            if (post.content) {
-                const matches = post.content.match(/#[a-zA-Z0-9_]+/g);
-                if (matches) {
-                    matches.forEach(tag => {
-                        hashtags[tag] = (hashtags[tag] || 0) + 1;
-                    });
-                }
+    // Check if we need to update (throttle updates)
+    const now = Date.now();
+    if (now - lastTrendingUpdate < TRENDING_UPDATE_INTERVAL) {
+        return; // Skip update if too recent
+    }
+    lastTrendingUpdate = now;
+
+    // Use .once() instead of .on() for better performance
+    const snapshot = await database.ref('posts').limitToLast(50).once('value');
+    const hashtags = {};
+    
+    snapshot.forEach((child) => {
+        const post = child.val();
+        if (post.content) {
+            const matches = post.content.match(/#[a-zA-Z0-9_]+/g);
+            if (matches) {
+                matches.forEach(tag => {
+                    hashtags[tag] = (hashtags[tag] || 0) + 1;
+                });
             }
-        });
-
-        // Sort by count
-        const sortedTags = Object.entries(hashtags)
-            .sort((a, b) => b[1] - a[1])
-            .slice(0, 5); // Top 5
-
-        if (sortedTags.length === 0) {
-            trendingList.innerHTML = '<p class="text-slate-500 text-xs italic">No trending topics yet.</p>';
-            return;
         }
+    });
 
-        trendingList.innerHTML = '';
-        sortedTags.forEach(([tag, count]) => {
-            const div = document.createElement('div');
-            div.className = 'flex justify-between items-center cursor-pointer hover:bg-slate-800 p-2 rounded transition-colors';
-            div.innerHTML = `
-                <span class="text-brand-blue font-medium text-sm">${tag}</span>
-                <span class="text-slate-500 text-xs">${count} posts</span>
-            `;
-            // Simple search filter on click
-            div.onclick = () => {
-                const searchInput = document.getElementById('globalSearch');
-                if(searchInput) {
-                    searchInput.value = tag;
-                    searchInput.dispatchEvent(new Event('input'));
-                }
-            };
-            trendingList.appendChild(div);
-        });
+    // Sort by count
+    const sortedTags = Object.entries(hashtags)
+        .sort((a, b) => b[1] - a[1])
+        .slice(0, 5); // Top 5
+
+    if (sortedTags.length === 0) {
+        trendingList.innerHTML = '<p class="text-slate-500 text-xs italic">No trending topics yet.</p>';
+        return;
+    }
+
+    trendingList.innerHTML = '';
+    sortedTags.forEach(([tag, count]) => {
+        const div = document.createElement('div');
+        div.className = 'flex justify-between items-center cursor-pointer hover:bg-slate-800 p-2 rounded transition-colors';
+        div.innerHTML = `
+            <span class="text-brand-blue font-medium text-sm">${tag}</span>
+            <span class="text-slate-500 text-xs">${count} posts</span>
+        `;
+        // Simple search filter on click
+        div.onclick = () => {
+            const searchInput = document.getElementById('globalSearch');
+            if(searchInput) {
+                searchInput.value = tag;
+                searchInput.dispatchEvent(new Event('input'));
+            }
+        };
+        trendingList.appendChild(div);
     });
 }
 

@@ -15,71 +15,104 @@ const REACTIONS = {
 };
 
 // Load posts feed
-async function loadPostsFeed() {
-    const user = auth.currentUser;
-    if (!user) return;
+// Pagination variables
+let postsPerPage = 10;
+let lastLoadedPostKey = null;
+let allLoadedPosts = [];
+let isLoadingPosts = false;
 
+async function loadPostsFeed(loadMore = false) {
+    const user = auth.currentUser;
+    if (!user || isLoadingPosts) return;
+
+    isLoadingPosts = true;
     const postsFeed = document.getElementById('postsFeed');
-    postsFeed.innerHTML = '<div class="loading">Loading posts...</div>';
+    
+    if (!loadMore) {
+        postsFeed.innerHTML = '<div class="loading">Loading posts...</div>';
+        allLoadedPosts = [];
+        lastLoadedPostKey = null;
+    }
 
     // Create default posts if none exist (first time setup)
-    await createDefaultPostsIfNeeded();
+    if (!loadMore) {
+        await createDefaultPostsIfNeeded();
+    }
 
-    // Get user's friends list
-    const friendsRef = database.ref(`friends/${user.uid}`);
-    const friendsSnapshot = await friendsRef.once('value');
-    const friends = friendsSnapshot.val() || {};
-    const friendIds = Object.keys(friends);
+    // Get user's friends list (cache this)
+    if (!window.cachedFriendIds) {
+        const friendsRef = database.ref(`friends/${user.uid}`);
+        const friendsSnapshot = await friendsRef.once('value');
+        const friends = friendsSnapshot.val() || {};
+        window.cachedFriendIds = Object.keys(friends);
+    }
+    const friendIds = window.cachedFriendIds;
 
-    // Load all posts
-    database.ref('posts').orderByChild('timestamp').on('value', (snapshot) => {
-        const posts = [];
-        snapshot.forEach((childSnapshot) => {
-            const post = childSnapshot.val();
-            post.id = childSnapshot.key;
-            
-            // Filter based on privacy
-            if (post.privacy === 'public') {
-                posts.push(post);
-            } else if (post.privacy === 'friends' && (post.authorId === user.uid || friendIds.includes(post.authorId))) {
-                posts.push(post);
-            } else if (post.privacy === 'private' && post.authorId === user.uid) {
-                posts.push(post);
-            }
-        });
+    // Load posts with pagination - limit to 20 at a time
+    let query = database.ref('posts').orderByChild('timestamp').limitToLast(20);
 
-        // Apply Sorting
-        if (currentFeedSort === 'latest') {
-            posts.sort((a, b) => b.timestamp - a.timestamp);
-        } else if (currentFeedSort === 'popular') {
-            posts.sort((a, b) => {
-                const scoreA = (a.likes ? Object.keys(a.likes).length : 0) + (a.comments ? Object.keys(a.comments).length : 0);
-                const scoreB = (b.likes ? Object.keys(b.likes).length : 0) + (b.comments ? Object.keys(b.comments).length : 0);
-                return scoreB - scoreA;
-            });
-        } else if (currentFeedSort === 'personalized') {
-            // Prioritize friends' posts, then popular
-            posts.sort((a, b) => {
-                const isFriendA = friendIds.includes(a.authorId) ? 1 : 0;
-                const isFriendB = friendIds.includes(b.authorId) ? 1 : 0;
-                if (isFriendA !== isFriendB) return isFriendB - isFriendA;
-                return b.timestamp - a.timestamp;
-            });
+    const snapshot = await query.once('value');
+    const posts = [];
+    
+    snapshot.forEach((childSnapshot) => {
+        const post = childSnapshot.val();
+        post.id = childSnapshot.key;
+        
+        // Filter based on privacy
+        if (post.privacy === 'public') {
+            posts.push(post);
+        } else if (post.privacy === 'friends' && (post.authorId === user.uid || friendIds.includes(post.authorId))) {
+            posts.push(post);
+        } else if (post.privacy === 'private' && post.authorId === user.uid) {
+            posts.push(post);
         }
-
-        if (posts.length === 0) {
-            postsFeed.innerHTML = '<div class="empty-state">No posts yet. Be the first to share something!</div>';
-            return;
-        }
-
-        postsFeed.innerHTML = '';
-        posts.forEach(post => {
-            displayPost(post);
-        });
     });
+
+    // Apply Sorting
+    if (currentFeedSort === 'latest') {
+        posts.sort((a, b) => b.timestamp - a.timestamp);
+    } else if (currentFeedSort === 'popular') {
+        posts.sort((a, b) => {
+            const scoreA = (a.reactions ? Object.keys(a.reactions).length : 0) + (a.comments ? Object.keys(a.comments).length : 0);
+            const scoreB = (b.reactions ? Object.keys(b.reactions).length : 0) + (b.comments ? Object.keys(b.comments).length : 0);
+            return scoreB - scoreA;
+        });
+    } else if (currentFeedSort === 'personalized') {
+        // Prioritize friends' posts, then popular
+        posts.sort((a, b) => {
+            const isFriendA = friendIds.includes(a.authorId) ? 1 : 0;
+            const isFriendB = friendIds.includes(b.authorId) ? 1 : 0;
+            if (isFriendA !== isFriendB) return isFriendB - isFriendA;
+            return b.timestamp - a.timestamp;
+        });
+    }
+
+    if (posts.length === 0 && !loadMore) {
+        postsFeed.innerHTML = '<div class="empty-state">No posts yet. Be the first to share something!</div>';
+        isLoadingPosts = false;
+        return;
+    }
+
+    if (!loadMore) {
+        postsFeed.innerHTML = '';
+    }
+    
+    // Display only new posts (limit to 10 per load)
+    const postsToShow = posts.slice(0, postsPerPage);
+    postsToShow.forEach(post => {
+        if (!allLoadedPosts.find(p => p.id === post.id)) {
+            displayPost(post);
+            allLoadedPosts.push(post);
+        }
+    });
+
+    isLoadingPosts = false;
+
+    // Setup infinite scroll
+    setupInfiniteScroll();
 }
 
-// Display a single post
+// Display a single post (basic version - will be enhanced by posts-features.js)
 function displayPost(post) {
     const user = auth.currentUser;
     const postsFeed = document.getElementById('postsFeed');
@@ -94,9 +127,48 @@ function displayPost(post) {
     const likeCount = post.likes ? Object.keys(post.likes).length : 0;
     const commentCount = post.comments ? Object.keys(post.comments).length : 0;
 
+    // Build poll HTML if poll exists
+    let pollHTML = '';
+    if (post.poll) {
+        const userVote = post.poll.votes ? post.poll.votes[user.uid] : null;
+        const totalVotes = post.poll.votes ? Object.keys(post.poll.votes).length : 0;
+        
+        pollHTML = `
+            <div class="poll-container mt-4 p-4 bg-slate-900 rounded-lg border border-slate-700">
+                <h4 class="text-white font-medium mb-3">📊 ${escapeHtml(post.poll.question)}</h4>
+                <div class="space-y-2">
+                    ${post.poll.options.map((option, index) => {
+                        const optionVotes = post.poll.votes ? Object.values(post.poll.votes).filter(v => v === index).length : 0;
+                        const percentage = totalVotes > 0 ? Math.round((optionVotes / totalVotes) * 100) : 0;
+                        const isSelected = userVote === index;
+                        
+                        return `
+                            <button 
+                                class="w-full text-left p-3 rounded-lg border transition-all ${isSelected ? 'border-brand-blue bg-brand-blue/20' : 'border-slate-700 hover:border-slate-600'}" 
+                                onclick="votePoll('${post.id}', ${index})"
+                                ${userVote !== null ? 'disabled' : ''}
+                            >
+                                <div class="flex justify-between items-center mb-1">
+                                    <span class="text-white font-medium">${escapeHtml(option)}</span>
+                                    ${userVote !== null ? `<span class="text-slate-400 text-sm">${percentage}%</span>` : ''}
+                                </div>
+                                ${userVote !== null ? `
+                                    <div class="w-full bg-slate-800 rounded-full h-2">
+                                        <div class="bg-brand-blue h-2 rounded-full transition-all" style="width: ${percentage}%"></div>
+                                    </div>
+                                ` : ''}
+                            </button>
+                        `;
+                    }).join('')}
+                </div>
+                <div class="text-slate-400 text-sm mt-3">${totalVotes} ${totalVotes === 1 ? 'vote' : 'votes'}</div>
+            </div>
+        `;
+    }
+
     postCard.innerHTML = `
         <div class="post-header">
-            <img src="${post.authorAvatar || "data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='40' height='40'%3E%3Ccircle cx='20' cy='20' r='20' fill='%23334155'/%3E%3C/svg%3E"}" alt="${post.authorName}" class="post-avatar" style="cursor: pointer;" onclick="viewUserProfile('${post.authorId}')">
+            <img src="${post.authorAvatar || "data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='40' height='40'%3E%3Ccircle cx='20' cy='20' r='20' fill='%23334155'/%3E%3C/svg%3E"}" alt="${post.authorName}" class="post-avatar" loading="lazy" style="cursor: pointer;" onclick="viewUserProfile('${post.authorId}')">
             <div class="post-info">
                 <div class="post-author flex items-center gap-1" style="cursor: pointer;" onclick="viewUserProfile('${post.authorId}')">
                     ${post.authorName}
@@ -119,7 +191,8 @@ function displayPost(post) {
             `}
         </div>
         <div class="post-content">${escapeHtml(post.content)}</div>
-        ${post.imageUrl ? `<img src="${post.imageUrl}" alt="Post image" class="post-image">` : ''}
+        ${post.imageUrl ? `<img src="${post.imageUrl}" alt="Post image" class="post-image" loading="lazy">` : ''}
+        ${pollHTML}
         <div class="post-stats">
             <span>${likeCount} ${likeCount === 1 ? 'like' : 'likes'}</span>
             <span>${commentCount} ${commentCount === 1 ? 'comment' : 'comments'}</span>
@@ -979,13 +1052,70 @@ async function toggleReaction(postId, reactionType) {
 // Vote on poll
 async function votePoll(postId, optionIndex) {
     const user = auth.currentUser;
-    if (!user) return;
+    if (!user) {
+        showToast('⚠️ Please log in to vote');
+        return;
+    }
 
     const voteRef = database.ref(`posts/${postId}/poll/votes/${user.uid}`);
+    const existingVote = await voteRef.once('value');
+    
+    if (existingVote.exists()) {
+        showToast('⚠️ You have already voted on this poll');
+        return;
+    }
+    
     await voteRef.set(optionIndex);
     
     showToast('✅ Vote recorded!');
     if (typeof sounds !== 'undefined') sounds.success();
+    
+    // Refresh the post to show results
+    const postRef = database.ref(`posts/${postId}`);
+    const postSnapshot = await postRef.once('value');
+    const post = postSnapshot.val();
+    if (post) {
+        post.id = postId;
+        
+        // Find and replace the post card
+        const oldPostCard = document.querySelector(`.post-card[data-post-id="${postId}"]`);
+        if (oldPostCard) {
+            const parent = oldPostCard.parentElement;
+            const next = oldPostCard.nextElementSibling;
+            oldPostCard.remove();
+            
+            // Temporarily change postsFeed to render into
+            const tempDiv = document.createElement('div');
+            tempDiv.id = 'postsFeed';
+            document.body.appendChild(tempDiv);
+            displayPost(post);
+            const newCard = tempDiv.firstChild;
+            tempDiv.remove();
+            
+            if (next) {
+                parent.insertBefore(newCard, next);
+            } else {
+                parent.appendChild(newCard);
+            }
+        }
+        
+        // Send notification to poll author
+        if (post.authorId !== user.uid) {
+            const userSnapshot = await database.ref(`users/${user.uid}`).once('value');
+            const userData = userSnapshot.val();
+            
+            await database.ref(`notifications/${post.authorId}`).push({
+                type: 'activity',
+                title: 'New Poll Vote',
+                message: `${userData.displayName || 'Someone'} voted on your poll`,
+                from: user.uid,
+                fromName: userData.displayName || 'Someone',
+                postId: postId,
+                timestamp: Date.now(),
+                read: false
+            });
+        }
+    }
 }
 
 // Toggle bookmark
@@ -1045,4 +1175,31 @@ async function loadBookmarkedPosts() {
 
     postsFeed.innerHTML = '';
     posts.forEach(post => displayPost(post));
+}
+// Infinite scroll functionality
+let scrollTimeout;
+function setupInfiniteScroll() {
+    const mainContent = document.querySelector('.main-content');
+    if (!mainContent) return;
+    
+    // Remove old listener if exists
+    if (window.__scrollListener) {
+        mainContent.removeEventListener('scroll', window.__scrollListener);
+    }
+    
+    window.__scrollListener = function() {
+        clearTimeout(scrollTimeout);
+        scrollTimeout = setTimeout(() => {
+            const scrollTop = mainContent.scrollTop;
+            const scrollHeight = mainContent.scrollHeight;
+            const clientHeight = mainContent.clientHeight;
+            
+            // Load more when near bottom (within 300px)
+            if (scrollTop + clientHeight >= scrollHeight - 300 && !isLoadingPosts) {
+                loadPostsFeed(true);
+            }
+        }, 200);
+    };
+    
+    mainContent.addEventListener('scroll', window.__scrollListener);
 }

@@ -48,28 +48,27 @@ function initializeUserSearch() {
     });
 }
 
-// Load all users
+// Load all users - Optimized for performance
 async function loadUsers() {
     const usersRef = database.ref('users');
     
-    usersRef.on('value', (snapshot) => {
-        allUsers = [];
-        const usersGrid = document.getElementById('usersGrid');
+    // Use .once() instead of .on() to reduce continuous updates
+    const snapshot = await usersRef.once('value');
+    allUsers = [];
+    
+    snapshot.forEach((childSnapshot) => {
+        const user = {
+            uid: childSnapshot.key,
+            ...childSnapshot.val()
+        };
         
-        snapshot.forEach((childSnapshot) => {
-            const user = {
-                uid: childSnapshot.key,
-                ...childSnapshot.val()
-            };
-            
-            // Don't include current user
-            if (user.uid !== currentUser.uid) {
-                allUsers.push(user);
-            }
-        });
-        
-        displayUsers(allUsers);
+        // Don't include current user
+        if (user.uid !== currentUser.uid) {
+            allUsers.push(user);
+        }
     });
+    
+    displayUsers(allUsers);
 }
 
 // Display users
