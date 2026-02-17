@@ -23,18 +23,45 @@
         .room-card { 
             background: #1e293b; 
             border: 1px solid #334155; 
-            border-radius: 1rem; 
+            border-radius: 0.75rem; 
             overflow: hidden; 
             transition: transform 0.2s;
         }
-        .room-card:hover { transform: translateY(-2px); border-color: #3B82F6; }
-        .room-card-image { width: 100%; height: 120px; object-fit: cover; }
-        .room-card-content { padding: 1rem; }
-        .room-card-title { font-weight: 600; color: #f1f5f9; margin-bottom: 0.25rem; font-size: 1.1rem; }
-        .room-card-category { font-size: 0.75rem; color: #3B82F6; background: rgba(59, 130, 246, 0.1); padding: 2px 8px; rounded: 999px; display: inline-block; margin-bottom: 0.5rem; border-radius: 999px; }
-        .room-card-description { font-size: 0.875rem; color: #94a3b8; margin-bottom: 1rem; line-height: 1.4; }
-        .room-card-footer { display: flex; justify-content: space-between; align-items: center; font-size: 0.75rem; color: #64748b; }
-        .room-members-count { display: flex; align-items: center; gap: 4px; }
+        @media (min-width: 768px) {
+            .room-card { border-radius: 1rem; }
+        }
+        @media (hover: hover) {
+            .room-card:hover { transform: translateY(-2px); border-color: #3B82F6; }
+        }
+        .room-card:active { transform: scale(0.98); }
+        .room-card-image { width: 100%; height: 100px; object-fit: cover; }
+        @media (min-width: 768px) {
+            .room-card-image { height: 120px; }
+        }
+        .room-card-content { padding: 0.875rem; }
+        @media (min-width: 768px) {
+            .room-card-content { padding: 1rem; }
+        }
+        .room-card-title { font-weight: 600; color: #f1f5f9; margin-bottom: 0.25rem; font-size: 0.9375rem; }
+        @media (min-width: 768px) {
+            .room-card-title { font-size: 1.1rem; }
+        }
+        .room-card-category { font-size: 0.6875rem; color: #3B82F6; background: rgba(59, 130, 246, 0.1); padding: 2px 6px; display: inline-block; margin-bottom: 0.5rem; border-radius: 999px; }
+        @media (min-width: 768px) {
+            .room-card-category { font-size: 0.75rem; padding: 2px 8px; }
+        }
+        .room-card-description { font-size: 0.8125rem; color: #94a3b8; margin-bottom: 0.75rem; line-height: 1.4; }
+        @media (min-width: 768px) {
+            .room-card-description { font-size: 0.875rem; margin-bottom: 1rem; }
+        }
+        .room-card-footer { display: flex; justify-content: space-between; align-items: center; font-size: 0.6875rem; color: #64748b; }
+        @media (min-width: 768px) {
+            .room-card-footer { font-size: 0.75rem; }
+        }
+        .room-members-count { display: flex; align-items: center; gap: 3px; }
+        @media (min-width: 768px) {
+            .room-members-count { gap: 4px; }
+        }
         
         /* Notification Tab Styling */
         .notification-tab {
@@ -78,25 +105,53 @@
             background: rgba(30, 41, 59, 0.4);
             border: 1px solid #334155;
             border-radius: 1rem;
-            padding: 1.5rem;
-            margin-bottom: 1.5rem;
+            padding: 1rem;
+            margin-bottom: 1rem;
         }
-        .post-header { display: flex; align-items: center; gap: 1rem; margin-bottom: 1rem; }
-        .post-avatar { width: 40px; height: 40px; border-radius: 50%; object-fit: cover; }
-        .post-info { flex: 1; }
-        .post-author { color: #f1f5f9; font-weight: 600; font-size: 0.95rem; }
-        .post-time { color: #94a3b8; font-size: 0.8rem; }
-        .post-content { color: #e2e8f0; line-height: 1.6; margin-bottom: 1rem; white-space: pre-wrap; }
-        .post-image { width: 100%; border-radius: 0.75rem; margin-top: 0.5rem; border: 1px solid #334155; }
-        .post-stats { display: flex; gap: 1rem; color: #94a3b8; font-size: 0.875rem; margin: 1rem 0; padding-bottom: 0.5rem; border-bottom: 1px solid #334155; }
-        .post-actions { display: flex; gap: 0.5rem; }
+        @media (min-width: 768px) {
+            .post-card {
+                padding: 1.5rem;
+                margin-bottom: 1.5rem;
+            }
+        }
+        .post-header { display: flex; align-items: center; gap: 0.75rem; margin-bottom: 0.75rem; }
+        .post-avatar { width: 36px; height: 36px; border-radius: 50%; object-fit: cover; }
+        @media (min-width: 768px) {
+            .post-header { gap: 1rem; margin-bottom: 1rem; }
+            .post-avatar { width: 40px; height: 40px; }
+        }
+        .post-info { flex: 1; min-width: 0; }
+        .post-author { color: #f1f5f9; font-weight: 600; font-size: 0.875rem; }
+        @media (min-width: 768px) {
+            .post-author { font-size: 0.95rem; }
+        }
+        .post-time { color: #94a3b8; font-size: 0.75rem; }
+        @media (min-width: 768px) {
+            .post-time { font-size: 0.8rem; }
+        }
+        .post-content { color: #e2e8f0; line-height: 1.5; margin-bottom: 0.75rem; white-space: pre-wrap; font-size: 0.9375rem; }
+        @media (min-width: 768px) {
+            .post-content { line-height: 1.6; margin-bottom: 1rem; font-size: 1rem; }
+        }
+        .post-image { width: 100%; border-radius: 0.5rem; margin-top: 0.5rem; border: 1px solid #334155; }
+        @media (min-width: 768px) {
+            .post-image { border-radius: 0.75rem; }
+        }
+        .post-stats { display: flex; gap: 0.75rem; color: #94a3b8; font-size: 0.8125rem; margin: 0.75rem 0; padding-bottom: 0.5rem; border-bottom: 1px solid #334155; }
+        @media (min-width: 768px) {
+            .post-stats { gap: 1rem; font-size: 0.875rem; margin: 1rem 0; }
+        }
+        .post-actions { display: flex; gap: 0.25rem; }
+        @media (min-width: 768px) {
+            .post-actions { gap: 0.5rem; }
+        }
         .post-action-btn { 
             flex: 1; 
             display: flex; 
             align-items: center; 
             justify-content: center; 
-            gap: 0.5rem; 
-            padding: 0.625rem; 
+            gap: 0.375rem; 
+            padding: 0.5rem 0.25rem; 
             border-radius: 0.5rem; 
             color: #94a3b8; 
             transition: all 0.2s;
@@ -104,15 +159,26 @@
             background: transparent;
             border: none;
             font-weight: 500;
-            font-size: 0.875rem;
+            font-size: 0.8125rem;
+            min-height: 44px;
         }
-        .post-action-btn:hover { 
-            background: rgba(51, 65, 85, 0.5); 
-            color: #f1f5f9; 
-            transform: scale(1.02);
+        @media (min-width: 768px) {
+            .post-action-btn {
+                gap: 0.5rem;
+                padding: 0.625rem;
+                font-size: 0.875rem;
+            }
+        }
+        @media (hover: hover) {
+            .post-action-btn:hover { 
+                background: rgba(51, 65, 85, 0.5); 
+                color: #f1f5f9; 
+                transform: scale(1.02);
+            }
         }
         .post-action-btn:active { 
-            transform: scale(0.98); 
+            transform: scale(0.95); 
+            background: rgba(51, 65, 85, 0.5);
         }
         .post-action-btn.liked { 
             color: #ef4444; 
@@ -122,9 +188,15 @@
             fill: #ef4444;
         }
         .post-action-btn svg { 
-            width: 20px; 
-            height: 20px; 
+            width: 18px; 
+            height: 18px; 
             transition: all 0.2s;
+        }
+        @media (min-width: 768px) {
+            .post-action-btn svg {
+                width: 20px;
+                height: 20px;
+            }
         }
         
         @keyframes likeAnimation {
@@ -186,6 +258,122 @@
         @keyframes fadeIn {
             from { opacity: 0; transform: translateY(10px); }
             to { opacity: 1; transform: translateY(0); }
+        }
+        
+        /* Mobile-First Responsive Improvements */
+        @media (max-width: 767px) {
+            /* Larger touch targets for mobile */
+            button, a, input[type="file"] {
+                min-height: 44px;
+                min-width: 44px;
+            }
+            
+            /* Better text readability */
+            body {
+                font-size: 15px;
+                line-height: 1.5;
+            }
+            
+            /* Optimize modal sizes */
+            .modal > div > div {
+                margin: 1rem;
+                max-height: calc(100vh - 2rem);
+            }
+            
+            /* Better spacing */
+            h1 { font-size: 1.5rem; }
+            h2 { font-size: 1.25rem; }
+            h3 { font-size: 1.125rem; }
+            h4 { font-size: 1rem; }
+            
+            /* Optimize input fields */
+            input, textarea, select {
+                font-size: 16px !important; /* Prevent zoom on iOS */
+            }
+            
+            /* Better button sizing */
+            .btn, button:not(.post-action-btn) {
+                padding: 0.75rem 1rem;
+                font-size: 0.9375rem;
+            }
+            
+            /* Optimize grid layouts */
+            .grid {
+                gap: 0.75rem;
+            }
+        }
+        
+        /* Prevent horizontal scroll on mobile */
+        body {
+            overflow-x: hidden;
+            max-width: 100vw;
+        }
+        
+        /* Better mobile notification dropdown */
+        @media (max-width: 767px) {
+            #notificationDropdown {
+                left: 0.5rem;
+                right: 0.5rem;
+                width: calc(100% - 1rem);
+                max-width: none;
+            }
+        }
+        
+        /* Mobile Image Optimization */
+        @media (max-width: 767px) {
+            img {
+                max-width: 100%;
+                height: auto;
+            }
+            
+            .post-image, .event-image, .page-image {
+                max-height: 250px;
+                object-fit: cover;
+            }
+        }
+        
+        /* Smooth Scrolling */
+        html {
+            scroll-behavior: smooth;
+        }
+        
+        /* Mobile Features Hub Optimization */
+        @media (max-width: 767px) {
+            .features-hub {
+                width: 85vw !important;
+                max-width: 360px !important;
+            }
+            
+            .features-hub .feature-button {
+                min-height: 52px;
+                padding: 0.75rem;
+            }
+            
+            .features-hub input[type="search"] {
+                font-size: 16px !important;
+            }
+        }
+        
+        /* Better Mobile Card Shadows */
+        @media (max-width: 767px) {
+            .shadow-lg, .shadow-xl, .shadow-2xl {
+                box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.3), 0 2px 4px -1px rgba(0, 0, 0, 0.2) !important;
+            }
+        }
+        
+        /* Optimize Text Selection on Mobile */
+        @media (max-width: 767px) {
+            ::selection {
+                background-color: rgba(59, 130, 246, 0.3);
+            }
+        }
+        
+        /* Better Loading States on Mobile */
+        @media (max-width: 767px) {
+            .loading-spinner {
+                width: 32px;
+                height: 32px;
+            }
         }
     </style>
     <script>
@@ -253,11 +441,17 @@
                 <span class="absolute left-14 bg-slate-800 text-white text-xs px-2 py-1 rounded opacity-0 group-hover:opacity-100 transition-opacity pointer-events-none whitespace-nowrap z-50 shadow-xl border border-slate-700">Leaderboard</span>
             </a>
 
-            <!-- NEW: Features Menu Button -->
-            <button id="featuresMenuBtn" class="nav-item group flex items-center justify-center w-12 h-12 rounded-2xl mx-auto text-amber-400 hover:bg-gradient-to-br hover:from-amber-500/20 hover:to-orange-500/20 hover:text-amber-300 transition-all duration-200 relative animate-pulse">
+            <!-- NEW: Features Hub Button -->
+            <button id="featuresMenuBtn" class="nav-item group flex items-center justify-center w-12 h-12 rounded-2xl mx-auto text-amber-400 hover:bg-gradient-to-br hover:from-amber-500/20 hover:to-orange-500/20 hover:text-amber-300 transition-all duration-200 relative animate-pulse" title="Open Features Menu">
                 <div class="absolute inset-y-0 left-0 w-1 bg-amber-500 rounded-r-full h-8 my-auto opacity-0 group-hover:opacity-50 transition-opacity"></div>
-                <svg class="w-6 h-6 group-hover:scale-110 transition-transform" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 3v4M3 5h4M6 17v4m-2-2h4m5-16l2.286 6.857L21 12l-5.714 2.143L13 21l-2.286-6.857L5 12l5.714-2.143L13 3z"/></svg>
-                <span class="absolute left-14 bg-gradient-to-r from-amber-600 to-orange-600 text-white text-xs px-2 py-1 rounded opacity-0 group-hover:opacity-100 transition-opacity pointer-events-none whitespace-nowrap z-50 shadow-xl border border-amber-500">✨ New Features!</span>
+                <div class="relative">
+                    <svg class="w-6 h-6 group-hover:scale-110 transition-transform" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 3v4M3 5h4M6 17v4m-2-2h4m5-16l2.286 6.857L21 12l-5.714 2.143L13 21l-2.286-6.857L5 12l5.714-2.143L13 3z"/></svg>
+                    <span class="absolute -top-1 -right-1 flex h-2 w-2">
+                        <span class="animate-ping absolute inline-flex h-full w-full rounded-full bg-amber-400 opacity-75"></span>
+                        <span class="relative inline-flex rounded-full h-2 w-2 bg-amber-500"></span>
+                    </span>
+                </div>
+                <span class="absolute left-14 bg-gradient-to-r from-amber-600 to-orange-600 text-white text-xs px-2 py-1 rounded opacity-0 group-hover:opacity-100 transition-opacity pointer-events-none whitespace-nowrap z-50 shadow-xl border border-amber-500">✨ Open Menu</span>
             </button>
         </div>
 
@@ -277,15 +471,15 @@
         <header class="h-auto md:h-16 flex flex-col md:flex-row md:items-center px-4 md:px-8 py-3 md:py-0 border-b border-slate-700/50 bg-slate-900/50 backdrop-blur-md sticky top-0 z-10 gap-3 md:gap-0 md:justify-between">
             <!-- Mobile Header Row -->
             <div class="flex md:hidden items-center justify-between">
-                <div class="flex items-center gap-3">
-                    <div class="p-2 rounded-lg bg-gradient-to-br from-brand-blue to-indigo-600 shadow-lg shadow-brand-blue/20">
-                        <svg class="w-5 h-5 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 10V3L4 14h7v7l9-11h-7z"/></svg>
+                <div class="flex items-center gap-2 sm:gap-3">
+                    <div class="p-1.5 sm:p-2 rounded-lg bg-gradient-to-br from-brand-blue to-indigo-600 shadow-lg shadow-brand-blue/20">
+                        <svg class="w-4 h-4 sm:w-5 sm:h-5 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 10V3L4 14h7v7l9-11h-7z"/></svg>
                     </div>
-                    <h1 class="text-lg font-bold text-white">C-meet</h1>
+                    <h1 class="text-base sm:text-lg font-bold text-white">C-meet</h1>
                 </div>
-                <div class="flex items-center gap-2">
-                    <button id="mobileNotificationBtn" class="p-2 text-slate-400 hover:text-white transition-colors rounded-lg hover:bg-slate-800 relative">
-                        <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 17h5l-1.405-1.405A2.032 2.032 0 0118 14.158V11a6.002 6.002 0 00-4-5.659V5a2 2 0 10-4 0v.341C7.67 6.165 6 8.388 6 11v3.159c0 .538-.214 1.055-.595 1.436L4 17h5m6 0v1a3 3 0 11-6 0v-1m6 0H9"/></svg>
+                <div class="flex items-center gap-1 sm:gap-2">
+                    <button id="mobileNotificationBtn" class="p-2 text-slate-400 hover:text-white transition-colors rounded-lg hover:bg-slate-800 relative min-w-[44px] min-h-[44px] flex items-center justify-center">
+                        <svg class="w-5 h-5 sm:w-6 sm:h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 17h5l-1.405-1.405A2.032 2.032 0 0118 14.158V11a6.002 6.002 0 00-4-5.659V5a2 2 0 10-4 0v.341C7.67 6.165 6 8.388 6 11v3.159c0 .538-.214 1.055-.595 1.436L4 17h5m6 0v1a3 3 0 11-6 0v-1m6 0H9"/></svg>
                         <span id="mobileNotificationCount" class="absolute top-1 right-1 flex h-3 w-3 hidden">
                             <span class="animate-ping absolute inline-flex h-full w-full rounded-full bg-brand-blue opacity-75"></span>
                             <span class="relative inline-flex rounded-full h-3 w-3 bg-brand-blue"></span>
@@ -301,11 +495,19 @@
                 <span class="text-brand-blue font-medium cursor-pointer hover:text-blue-400" id="currentViewTitle">Feed</span>
             </div>
 
+            <!-- Mobile Search Bar -->
+            <div class="flex md:hidden relative w-full">
+                <input type="text" id="mobileGlobalSearch" class="w-full pl-9 pr-3 py-2 border border-slate-700 rounded-lg leading-5 bg-slate-800 text-slate-300 placeholder-slate-500 focus:outline-none focus:bg-slate-900 focus:ring-1 focus:ring-brand-blue focus:border-brand-blue text-base transition-all shadow-sm" placeholder="Search...">
+                <div class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
+                    <svg class="w-4 h-4 text-slate-500" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"/></svg>
+                </div>
+            </div>
+
             <!-- Desktop Actions -->
-            <div class="hidden md:flex items-center gap-4">
+            <div class="hidden md:flex items-center gap-3 lg:gap-4">
                 <!-- Search & Filters -->
-                <div class="relative w-80 group hidden md:block">
-                    <input type="text" id="globalSearch" class="block w-full pl-10 pr-3 py-2 border border-slate-700 rounded-lg leading-5 bg-slate-800 text-slate-300 placeholder-slate-500 focus:outline-none focus:bg-slate-900 focus:ring-1 focus:ring-brand-blue focus:border-brand-blue sm:text-sm transition-all shadow-sm" placeholder="Search...">
+                <div class="relative w-56 lg:w-80 group hidden md:block">
+                    <input type="text" id="globalSearch" class="block w-full pl-10 pr-3 py-2 border border-slate-700 rounded-lg leading-5 bg-slate-800 text-slate-300 placeholder-slate-500 focus:outline-none focus:bg-slate-900 focus:ring-1 focus:ring-brand-blue focus:border-brand-blue text-base transition-all shadow-sm" placeholder="Search...">
                     <div class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
                         <svg class="w-4 h-4 text-slate-500 group-focus-within:text-brand-blue transition-colors" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"/></svg>
                     </div>
@@ -333,20 +535,20 @@
             </div>
 
             <!-- Enhanced Notification Dropdown -->
-            <div class="hidden absolute right-4 top-16 md:top-14 md:right-8 w-96 bg-slate-800 border border-slate-700 rounded-xl shadow-2xl z-50 overflow-hidden" id="notificationDropdown">
+            <div class="hidden absolute right-2 sm:right-4 top-16 md:top-14 md:right-8 w-[calc(100vw-1rem)] sm:w-96 max-w-md bg-slate-800 border border-slate-700 rounded-lg sm:rounded-xl shadow-2xl z-50 overflow-hidden" id="notificationDropdown">
                 <!-- Header -->
-                <div class="px-4 py-3 border-b border-slate-700 flex items-center justify-between bg-slate-900/50">
-                    <h3 class="font-bold text-white text-lg">Notifications</h3>
-                    <button onclick="markAllNotificationsAsRead()" class="text-xs text-brand-blue hover:text-blue-400 font-medium transition-colors">Mark all read</button>
+                <div class="px-3 sm:px-4 py-2.5 sm:py-3 border-b border-slate-700 flex items-center justify-between bg-slate-900/50">
+                    <h3 class="font-bold text-white text-base sm:text-lg">Notifications</h3>
+                    <button onclick="markAllNotificationsAsRead()" class="text-xs text-brand-blue hover:text-blue-400 font-medium transition-colors min-h-[40px] px-2">Mark all read</button>
                 </div>
                 
                 <!-- Tabs -->
                 <div class="flex border-b border-slate-700 bg-slate-900/30">
-                    <button onclick="switchNotificationTab('all')" class="notification-tab active flex-1 px-4 py-2 text-sm font-medium text-slate-400 hover:text-white transition-colors relative" data-tab="all">
+                    <button onclick="switchNotificationTab('all')" class="notification-tab active flex-1 px-3 sm:px-4 py-2.5 text-xs sm:text-sm font-medium text-slate-400 hover:text-white transition-colors relative min-h-[44px]" data-tab="all">
                         All
                         <span class="absolute bottom-0 left-0 right-0 h-0.5 bg-brand-blue opacity-0"></span>
                     </button>
-                    <button onclick="switchNotificationTab('friends')" class="notification-tab flex-1 px-4 py-2 text-sm font-medium text-slate-400 hover:text-white transition-colors relative" data-tab="friends">
+                    <button onclick="switchNotificationTab('friends')" class="notification-tab flex-1 px-3 sm:px-4 py-2.5 text-xs sm:text-sm font-medium text-slate-400 hover:text-white transition-colors relative min-h-[44px]" data-tab="friends">
                         Friend Requests
                         <span id="friendRequestNotifBadge" class="hidden ml-1 bg-red-500 text-white text-xs px-1.5 rounded-full">0</span>
                         <span class="absolute bottom-0 left-0 right-0 h-0.5 bg-brand-blue opacity-0"></span>
@@ -374,7 +576,7 @@
             </div>
         </header>
 
-        <div class="flex-1 overflow-y-auto px-4 md:px-8 py-4 md:py-8 hide-scrollbar" id="mainScrollArea">
+        <div class="flex-1 overflow-y-auto px-3 sm:px-4 md:px-8 py-3 sm:py-4 md:py-8 hide-scrollbar" id="mainScrollArea">
             <div class="max-w-3xl mx-auto w-full"> 
 
                 <!-- Mobile Search (Visible only on small screens) -->
@@ -387,55 +589,55 @@
                     </div>
                 </div>
 
-                <div class="mb-8 p-4 rounded-2xl bg-slate-800/40 border border-slate-700/50 hover:bg-slate-800/60 transition-colors shadow-lg shadow-black/20 cursor-pointer" id="createPostInputBtn">
-                    <div class="flex items-center gap-4">
-                        <img src="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='40' height='40'%3E%3Ccircle cx='20' cy='20' r='20' fill='%23334155'/%3E%3C/svg%3E" class="w-10 h-10 rounded-full object-cover ring-2 ring-slate-700" alt="User" id="userAvatarSmall">
-                        <div class="flex-1 h-10 bg-slate-900/50 rounded-xl flex items-center px-4 text-slate-500 hover:text-slate-400 transition-colors select-none">
+                <div class="mb-4 sm:mb-6 p-3 sm:p-4 rounded-xl sm:rounded-2xl bg-slate-800/40 border border-slate-700/50 hover:bg-slate-800/60 transition-colors shadow-lg shadow-black/20 cursor-pointer" id="createPostInputBtn">
+                    <div class="flex items-center gap-3 sm:gap-4">
+                        <img src="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='40' height='40'%3E%3Ccircle cx='20' cy='20' r='20' fill='%23334155'/%3E%3C/svg%3E" class="w-9 h-9 sm:w-10 sm:h-10 rounded-full object-cover ring-2 ring-slate-700" alt="User" id="userAvatarSmall">
+                        <div class="flex-1 h-9 sm:h-10 bg-slate-900/50 rounded-lg sm:rounded-xl flex items-center px-3 sm:px-4 text-slate-500 hover:text-slate-400 transition-colors select-none text-sm sm:text-base">
                             What is on your mind? ...
                         </div>
                     </div>
                 </div>
 
-                <div class="space-y-6">
-                    <div id="feedView" class="space-y-6">
-                        <div class="flex items-center justify-between">
-                            <h2 class="text-xl font-bold text-white">News Feed</h2>
-                            <div class="flex bg-slate-800 rounded-lg p-1 border border-slate-700">
-                                <button class="feed-sort-btn px-3 py-1 text-xs font-medium rounded-md bg-brand-blue text-white shadow transition-all" data-sort="latest">Latest</button>
-                                <button class="feed-sort-btn px-3 py-1 text-xs font-medium rounded-md text-slate-400 hover:text-white transition-all" data-sort="popular">Popular</button>
-                                <button class="feed-sort-btn px-3 py-1 text-xs font-medium rounded-md text-slate-400 hover:text-white transition-all" data-sort="personalized">For You</button>
+                <div class="space-y-4 sm:space-y-6">
+                    <div id="feedView" class="space-y-4 sm:space-y-6">
+                        <div class="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3">
+                            <h2 class="text-lg sm:text-xl font-bold text-white">News Feed</h2>
+                            <div class="flex bg-slate-800 rounded-lg p-1 border border-slate-700 w-full sm:w-auto">
+                                <button class="feed-sort-btn flex-1 sm:flex-initial px-2.5 sm:px-3 py-1.5 sm:py-1 text-xs font-medium rounded-md bg-brand-blue text-white shadow transition-all" data-sort="latest">Latest</button>
+                                <button class="feed-sort-btn flex-1 sm:flex-initial px-2.5 sm:px-3 py-1.5 sm:py-1 text-xs font-medium rounded-md text-slate-400 hover:text-white transition-all" data-sort="popular">Popular</button>
+                                <button class="feed-sort-btn flex-1 sm:flex-initial px-2.5 sm:px-3 py-1.5 sm:py-1 text-xs font-medium rounded-md text-slate-400 hover:text-white transition-all" data-sort="personalized">For You</button>
                             </div>
                         </div>
-                        <div id="postsFeed" class="space-y-6"></div>
+                        <div id="postsFeed" class="space-y-3 sm:space-y-6"></div>
                     </div>
 
                     <div id="roomsView" class="hidden">
-                        <div class="flex justify-between items-center mb-6">
-                           <h2 class="text-2xl font-bold text-white">Discussion Rooms</h2>
-                           <button class="text-brand-blue hover:text-blue-400 text-sm font-medium">Browse All</button>
+                        <div class="flex flex-col sm:flex-row sm:justify-between sm:items-center mb-4 sm:mb-6 gap-3">
+                           <h2 class="text-xl sm:text-2xl font-bold text-white">Discussion Rooms</h2>
+                           <button class="text-brand-blue hover:text-blue-400 text-sm font-medium self-start sm:self-auto">Browse All</button>
                         </div>
-                        <div id="roomsGrid" class="grid grid-cols-1 md:grid-cols-2 gap-4"></div>
+                        <div id="roomsGrid" class="grid grid-cols-1 sm:grid-cols-2 gap-3 sm:gap-4"></div>
                         <!-- Hidden modal for creating room -->
                          <div class="modal hidden fixed inset-0 z-50" id="createRoomModal">
                             <div class="absolute inset-0 bg-slate-900/80 backdrop-blur-sm"></div>
-                            <div class="relative flex min-h-full items-center justify-center p-4">
-                                <div class="bg-slate-800 rounded-2xl border border-slate-700 shadow-2xl w-full max-w-lg overflow-hidden">
-                                     <div class="p-6 border-b border-slate-700 flex justify-between">
-                                         <h2 class="text-xl font-bold text-white">Create Room</h2>
-                                         <span class="cursor-pointer text-slate-400 hover:text-white" id="closeModal">&times;</span>
+                            <div class="relative flex min-h-full items-center justify-center p-3 sm:p-4">
+                                <div class="bg-slate-800 rounded-xl sm:rounded-2xl border border-slate-700 shadow-2xl w-full max-w-lg overflow-hidden">
+                                     <div class="p-4 sm:p-6 border-b border-slate-700 flex justify-between">
+                                         <h2 class="text-lg sm:text-xl font-bold text-white">Create Room</h2>
+                                         <span class="cursor-pointer text-slate-400 hover:text-white text-2xl leading-none" id="closeModal">&times;</span>
                                      </div>
-                                     <div class="p-6">
-                                         <form id="createRoomForm" class="space-y-4">
-                                             <div><label class="block text-slate-400 mb-1 text-sm">Room Name</label><input type="text" id="roomName" required class="w-full bg-slate-900 border border-slate-700 rounded-lg p-2 text-white outline-none focus:border-brand-blue"></div>
-                                             <div><label class="block text-slate-400 mb-1 text-sm">Description</label><textarea id="roomDescription" required rows="3" class="w-full bg-slate-900 border border-slate-700 rounded-lg p-2 text-white outline-none focus:border-brand-blue"></textarea></div>
-                                             <div><label class="block text-slate-400 mb-1 text-sm">Category</label>
-                                             <select id="roomCategory" required class="w-full bg-slate-900 border border-slate-700 rounded-lg p-2 text-white outline-none">
+                                     <div class="p-4 sm:p-6">
+                                         <form id="createRoomForm" class="space-y-3 sm:space-y-4">
+                                             <div><label class="block text-slate-400 mb-1.5 text-sm">Room Name</label><input type="text" id="roomName" required class="w-full bg-slate-900 border border-slate-700 rounded-lg p-2.5 sm:p-2 text-white text-base outline-none focus:border-brand-blue"></div>
+                                             <div><label class="block text-slate-400 mb-1.5 text-sm">Description</label><textarea id="roomDescription" required rows="3" class="w-full bg-slate-900 border border-slate-700 rounded-lg p-2.5 sm:p-2 text-white text-base outline-none focus:border-brand-blue"></textarea></div>
+                                             <div><label class="block text-slate-400 mb-1.5 text-sm">Category</label>
+                                             <select id="roomCategory" required class="w-full bg-slate-900 border border-slate-700 rounded-lg p-2.5 sm:p-2 text-white text-base outline-none">
                                                  <option value="">Select Category</option>
                                                  <option value="technology">Technology</option>
                                                  <option value="art">Art</option>
                                                  <option value="music">Music</option>
                                              </select></div>
-                                             <button type="submit" class="w-full bg-brand-blue py-2 rounded-lg text-white font-medium hover:bg-blue-600 transition-colors">Create Room</button>
+                                             <button type="submit" class="w-full bg-brand-blue py-3 rounded-lg sm:rounded-xl text-white font-medium hover:bg-blue-600 transition-colors text-base">Create Room</button>
                                          </form>
                                      </div>
                                 </div>
@@ -444,42 +646,42 @@
                     </div>
 
                     <div id="pagesView" class="hidden">
-                         <h2 class="text-2xl font-bold text-white mb-6">Pages</h2>
-                        <div id="pagesGrid" class="grid grid-cols-1 md:grid-cols-2 gap-4"></div>
+                         <h2 class="text-xl sm:text-2xl font-bold text-white mb-4 sm:mb-6">Pages</h2>
+                        <div id="pagesGrid" class="grid grid-cols-1 sm:grid-cols-2 gap-3 sm:gap-4"></div>
                     </div>
 
                     <div id="eventsView" class="hidden">
-                        <div class="flex justify-between items-center mb-6">
-                            <h2 class="text-2xl font-bold text-white">Upcoming Events</h2>
-                            <button onclick="document.getElementById('createEventModal').classList.remove('hidden')" class="bg-brand-blue hover:bg-blue-600 text-white px-4 py-2 rounded-lg text-sm font-medium transition-colors">Create Event</button>
+                        <div class="flex flex-col sm:flex-row sm:justify-between sm:items-center mb-4 sm:mb-6 gap-3">
+                            <h2 class="text-xl sm:text-2xl font-bold text-white">Upcoming Events</h2>
+                            <button onclick="document.getElementById('createEventModal').classList.remove('hidden')" class="bg-brand-blue hover:bg-blue-600 active:scale-95 text-white px-4 py-2.5 rounded-lg text-sm font-medium transition-colors self-start sm:self-auto min-h-[44px]">Create Event</button>
                         </div>
-                        <div id="eventsGrid" class="grid grid-cols-1 md:grid-cols-2 gap-4"></div>
+                        <div id="eventsGrid" class="grid grid-cols-1 sm:grid-cols-2 gap-3 sm:gap-4"></div>
                     </div>
 
                     <div id="friendsView" class="hidden">
                         <!-- Friend Requests Section (Prominent) -->
-                        <div id="friendRequestsSection" class="mb-8">
-                            <div class="flex items-center justify-between mb-4">
-                                <h2 class="text-2xl font-bold text-white flex items-center gap-3">
+                        <div id="friendRequestsSection" class="mb-6 sm:mb-8">
+                            <div class="flex flex-col sm:flex-row sm:items-center sm:justify-between mb-3 sm:mb-4 gap-2">
+                                <h2 class="text-xl sm:text-2xl font-bold text-white flex items-center gap-2 sm:gap-3">
                                     Friend Requests
-                                    <span id="friendRequestsBadge" class="hidden bg-red-500 text-white text-sm font-bold px-3 py-1 rounded-full">0</span>
+                                    <span id="friendRequestsBadge" class="hidden bg-red-500 text-white text-xs sm:text-sm font-bold px-2 sm:px-3 py-1 rounded-full">0</span>
                                 </h2>
-                                <button onclick="markAllRequestsAsRead()" class="text-sm text-slate-400 hover:text-white transition-colors">Mark all as read</button>
+                                <button onclick="markAllRequestsAsRead()" class="text-xs sm:text-sm text-slate-400 hover:text-white transition-colors self-start sm:self-auto min-h-[44px] px-3 rounded-lg hover:bg-slate-700/50">Mark all as read</button>
                             </div>
-                            <div id="friendRequestsMainGrid" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4 mb-4">
+                            <div id="friendRequestsMainGrid" class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-3 sm:gap-4 mb-3 sm:mb-4">
                                 <!-- Friend requests will be loaded here -->
                             </div>
-                            <p id="noRequestsMessage" class="hidden text-slate-500 text-center py-8 bg-slate-800/30 rounded-xl border border-slate-700/50">
+                            <p id="noRequestsMessage" class="hidden text-slate-500 text-center py-6 sm:py-8 bg-slate-800/30 rounded-lg sm:rounded-xl border border-slate-700/50 text-sm sm:text-base">
                                 No pending friend requests
                             </p>
                         </div>
 
                         <!-- Current Friends -->
-                        <h2 class="text-2xl font-bold text-white mb-6">My Friends</h2>
-                        <div id="friendsGrid" class="grid grid-cols-2 md:grid-cols-3 gap-4 mb-8"></div>
+                        <h2 class="text-xl sm:text-2xl font-bold text-white mb-4 sm:mb-6">My Friends</h2>
+                        <div id="friendsGrid" class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-3 sm:gap-4 mb-6 sm:mb-8"></div>
                         
                         <!-- Suggestions -->
-                        <h2 class="text-xl font-bold text-white mb-4 flex items-center gap-2">
+                        <h2 class="text-lg sm:text-xl font-bold text-white mb-3 sm:mb-4 flex items-center gap-2">
                             <span>People You May Know</span>
                             <span class="text-xs font-normal text-slate-500 bg-slate-800 px-2 py-1 rounded-full">Recommended</span>
                         </h2>
@@ -538,25 +740,25 @@
     <!-- Create Post Modal -->
     <div id="createPostModal" class="hidden fixed inset-0 z-50 overflow-y-auto">
         <div class="fixed inset-0 bg-slate-900/80 backdrop-blur-sm transition-opacity"></div>
-        <div class="flex min-h-full items-center justify-center p-4">
-            <div class="relative w-full max-w-lg rounded-2xl bg-slate-800 border border-slate-700 shadow-2xl overflow-hidden">
-                <div class="px-6 py-4 border-b border-slate-700 flex justify-between items-center">
-                    <h3 class="text-lg font-semibold text-white">Create Post</h3>
-                    <button id="closePostModal" class="text-slate-400 hover:text-white">&times;</button>
+        <div class="flex min-h-full items-center justify-center p-3 sm:p-4">
+            <div class="relative w-full max-w-lg rounded-xl sm:rounded-2xl bg-slate-800 border border-slate-700 shadow-2xl overflow-hidden">
+                <div class="px-4 sm:px-6 py-3 sm:py-4 border-b border-slate-700 flex justify-between items-center">
+                    <h3 class="text-base sm:text-lg font-semibold text-white">Create Post</h3>
+                    <button id="closePostModal" class="text-slate-400 hover:text-white text-2xl leading-none min-w-[44px] min-h-[44px] flex items-center justify-center">&times;</button>
                 </div>
-                <div class="p-6">
-                    <div class="flex items-center gap-3 mb-4">
-                         <img src="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='40' height='40'%3E%3Ccircle cx='20' cy='20' r='20' fill='%23334155'/%3E%3C/svg%3E" id="postUserAvatar" class="w-10 h-10 rounded-full" alt="User">
+                <div class="p-4 sm:p-6">
+                    <div class="flex items-center gap-2 sm:gap-3 mb-3 sm:mb-4">
+                         <img src="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='40' height='40'%3E%3Ccircle cx='20' cy='20' r='20' fill='%23334155'/%3E%3C/svg%3E" id="postUserAvatar" class="w-9 h-9 sm:w-10 sm:h-10 rounded-full" alt="User">
                          <div>
-                             <p class="font-medium text-white" id="postUserName">User</p>
-                             <select id="postPrivacy" class="text-xs bg-slate-900 border border-slate-700 rounded px-2 py-1 text-slate-400 outline-none">
+                             <p class="font-medium text-white text-sm sm:text-base" id="postUserName">User</p>
+                             <select id="postPrivacy" class="text-xs bg-slate-900 border border-slate-700 rounded px-2 py-1.5 text-slate-400 outline-none min-h-[32px]">
                                  <option value="public">Global</option>
                                  <option value="friends">Friends</option>
                                  <option value="private">Private</option>
                              </select>
                          </div>
                     </div>
-                    <textarea id="postContent" class="w-full bg-transparent border-0 focus:ring-0 text-slate-200 placeholder-slate-500 text-lg resize-none h-32 focus:outline-none" placeholder="What is on your mind?"></textarea>
+                    <textarea id="postContent" class="w-full bg-transparent border-0 focus:ring-0 text-slate-200 placeholder-slate-500 text-base sm:text-lg resize-none h-28 sm:h-32 focus:outline-none" placeholder="What is on your mind?"></textarea>
                     
                     <div id="postImagePreview" class="hidden mb-4 relative rounded-xl overflow-hidden border border-slate-700">
                         <img src="" id="postPreviewImg" class="w-full h-auto object-cover">
@@ -574,34 +776,34 @@
                     </div>
 
                     <!-- Poll Creation Section -->
-                    <div id="pollCreationSection" class="hidden mb-4 p-4 bg-slate-900 rounded-lg border border-slate-700">
+                    <div id="pollCreationSection" class="hidden mb-3 sm:mb-4 p-3 sm:p-4 bg-slate-900 rounded-lg border border-slate-700">
                         <div class="flex justify-between items-center mb-3">
-                            <h4 class="text-white font-medium">📊 Create Poll</h4>
-                            <button id="removePollBtn" class="text-slate-400 hover:text-white">&times;</button>
+                            <h4 class="text-white font-medium text-sm sm:text-base">📊 Create Poll</h4>
+                            <button id="removePollBtn" class="text-slate-400 hover:text-white text-xl min-w-[44px] min-h-[44px] flex items-center justify-center">&times;</button>
                         </div>
-                        <input type="text" id="pollQuestion" placeholder="Ask a question..." class="w-full bg-slate-800 border border-slate-700 rounded-lg px-3 py-2 text-white mb-2 outline-none focus:border-brand-blue">
+                        <input type="text" id="pollQuestion" placeholder="Ask a question..." class="w-full bg-slate-800 border border-slate-700 rounded-lg px-3 py-2.5 text-white text-base mb-2 outline-none focus:border-brand-blue">
                         <div id="pollOptionsContainer" class="space-y-2 mb-2">
-                            <input type="text" class="poll-option w-full bg-slate-800 border border-slate-700 rounded-lg px-3 py-2 text-white outline-none focus:border-brand-blue" placeholder="Option 1">
-                            <input type="text" class="poll-option w-full bg-slate-800 border border-slate-700 rounded-lg px-3 py-2 text-white outline-none focus:border-brand-blue" placeholder="Option 2">
+                            <input type="text" class="poll-option w-full bg-slate-800 border border-slate-700 rounded-lg px-3 py-2.5 text-white text-base outline-none focus:border-brand-blue" placeholder="Option 1">
+                            <input type="text" class="poll-option w-full bg-slate-800 border border-slate-700 rounded-lg px-3 py-2.5 text-white text-base outline-none focus:border-brand-blue" placeholder="Option 2">
                         </div>
-                        <button id="addPollOption" class="text-brand-blue text-sm hover:underline">+ Add option</button>
+                        <button id="addPollOption" class="text-brand-blue text-sm sm:text-base hover:underline min-h-[44px]">+ Add option</button>
                     </div>
 
-                    <div class="border-t border-slate-700 pt-4 flex items-center justify-between">
-                         <div class="flex gap-2">
-                             <label class="cursor-pointer p-2 rounded-full hover:bg-slate-700 text-brand-blue transition-colors relative" title="Add Image">
+                    <div class="border-t border-slate-700 pt-3 sm:pt-4 flex items-center justify-between">
+                         <div class="flex gap-1 sm:gap-2">
+                             <label class="cursor-pointer p-2 sm:p-2.5 rounded-full hover:bg-slate-700 text-brand-blue transition-colors relative min-w-[44px] min-h-[44px] flex items-center justify-center" title="Add Image">
                                  <input type="file" id="postImageInput" accept="image/*" class="hidden">
-                                 <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z"/></svg>
+                                 <svg class="w-5 h-5 sm:w-6 sm:h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z"/></svg>
                              </label>
-                             <label class="cursor-pointer p-2 rounded-full hover:bg-slate-700 text-purple-400 transition-colors relative" title="Attach File (PDF, DOC, XLS, ZIP)">
+                             <label class="cursor-pointer p-2 sm:p-2.5 rounded-full hover:bg-slate-700 text-purple-400 transition-colors relative min-w-[44px] min-h-[44px] flex items-center justify-center" title="Attach File">
                                  <input type="file" id="postFileInput" accept=".pdf,.doc,.docx,.xls,.xlsx,.ppt,.pptx,.txt,.zip,.rar" class="hidden">
-                                 <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15.172 7l-6.586 6.586a2 2 0 102.828 2.828l6.414-6.586a4 4 0 00-5.656-5.656l-6.415 6.585a6 6 0 108.486 8.486L20.5 13"/></svg>
+                                 <svg class="w-5 h-5 sm:w-6 sm:h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15.172 7l-6.586 6.586a2 2 0 102.828 2.828l6.414-6.586a4 4 0 00-5.656-5.656l-6.415 6.585a6 6 0 108.486 8.486L20.5 13"/></svg>
                              </label>
-                             <button id="addPollBtn" class="p-2 rounded-full hover:bg-slate-700 text-green-400 transition-colors" title="Add Poll">
-                                 <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z"/></svg>
+                             <button id="addPollBtn" class="p-2 sm:p-2.5 rounded-full hover:bg-slate-700 text-green-400 transition-colors min-w-[44px] min-h-[44px] flex items-center justify-center" title="Add Poll">
+                                 <svg class="w-5 h-5 sm:w-6 sm:h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z"/></svg>
                              </button>
                          </div>
-                         <button id="submitPost" class="bg-brand-blue hover:bg-blue-600 text-white px-6 py-2 rounded-lg font-medium shadow-lg shadow-brand-blue/20 transition-all">Post</button>
+                         <button id="submitPost" class="bg-brand-blue hover:bg-blue-600 active:scale-95 text-white px-4 sm:px-6 py-2.5 sm:py-2 rounded-lg font-medium shadow-lg shadow-brand-blue/20 transition-all text-sm sm:text-base min-h-[44px]">Post</button>
                     </div>
                 </div>
             </div>
@@ -611,18 +813,18 @@
     <!-- Create Event Modal -->
     <div id="createEventModal" class="hidden fixed inset-0 z-50 overflow-y-auto">
         <div class="fixed inset-0 bg-slate-900/80 backdrop-blur-sm"></div>
-        <div class="flex min-h-full items-center justify-center p-4">
-            <div class="relative w-full max-w-md rounded-2xl bg-slate-800 border border-slate-700 shadow-2xl p-6">
-                <div class="flex justify-between items-center mb-6">
-                    <h3 class="text-xl font-bold text-white">Create Event</h3>
-                    <button onclick="document.getElementById('createEventModal').classList.add('hidden')" class="text-slate-400 hover:text-white">&times;</button>
+        <div class="flex min-h-full items-center justify-center p-3 sm:p-4">
+            <div class="relative w-full max-w-md rounded-xl sm:rounded-2xl bg-slate-800 border border-slate-700 shadow-2xl p-4 sm:p-6">
+                <div class="flex justify-between items-center mb-4 sm:mb-6">
+                    <h3 class="text-lg sm:text-xl font-bold text-white">Create Event</h3>
+                    <button onclick="document.getElementById('createEventModal').classList.add('hidden')" class="text-slate-400 hover:text-white text-2xl leading-none min-w-[44px] min-h-[44px] flex items-center justify-center">&times;</button>
                 </div>
-                <div class="space-y-4">
-                    <input type="text" id="eventNameInput" placeholder="Event Name" class="w-full bg-slate-900 border border-slate-700 rounded-lg px-4 py-3 text-white outline-none focus:border-brand-blue">
-                    <input type="date" id="eventDateInput" class="w-full bg-slate-900 border border-slate-700 rounded-lg px-4 py-3 text-white outline-none focus:border-brand-blue">
-                    <input type="text" id="eventLocationInput" placeholder="Location" class="w-full bg-slate-900 border border-slate-700 rounded-lg px-4 py-3 text-white outline-none focus:border-brand-blue">
-                    <textarea id="eventDescInput" placeholder="Description" rows="3" class="w-full bg-slate-900 border border-slate-700 rounded-lg px-4 py-3 text-white outline-none focus:border-brand-blue resize-none"></textarea>
-                    <button onclick="createEvent()" class="w-full bg-brand-blue hover:bg-blue-600 text-white py-3 rounded-xl font-semibold shadow-lg shadow-brand-blue/20 transition-all">Create Event</button>
+                <div class="space-y-3 sm:space-y-4">
+                    <input type="text" id="eventNameInput" placeholder="Event Name" class="w-full bg-slate-900 border border-slate-700 rounded-lg px-3 sm:px-4 py-2.5 sm:py-3 text-white text-base outline-none focus:border-brand-blue">
+                    <input type="date" id="eventDateInput" class="w-full bg-slate-900 border border-slate-700 rounded-lg px-3 sm:px-4 py-2.5 sm:py-3 text-white text-base outline-none focus:border-brand-blue">
+                    <input type="text" id="eventLocationInput" placeholder="Location" class="w-full bg-slate-900 border border-slate-700 rounded-lg px-3 sm:px-4 py-2.5 sm:py-3 text-white text-base outline-none focus:border-brand-blue">
+                    <textarea id="eventDescInput" placeholder="Description" rows="3" class="w-full bg-slate-900 border border-slate-700 rounded-lg px-3 sm:px-4 py-2.5 sm:py-3 text-white text-base outline-none focus:border-brand-blue resize-none"></textarea>
+                    <button onclick="createEvent()" class="w-full bg-brand-blue hover:bg-blue-600 active:scale-95 text-white py-3 rounded-lg sm:rounded-xl font-semibold shadow-lg shadow-brand-blue/20 transition-all text-base min-h-[48px]">Create Event</button>
                 </div>
             </div>
         </div>
@@ -631,85 +833,87 @@
     <!-- Create Page Modal -->
     <div id="createPageModal" class="hidden fixed inset-0 z-50 overflow-y-auto">
         <div class="fixed inset-0 bg-slate-900/80 backdrop-blur-sm"></div>
-        <div class="flex min-h-full items-center justify-center p-4">
-            <div class="relative w-full max-w-md rounded-2xl bg-slate-800 border border-slate-700 shadow-2xl p-6">
-                 <div class="flex justify-between items-center mb-6">
-                    <h3 class="text-xl font-bold text-white">Create Page</h3>
-                    <button id="closePageModal" class="text-slate-400 hover:text-white">&times;</button>
+        <div class="flex min-h-full items-center justify-center p-3 sm:p-4">
+            <div class="relative w-full max-w-md rounded-xl sm:rounded-2xl bg-slate-800 border border-slate-700 shadow-2xl p-4 sm:p-6">
+                 <div class="flex justify-between items-center mb-4 sm:mb-6">
+                    <h3 class="text-lg sm:text-xl font-bold text-white">Create Page</h3>
+                    <button id="closePageModal" class="text-slate-400 hover:text-white text-2xl leading-none min-w-[44px] min-h-[44px] flex items-center justify-center">&times;</button>
                 </div>
-                <div class="space-y-4">
-                    <input type="text" id="pageNameInput" placeholder="Page Name" class="w-full bg-slate-900 border border-slate-700 rounded-lg px-4 py-3 text-white outline-none focus:border-brand-blue">
-                    <textarea id="pageDescInput" placeholder="Description" rows="3" class="w-full bg-slate-900 border border-slate-700 rounded-lg px-4 py-3 text-white outline-none focus:border-brand-blue resize-none"></textarea>
-                    <select id="pageCategoryInput" class="w-full bg-slate-900 border border-slate-700 rounded-lg px-4 py-3 text-white outline-none">
+                <div class="space-y-3 sm:space-y-4">
+                    <input type="text" id="pageNameInput" placeholder="Page Name" class="w-full bg-slate-900 border border-slate-700 rounded-lg px-3 sm:px-4 py-2.5 sm:py-3 text-white text-base outline-none focus:border-brand-blue">
+                    <textarea id="pageDescInput" placeholder="Description" rows="3" class="w-full bg-slate-900 border border-slate-700 rounded-lg px-3 sm:px-4 py-2.5 sm:py-3 text-white text-base outline-none focus:border-brand-blue resize-none"></textarea>
+                    <select id="pageCategoryInput" class="w-full bg-slate-900 border border-slate-700 rounded-lg px-3 sm:px-4 py-2.5 sm:py-3 text-white text-base outline-none min-h-[44px]">
                         <option value="business">Business</option>
                         <option value="community">Community</option>
                     </select>
                 </div>
-                 <div class="mt-4">
+                 <div class="mt-3 sm:mt-4">
                      <label class="block text-sm text-slate-400 mb-2">Cover Image</label>
-                     <input type="file" id="pageImageInput" class="block w-full text-sm text-slate-500 file:mr-4 file:py-2 file:px-4 file:rounded-full file:border-0 file:text-sm file:font-semibold file:bg-brand-blue file:text-white hover:file:bg-blue-600"/>
+                     <input type="file" id="pageImageInput" class="block w-full text-sm text-slate-500 file:mr-3 file:py-2 file:px-4 file:rounded-full file:border-0 file:text-sm file:font-semibold file:bg-brand-blue file:text-white hover:file:bg-blue-600 file:min-h-[40px]"/>
                  </div>
-                <div class="mt-6 flex justify-end">
-                    <button id="submitCreatePage" class="bg-brand-blue hover:bg-blue-600 text-white w-full py-3 rounded-xl font-semibold shadow-lg shadow-brand-blue/20 transition-all active:scale-95">Create</button>
+                <div class="mt-4 sm:mt-6 flex justify-end">
+                    <button id="submitCreatePage" class="bg-brand-blue hover:bg-blue-600 text-white w-full py-3 rounded-lg sm:rounded-xl font-semibold shadow-lg shadow-brand-blue/20 transition-all active:scale-95 text-base min-h-[48px]">Create</button>
                 </div>
             </div>
         </div>
     </div>
 
     <!-- Hidden Modals (Placeholders for JS compatibility) -->
-    <div id="commentModal" class="hidden fixed inset-0 z-50 flex items-center justify-center bg-black/80">
-        <div class="bg-slate-800 rounded-xl p-4 w-full max-w-md">
-            <div class="flex justify-between border-b border-slate-700 pb-2 mb-2">
-                <h3 class="text-white font-bold">Comments</h3>
-                <button id="closeCommentModal" class="text-slate-400">&times;</button>
+    <div id="commentModal" class="hidden fixed inset-0 z-50 flex items-center justify-center bg-black/80 p-3 sm:p-4">
+        <div class="bg-slate-800 rounded-xl sm:rounded-2xl p-3 sm:p-4 w-full max-w-md">
+            <div class="flex justify-between border-b border-slate-700 pb-2 sm:pb-3 mb-2 sm:mb-3">
+                <h3 class="text-white font-bold text-base sm:text-lg">Comments</h3>
+                <button id="closeCommentModal" class="text-slate-400 hover:text-white text-xl min-w-[44px] min-h-[44px] flex items-center justify-center">&times;</button>
             </div>
-            <div id="commentsList" class="max-h-60 overflow-y-auto mb-4 text-slate-300 space-y-2"></div>
+            <div id="commentsList" class="max-h-60 overflow-y-auto mb-3 sm:mb-4 text-slate-300 space-y-2 text-sm sm:text-base"></div>
             <div class="flex gap-2">
-                <input type="text" id="commentInput" class="flex-1 bg-slate-900 border border-slate-700 rounded px-2 py-1 text-white" placeholder="Write a comment...">
-                <button id="submitComment" class="text-brand-blue">Post</button>
+                <input type="text" id="commentInput" class="flex-1 bg-slate-900 border border-slate-700 rounded-lg px-3 py-2.5 text-white text-base outline-none focus:border-brand-blue" placeholder="Write a comment...">
+                <button id="submitComment" class="text-brand-blue font-medium min-w-[60px] min-h-[44px] hover:bg-slate-700 rounded-lg px-3 transition-colors">Post</button>
             </div>
         </div>
     </div>
 
     <!-- Enhanced Settings Modal -->
-    <div id="settingsModal" class="hidden fixed inset-0 z-50 flex items-center justify-center bg-black/80 backdrop-blur-sm p-4">
-        <div class="bg-slate-800/95 backdrop-blur-xl border border-slate-700/50 rounded-2xl shadow-2xl w-full max-w-4xl max-h-[90vh] overflow-hidden">
+    <div id="settingsModal" class="hidden fixed inset-0 z-50 flex items-center justify-center bg-black/80 backdrop-blur-sm p-2 sm:p-4">
+        <div class="bg-slate-800/95 backdrop-blur-xl border border-slate-700/50 rounded-xl sm:rounded-2xl shadow-2xl w-full max-w-4xl max-h-[95vh] sm:max-h-[90vh] overflow-hidden">
              <!-- Header -->
-             <div class="flex items-center justify-between p-6 border-b border-slate-700/50">
+             <div class="flex items-center justify-between p-3 sm:p-4 md:p-6 border-b border-slate-700/50">
                  <div>
-                     <h2 class="text-2xl font-bold text-white">Account Settings</h2>
-                     <p class="text-sm text-slate-400 mt-1">Manage your profile and preferences</p>
+                     <h2 class="text-xl sm:text-2xl font-bold text-white">Account Settings</h2>
+                     <p class="text-xs sm:text-sm text-slate-400 mt-1 hidden sm:block">Manage your profile and preferences</p>
                  </div>
-                 <button id="closeSettingsModal" class="text-slate-400 hover:text-white transition-colors p-2 rounded-lg hover:bg-slate-700/50">
-                     <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                 <button id="closeSettingsModal" class="text-slate-400 hover:text-white transition-colors p-2 rounded-lg hover:bg-slate-700/50 min-w-[44px] min-h-[44px] flex items-center justify-center">
+                     <svg class="w-5 h-5 sm:w-6 sm:h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"/>
                      </svg>
                  </button>
              </div>
              
              <!-- Content -->
-             <div class="flex h-[calc(90vh-140px)]">
+             <div class="flex flex-col md:flex-row h-[calc(95vh-100px)] sm:h-[calc(90vh-140px)]">
                  <!-- Sidebar Tabs -->
-                 <div class="w-64 border-r border-slate-700/50 p-4 space-y-1 overflow-y-auto">
-                     <button class="settings-tab active w-full text-left px-4 py-3 rounded-lg text-slate-300 hover:bg-slate-700/50 hover:text-white transition-all flex items-center gap-3 font-medium" data-tab="profile">
-                         <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z"/>
-                         </svg>
-                         Profile Info
-                     </button>
-                     <button class="settings-tab w-full text-left px-4 py-3 rounded-lg text-slate-400 hover:bg-slate-700/50 hover:text-white transition-all flex items-center gap-3 font-medium" data-tab="privacy">
-                         <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z"/>
-                         </svg>
-                         Privacy
-                     </button>
-                     <button class="settings-tab w-full text-left px-4 py-3 rounded-lg text-slate-400 hover:bg-slate-700/50 hover:text-white transition-all flex items-center gap-3 font-medium" data-tab="preferences">
-                         <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10.325 4.317c.426-1.756 2.924-1.756 3.35 0a1.724 1.724 0 002.573 1.066c1.543-.94 3.31.826 2.37 2.37a1.724 1.724 0 001.065 2.572c1.756.426 1.756 2.924 0 3.35a1.724 1.724 0 00-1.066 2.573c.94 1.543-.826 3.31-2.37 2.37a1.724 1.724 0 00-2.572 1.065c-.426 1.756-2.924 1.756-3.35 0a1.724 1.724 0 00-2.573-1.066c-1.543.94-3.31-.826-2.37-2.37a1.724 1.724 0 00-1.065-2.572c-1.756-.426-1.756-2.924 0-3.35a1.724 1.724 0 001.066-2.573c-.94-1.543.826-3.31 2.37-2.37.996.608 2.296.07 2.572-1.065z"/>
-                             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"/>
-                         </svg>
-                         Preferences
-                     </button>
+                 <div class="md:w-64 border-b md:border-b-0 md:border-r border-slate-700/50 p-2 sm:p-3 md:p-4 overflow-x-auto md:overflow-x-visible md:overflow-y-auto">
+                     <div class="flex md:flex-col md:space-y-1 gap-2 md:gap-0 whitespace-nowrap md:whitespace-normal">
+                         <button class="settings-tab active flex-shrink-0 md:w-full text-left px-3 sm:px-4 py-2 sm:py-3 rounded-lg text-slate-300 hover:bg-slate-700/50 hover:text-white transition-all flex items-center gap-2 sm:gap-3 font-medium text-sm sm:text-base min-h-[44px]" data-tab="profile">
+                             <svg class="w-4 h-4 sm:w-5 sm:h-5 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z"/>
+                             </svg>
+                             <span>Profile</span>
+                         </button>
+                         <button class="settings-tab flex-shrink-0 md:w-full text-left px-3 sm:px-4 py-2 sm:py-3 rounded-lg text-slate-400 hover:bg-slate-700/50 hover:text-white transition-all flex items-center gap-2 sm:gap-3 font-medium text-sm sm:text-base min-h-[44px]" data-tab="privacy">
+                             <svg class="w-4 h-4 sm:w-5 sm:h-5 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z"/>
+                             </svg>
+                             <span>Privacy</span>
+                         </button>
+                         <button class="settings-tab flex-shrink-0 md:w-full text-left px-3 sm:px-4 py-2 sm:py-3 rounded-lg text-slate-400 hover:bg-slate-700/50 hover:text-white transition-all flex items-center gap-2 sm:gap-3 font-medium text-sm sm:text-base min-h-[44px]" data-tab="preferences">
+                             <svg class="w-4 h-4 sm:w-5 sm:h-5 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10.325 4.317c.426-1.756 2.924-1.756 3.35 0a1.724 1.724 0 002.573 1.066c1.543-.94 3.31.826 2.37 2.37a1.724 1.724 0 001.065 2.572c1.756.426 1.756 2.924 0 3.35a1.724 1.724 0 00-1.066 2.573c.94 1.543-.826 3.31-2.37 2.37a1.724 1.724 0 00-2.572 1.065c-.426 1.756-2.924 1.756-3.35 0a1.724 1.724 0 00-2.573-1.066c-1.543.94-3.31-.826-2.37-2.37a1.724 1.724 0 00-1.065-2.572c-1.756-.426-1.756-2.924 0-3.35a1.724 1.724 0 001.066-2.573c-.94-1.543.826-3.31 2.37-2.37.996.608 2.296.07 2.572-1.065z"/>
+                                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"/>
+                             </svg>
+                             <span>Preferences</span>
+                         </button>
+                     </div>
                  </div>
                  
                  <!-- Main Content Area -->
@@ -975,15 +1179,21 @@
     <!-- Mobile Bottom Navigation (Visible only on mobile) -->
     <nav class="md:hidden fixed bottom-0 left-0 right-0 z-50 mobile-bottom-nav">
         <div class="glass-panel border-t border-slate-700/50 bg-slate-900/95 backdrop-blur-xl">
-            <div class="flex items-center justify-around px-2 py-3">
-                <button id="mobileFeedTab" class="mobile-nav-item flex flex-col items-center gap-1 px-4 py-2 text-brand-blue transition-all active:scale-95">
+            <div class="flex items-center justify-around px-1 py-3">
+                <button id="mobileFeedTab" class="mobile-nav-item flex flex-col items-center gap-1 px-3 py-2 text-brand-blue transition-all active:scale-95">
                     <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 12l2-2m0 0l7-7 7 7M5 10v10a1 1 0 001 1h3m10-11l2 2m-2-2v10a1 1 0 01-1 1h-3m-6 0a1 1 0 001-1v-4a1 1 0 011-1h2a1 1 0 011 1v4a1 1 0 001 1m-6 0h6"/></svg>
                     <span class="text-xs font-medium">Home</span>
                 </button>
                 
-                <button id="mobileRoomsTab" class="mobile-nav-item flex flex-col items-center gap-1 px-4 py-2 text-slate-400 transition-all active:scale-95">
-                    <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0zm6 3a2 2 0 11-4 0 2 2 0 014 0zM7 10a2 2 0 11-4 0 2 2 0 014 0z"/></svg>
-                    <span class="text-xs font-medium">Rooms</span>
+                <button id="mobileFeaturesTab" class="mobile-nav-item flex flex-col items-center gap-1 px-3 py-2 text-slate-400 transition-all active:scale-95">
+                    <div class="relative">
+                        <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 3v4M3 5h4M6 17v4m-2-2h4m5-16l2.286 6.857L21 12l-5.714 2.143L13 21l-2.286-6.857L5 12l5.714-2.143L13 3z"/></svg>
+                        <span class="absolute -top-1 -right-1 flex h-2 w-2">
+                            <span class="animate-ping absolute inline-flex h-full w-full rounded-full bg-amber-400 opacity-75"></span>
+                            <span class="relative inline-flex rounded-full h-2 w-2 bg-amber-500"></span>
+                        </span>
+                    </div>
+                    <span class="text-xs font-medium">Features</span>
                 </button>
                 
                 <button id="mobileCreateBtn" class="mobile-nav-item flex flex-col items-center gap-1 -mt-4 transition-all active:scale-95">
@@ -992,14 +1202,14 @@
                     </div>
                 </button>
                 
-                <button id="mobileFriendsTab" class="mobile-nav-item flex flex-col items-center gap-1 px-4 py-2 text-slate-400 transition-all active:scale-95">
+                <button id="mobileFriendsTab" class="mobile-nav-item flex flex-col items-center gap-1 px-3 py-2 text-slate-400 transition-all active:scale-95">
                     <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4.354a4 4 0 110 5.292M15 21H3v-1a6 6 0 0112 0v1zm0 0h6v-1a6 6 0 00-9-5.197M13 7a4 4 0 11-8 0 4 4 0 018 0z"/></svg>
                     <span class="text-xs font-medium">Friends</span>
                 </button>
                 
-                <button id="mobileProfileTab" class="mobile-nav-item flex flex-col items-center gap-1 px-4 py-2 text-slate-400 transition-all active:scale-95">
-                    <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z"/></svg>
-                    <span class="text-xs font-medium">Profile</span>
+                <button id="mobileProfileTab" class="mobile-nav-item flex flex-col items-center gap-1 px-3 py-2 text-slate-400 transition-all active:scale-95">
+                    <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2H6a2 2 0 01-2-2V6zM14 6a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2h-2a2 2 0 01-2-2V6zM4 16a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2H6a2 2 0 01-2-2v-2zM14 16a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2h-2a2 2 0 01-2-2v-2z"/></svg>
+                    <span class="text-xs font-medium">Menu</span>
                 </button>
             </div>
         </div>
@@ -1036,8 +1246,72 @@
     <script src="js/memory-social-impact.js"></script>
     <script src="js/governance-devils-advocate.js"></script>
     <script src="js/features-menu.js"></script>
+    <script src="js/features-hub.js"></script>
     <script src="js/post-integrations.js"></script>
     <script src="js/feature-onboarding.js"></script>
+    
+    <script>
+        // Mobile navigation handlers
+        document.addEventListener('DOMContentLoaded', () => {
+            // Desktop features button opens hub
+            const desktopFeaturesBtn = document.getElementById('featuresMenuBtn');
+            if (desktopFeaturesBtn) {
+                desktopFeaturesBtn.addEventListener('click', () => {
+                    if (typeof openFeaturesHub === 'function') {
+                        openFeaturesHub();
+                    }
+                });
+            }
+            
+            // Mobile features button opens hub
+            const mobileFeaturesBtn = document.getElementById('mobileFeaturesTab');
+            if (mobileFeaturesBtn) {
+                mobileFeaturesBtn.addEventListener('click', () => {
+                    if (typeof openFeaturesHub === 'function') {
+                        openFeaturesHub();
+                    }
+                });
+            }
+            
+            // Mobile navigation tab switching
+            const mobileTabs = {
+                'mobileFeedTab': 'feedTab',
+                'mobileFriendsTab': 'friendsTab',
+                'mobileCreateBtn': 'createPostBtn',
+                'mobileProfileTab': 'openFeaturesHub' // Open features hub as menu
+            };
+            
+            Object.keys(mobileTabs).forEach(mobileId => {
+                const mobileBtn = document.getElementById(mobileId);
+                const action = mobileTabs[mobileId];
+                
+                if (mobileBtn && action) {
+                    mobileBtn.addEventListener('click', () => {
+                        // Remove active from all mobile tabs
+                        document.querySelectorAll('.mobile-nav-item').forEach(tab => {
+                            tab.classList.remove('active', 'text-brand-blue');
+                            tab.classList.add('text-slate-400');
+                        });
+                        
+                        // Add active to clicked tab (except for features/menu)
+                        if (mobileId !== 'mobileProfileTab' && mobileId !== 'mobileFeaturesTab') {
+                            mobileBtn.classList.add('active', 'text-brand-blue');
+                            mobileBtn.classList.remove('text-slate-400');
+                        }
+                        
+                        // Trigger action
+                        if (action === 'openFeaturesHub') {
+                            if (typeof openFeaturesHub === 'function') {
+                                openFeaturesHub();
+                            }
+                        } else {
+                            document.getElementById(action)?.click();
+                        }
+                    });
+                }
+            });
+        });
+    </script>
 
 </body>
 </html>"
