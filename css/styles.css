@@ -543,16 +543,18 @@ ul {
     padding-right: 8px;
 }
 
-.comment {
+.comment,
+.comment-item {
     display: flex;
-    gap: 12px;
+    gap: 16px;
     margin-bottom: 16px;
     animation: fadeIn 0.3s ease;
+    align-items: flex-start;
 }
 
 .comment-avatar {
-    width: 32px;
-    height: 32px;
+    width: 40px;
+    height: 40px;
     border-radius: 50%;
     object-fit: cover;
     flex-shrink: 0;
@@ -1307,43 +1309,119 @@ ul {
     }
 }
 
-/* Responsive */
+/* ==================== RESPONSIVE DESIGN ==================== */
+
+/* Tablet View */
 @media (max-width: 1024px) {
     .dashboard-container {
         grid-template-columns: 240px 1fr;
+        gap: 20px;
+        padding: 20px;
     }
     .right-sidebar {
         display: none;
     }
 }
 
+/* Mobile View - Primary Styles */
 @media (max-width: 768px) {
+    /* Layout */
     .dashboard-container {
         grid-template-columns: 1fr;
-        padding: 16px;
+        padding: 12px;
+        gap: 16px;
     }
+    
     .sidebar {
-        display: none; /* In full app, use drawer */
+        display: none; /* Use mobile drawer */
     }
+    
+    .main-content {
+        padding: 0;
+    }
+    
+    /* Navigation */
     .navbar {
         height: auto;
         padding: 12px 0;
     }
+    
     .nav-container {
-        flex-direction: column;
-        gap: 12px;
+        padding: 0 16px;
+        flex-wrap: wrap;
     }
     
+    .nav-brand h2 {
+        font-size: 20px;
+    }
+    
+    .nav-menu {
+        gap: 16px;
+    }
+    
+    .nav-link {
+        font-size: 14px;
+        padding: 6px 0;
+    }
+    
+    /* Cards */
+    .create-post-card,
+    .post,
+    .post-card {
+        border-radius: var(--border-radius-md);
+        margin-bottom: 16px;
+    }
+    
+    .create-post-card {
+        padding: 16px;
+    }
+    
+    .post-header {
+        padding: 12px 16px;
+    }
+    
+    .post-content {
+        padding: 0 16px 12px;
+        font-size: 14px;
+    }
+    
+    .post-stats {
+        padding: 10px 16px;
+        font-size: 12px;
+    }
+    
+    .post-footer {
+        padding: 4px 12px;
+    }
+    
+    /* Buttons */
+    .btn {
+        padding: 10px 16px;
+        font-size: 14px;
+    }
+    
+    .action-btn {
+        padding: 8px 6px;
+        font-size: 13px;
+        gap: 6px;
+    }
+    
+    /* Profile */
     .profile-info-header {
         flex-direction: column;
         gap: 16px;
         text-align: center;
+        padding: 16px;
     }
     
     .profile-actions {
         width: 100%;
-        flex-direction: row;
-        justify-content: center;
+        flex-direction: column;
+        gap: 8px;
+    }
+    
+    .profile-actions .btn {
+        width: 100%;
     }
     
     .profile-avatar-container {
@@ -1353,6 +1431,206 @@ ul {
     
     .profile-meta {
         justify-content: center;
+        flex-wrap: wrap;
+        gap: 16px;
+    }
+    
+    /* Modals */
+    .modal {
+        padding: 12px;
+    }
+    
+    .modal-content {
+        width: 95%;
+        max-width: 100%;
+        max-height: 90vh;
+        margin: 0;
+        border-radius: var(--border-radius-md);
+    }
+    
+    .modal-large {
+        width: 95%;
+        height: 85vh;
+    }
+    
+    .modal-header {
+        padding: 16px;
+    }
+    
+    .modal-header h2 {
+        font-size: 1.25rem;
+    }
+    
+    .modal-body {
+        flex-direction: column;
+    }
+    
+    .settings-tabs {
+        width: 100%;
+        flex-direction: row;
+        overflow-x: auto;
+        border-right: none;
+        border-bottom: 1px solid var(--border-color);
+        padding: 8px 0;
+    }
+    
+    .settings-tab {
+        padding: 10px 16px;
+        white-space: nowrap;
+        border-right: none;
+        border-bottom: 2px solid transparent;
+    }
+    
+    .settings-tab.active {
+        border-right: none;
+        border-bottom: 2px solid var(--primary-color);
+    }
+    
+    .settings-content {
+        padding: 20px 16px;
+    }
+    
+    /* Form Elements */
+    .form-group {
+        margin-bottom: 16px;
+    }
+    
+    .form-group input,
+    .form-group select,
+    .form-group textarea {
+        padding: 10px;
+        font-size: 14px;
+    }
+    
+    /* Comments */
+    .comments-list {
+        max-height: 300px;
+    }
+    
+    .comment,
+    .comment-item {
+        gap: 12px;
+        margin-bottom: 12px;
+    }
+    
+    .comment-avatar {
+        width: 36px;
+        height: 36px;
+    }
+    
+    .comment-bubble {
+        padding: 8px 12px;
+    }
+    
+    .comment-text {
+        font-size: 13px;
+    }
+    
+    /* Right Sidebar Cards */
+    .right-sidebar-card {
+        padding: 16px;
+    }
+}
+
+/* Extra Small Phones */
+@media (max-width: 480px) {
+    /* Reduce spacing for very small screens */
+    .dashboard-container {
+        padding: 8px;
+        gap: 12px;
+    }
+    
+    .nav-container {
+        padding: 0 12px;
+    }
+    
+    .nav-brand h2 {
+        font-size: 18px;
+    }
+    
+    .nav-menu {
+        gap: 12px;
+    }
+    
+    .create-post-card,
+    .post,
+    .post-card {
+        margin-bottom: 12px;
+    }
+    
+    .create-post-card {
+        padding: 12px;
+    }
+    
+    .post-header {
+        padding: 12px;
+    }
+    
+    .post-header img {
+        width: 36px;
+        height: 36px;
+    }
+    
+    .post-content {
+        padding: 0 12px 12px;
+        font-size: 13px;
+    }
+    
+    .post-stats {
+        padding: 8px 12px;
+        font-size: 11px;
+    }
+    
+    .post-footer {
+        padding: 4px 8px;
+    }
+    
+    .action-btn {
+        padding: 8px 4px;
+        font-size: 12px;
+        gap: 4px;
+    }
+    
+    .action-btn svg {
+        width: 16px;
+        height: 16px;
+    }
+    
+    .btn {
+        padding: 8px 14px;
+        font-size: 13px;
+    }
+    
+    .modal-content {
+        width: 98%;
+    }
+    
+    .modal-header {
+        padding: 12px;
+    }
+    
+    .modal-header h2 {
+        font-size: 1.1rem;
+    }
+    
+    .settings-content {
+        padding: 16px 12px;
+    }
+    
+    .form-group input,
+    .form-group select,
+    .form-group textarea {
+        padding: 8px;
+        font-size: 13px;
+    }
+    
+    .profile-info-header {
+        padding: 12px;
+    }
+    
+    .user-avatar {
+        width: 32px;
+        height: 32px;
     }
 }
 
@@ -1438,6 +1716,486 @@ img[loading="lazy"].loaded {
 .main-content {
     scroll-behavior: smooth;
     will-change: scroll-position;
+}
+
+/* ==================== ADDITIONAL MOBILE OPTIMIZATIONS ==================== */
+
+/* Mobile-First Typography */
+@media (max-width: 768px) {
+    body {
+        font-size: 14px;
+        line-height: 1.6;
+    }
+    
+    h1 { font-size: 1.5rem; }
+    h2 { font-size: 1.25rem; }
+    h3 { font-size: 1.1rem; }
+    h4 { font-size: 1rem; }
+    
+    /* Login/Auth Pages */
+    .login-container {
+        padding: 16px;
+    }
+    
+    .login-card {
+        border-radius: var(--border-radius-lg);
+    }
+    
+    .logo-section {
+        padding: 24px;
+    }
+    
+    .logo {
+        font-size: 28px;
+    }
+    
+    .form-section {
+        padding: 24px 20px;
+    }
+    
+    /* Groups & Rooms */
+    .groups-grid,
+    .rooms-grid {
+        grid-template-columns: 1fr !important;
+        gap: 12px !important;
+        padding: 0 !important;
+    }
+    
+    .group-card,
+    .room-card {
+        margin-bottom: 12px;
+    }
+    
+    /* Profile Page */
+    .profile-stats {
+        flex-wrap: wrap;
+        gap: 12px;
+    }
+    
+    .stat-item {
+        min-width: 45%;
+    }
+    
+    /* Post Create/Edit */
+    .post-textarea {
+        min-height: 100px;
+        font-size: 14px;
+    }
+    
+    .post-input {
+        font-size: 14px;
+        padding: 8px 16px;
+    }
+    
+    /* Image Preview */
+    .post-image-preview img {
+        max-height: 250px;
+    }
+    
+    /* Notification Panel */
+    .notification-panel {
+        width: 100% !important;
+        max-width: 100% !important;
+        left: 0 !important;
+        right: 0 !important;
+        border-radius: 0 !important;
+        max-height: 70vh;
+    }
+    
+    /* Search Results */
+    .search-results {
+        width: calc(100% - 24px);
+        left: 12px;
+        right: 12px;
+    }
+    
+    /* User Cards in Suggestions */
+    .user-suggestion,
+    .user-card {
+        padding: 12px;
+    }
+    
+    .user-card img {
+        width: 36px;
+        height: 36px;
+    }
+    
+    /* Tabs */
+    .tab-container {
+        overflow-x: auto;
+        -webkit-overflow-scrolling: touch;
+    }
+    
+    .tab {
+        font-size: 14px;
+        padding: 10px;
+        min-width: 100px;
+    }
+    
+    /* Dropdown Menus */
+    .create-dropdown,
+    .dropdown-menu {
+        width: calc(100vw - 32px);
+        max-width: 320px;
+        left: 50%;
+        transform: translateX(-50%);
+    }
+    
+    /* Avatar Sizes */
+    .settings-avatar,
+    .profile-avatar img {
+        width: 100px;
+        height: 100px;
+    }
+    
+    /* Spacing Utilities */
+    .mb-mobile {
+        margin-bottom: 16px;
+    }
+    
+    .p-mobile {
+        padding: 12px;
+    }
+    
+    /* Touch-Friendly Hit Areas */
+    button,
+    a,
+    .clickable {
+        min-height: 44px;
+        min-width: 44px;
+    }
+    
+    /* Horizontal Scrolling */
+    .scroll-container {
+        overflow-x: auto;
+        -webkit-overflow-scrolling: touch;
+        scrollbar-width: none;
+    }
+    
+    .scroll-container::-webkit-scrollbar {
+        display: none;
+    }
+    
+    /* Better Input Experience */
+    input[type="text"],
+    input[type="email"],
+    input[type="password"],
+    textarea {
+        font-size: 16px !important; /* Prevents zoom on iOS */
+    }
+    
+    /* Fixed Bottom Actions */
+    .fixed-bottom-actions {
+        position: fixed;
+        bottom: 0;
+        left: 0;
+        right: 0;
+        background: var(--surface-color);
+        padding: 12px 16px;
+        box-shadow: 0 -2px 10px rgba(0,0,0,0.1);
+        border-top: 1px solid var(--border-color);
+        z-index: 50;
+    }
+}
+
+/* Extra Small Screens - Additional Adjustments */
+@media (max-width: 480px) {
+    /* Tighter Typography */
+    body {
+        font-size: 13px;
+    }
+    
+    h1 { font-size: 1.35rem; }
+    h2 { font-size: 1.15rem; }
+    h3 { font-size: 1rem; }
+    
+    /* Compact Cards */
+    .create-post-card,
+    .post,
+    .post-card,
+    .group-card,
+    .room-card {
+        padding: 10px;
+        margin-bottom: 10px;
+    }
+    
+    /* Profile Stats */
+    .stat-item {
+        font-size: 12px;
+    }
+    
+    /* Modal Adjustments */
+    .modal-header h2 {
+        font-size: 1rem;
+    }
+    
+    .settings-tab {
+        font-size: 13px;
+        padding: 8px 12px;
+    }
+    
+    /* Notification sizes */
+    .notification-badge {
+        font-size: 9px;
+        height: 14px;
+        min-width: 14px;
+    }
+}
+
+    /* Landscape Mobile */
+@media (max-width: 768px) and (orientation: landscape) {
+    .modal-content {
+        max-height: 80vh;
+        overflow-y: auto;
+    }
+    
+    .modal-large {
+        height: 95vh;
+    }
+    
+    .login-container {
+        padding: 12px;
+    }
+}
+
+/* ==================== TAILWIND + CUSTOM MOBILE OVERRIDES ==================== */
+
+/* Mobile Bottom Navigation Padding */
+@media (max-width: 768px) {
+    body {
+        padding-bottom: 80px; /* Space for mobile bottom nav */
+    }
+    
+    .main-content,
+    .dashboard-container,
+    main,
+    .flex-1 {
+        padding-bottom: 100px !important; /* Extra padding for fixed nav */
+    }
+}
+
+/* Mobile-specific fixes for Tailwind classes */
+@media (max-width: 768px) {
+    /* Grid Adjustments */
+    .grid-cols-1,
+    .grid-cols-2,
+    .grid-cols-3,
+    .md\:grid-cols-2,
+    .md\:grid-cols-3,
+    .lg\:grid-cols-3,
+    .lg\:grid-cols-4 {
+        grid-template-columns: 1fr !important;
+    }
+    
+    /* Flexbox Mobile Adjustments */
+    .flex-row {
+        flex-direction: column;
+    }
+    
+    /* Container Padding */
+    .container,
+    .max-w-7xl,
+    .max-w-6xl,
+    .max-w-5xl {
+        padding-left: 16px !important;
+        padding-right: 16px !important;
+    }
+    
+    /* Spacing Adjustments */
+    .px-4 { padding-left: 12px !important; padding-right: 12px !important; }
+    .px-6 { padding-left: 16px !important; padding-right: 16px !important; }
+    .px-8 { padding-left: 16px !important; padding-right: 16px !important; }
+    .py-8 { padding-top: 20px !important; padding-bottom: 20px !important; }
+    .py-6 { padding-top: 16px !important; padding-bottom: 16px !important; }
+    
+    .gap-6 { gap: 12px !important; }
+    .gap-8 { gap: 16px !important; }
+    
+    /* Text Sizes */
+    .text-3xl { font-size: 1.5rem !important; line-height: 2rem !important; }
+    .text-2xl { font-size: 1.25rem !important; line-height: 1.75rem !important; }
+    .text-xl { font-size: 1.125rem !important; line-height: 1.75rem !important; }
+    
+    /* Mobile-Friendly Cards */
+    .rounded-2xl { border-radius: 12px !important; }
+    .rounded-xl { border-radius: 10px !important; }
+    
+    /* Buttons */
+    .px-6 { padding-left: 16px !important; padding-right: 16px !important; }
+    
+    /* Hidden on Mobile */
+    .hidden.md\:flex,
+    .hidden.md\:block {
+        display: none !important;
+    }
+    
+    /* Tab Scrolling */
+    .flex.gap-4.mb-6 {
+        overflow-x: auto;
+        -webkit-overflow-scrolling: touch;
+        scrollbar-width: none;
+    }
+    
+    .flex.gap-4.mb-6::-webkit-scrollbar {
+        display: none;
+    }
+    
+    /* Sidebar Hide */
+    .md\:ml-20 {
+        margin-left: 0 !important;
+    }
+    
+    /* Modal Improvements */
+    .fixed.inset-0 > div {
+        max-width: 95% !important;
+        margin: 12px !important;
+    }
+    
+    /* Group Cards */
+    .group-card {
+        padding: 1rem !important;
+    }
+    
+    /* Room Cards */
+    .room-card-content {
+        padding: 0.875rem !important;
+    }
+    
+    /* Better Touch Targets */
+    a, button, input[type="button"], input[type="submit"] {
+        -webkit-tap-highlight-color: rgba(59, 130, 246, 0.1);
+    }
+    
+    /* Smooth Scroll */
+    html {
+        scroll-behavior: smooth;
+        -webkit-overflow-scrolling: touch;
+    }
+    
+    /* Prevent Zoom on Input Focus (iOS) */
+    input[type="text"],
+    input[type="email"],
+    input[type="password"],
+    input[type="number"],
+    input[type="tel"],
+    textarea,
+    select {
+        font-size: 16px !important;
+    }
+}
+
+/* Extra Small Mobile */
+@media (max-width: 480px) {
+    /* Tighter Typography */
+    body {
+        font-size: 13px;
+        padding-bottom: 75px;
+    }
+    
+    h1 { font-size: 1.35rem; }
+    h2 { font-size: 1.15rem; }
+    h3 { font-size: 1rem; }
+    
+    .px-4 { padding-left: 8px !important; padding-right: 8px !important; }
+    .px-6 { padding-left: 12px !important; padding-right: 12px !important; }
+    
+    .text-3xl { font-size: 1.35rem !important; }
+    .text-2xl { font-size: 1.15rem !important; }
+    .text-xl { font-size: 1rem !important; }
+    
+    /* Button Adjustments */
+    button {
+        font-size: 14px;
+    }
+    
+    /* Tab Buttons */
+    .tab-btn {
+        padding: 10px 12px !important;
+        font-size: 13px !important;
+    }
+    
+    /* Compact Cards */
+    .create-post-card,
+    .post,
+    .post-card,
+    .group-card,
+    .room-card {
+        padding: 10px;
+        margin-bottom: 10px;
+    }
+    
+    /* More compact spacing */
+    .main-content,
+    .dashboard-container {
+        padding-bottom: 90px !important;
+    }
+}
+
+/* ==================== MOBILE IMAGE OPTIMIZATION ==================== */
+@media (max-width: 768px) {
+    img {
+        max-width: 100%;
+        height: auto;
+    }
+    
+    .post-image,
+    .event-image,
+    .page-image {
+        max-height: 300px;
+        object-fit: cover;
+        border-radius: var(--border-radius-md);
+    }
+}
+
+/* ==================== MOBILE LIST & FEED OPTIMIZATION ==================== */
+@media (max-width: 768px) {
+    /* Better line height for readability */
+    p, .post-content, .comment-text {
+        line-height: 1.6;
+    }
+    
+    /* Feed spacing */
+    .feed-item,
+    .post-item {
+        margin-bottom: 12px;
+    }
+}
+
+/* ==================== MOBILE FORM OPTIMIZATION ==================== */
+@media (max-width: 768px) {
+    /* Form groups */
+    .form-group {
+        margin-bottom: 14px;
+    }
+    
+    /* Form labels */
+    label {
+        font-size: 13px;
+        margin-bottom: 6px;
+    }
+    
+    /* Textareas */
+    textarea {
+        min-height: 100px;
+    }
+}
+
+/* ==================== MOBILE UTILITY CLASSES ==================== */
+@media (max-width: 768px) {
+    /* Hide on mobile */
+    .hide-mobile {
+        display: none !important;
+    }
+    
+    /* Show only on mobile */
+    .mobile-only {
+        display: block !important;
+    }
+    
+    /* Full width on mobile */
+    .mobile-full-width {
+        width: 100% !important;
+    }
 }
 
 /* Reduce animation on low-end devices */

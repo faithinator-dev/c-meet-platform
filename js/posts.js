@@ -379,7 +379,7 @@ function displayComment(comment, postId) {
     const commentDiv = document.createElement('div');
     commentDiv.className = 'comment-item';
     commentDiv.innerHTML = `
-        <img src="${comment.authorAvatar || "data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='32' height='32'%3E%3Ccircle cx='16' cy='16' r='16' fill='%23334155'/%3E%3C/svg%3E"}" alt="${comment.authorName}" class="comment-avatar">
+        <img src="${comment.authorAvatar || "data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='40' height='40'%3E%3Ccircle cx='20' cy='20' r='20' fill='%23334155'/%3E%3C/svg%3E"}" alt="${comment.authorName}" class="comment-avatar">
         <div class="comment-content">
             <div class="comment-header">
                 <span class="comment-author">${comment.authorName}</span>
@@ -414,7 +414,7 @@ async function addComment(postId, text) {
             text: text.trim(),
             authorId: user.uid,
             authorName: userData.displayName || 'Anonymous',
-            authorAvatar: userData.avatar || "data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='32' height='32'%3E%3Ccircle cx='16' cy='16' r='16' fill='%23334155'/%3E%3C/svg%3E",
+            authorAvatar: userData.avatar || "data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='40' height='40'%3E%3Ccircle cx='20' cy='20' r='20' fill='%23334155'/%3E%3C/svg%3E",
             timestamp: Date.now()
         };
 

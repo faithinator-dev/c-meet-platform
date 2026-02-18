@@ -251,7 +251,7 @@ async function unfriendUser(userId) {
 async function loadStats() {
     try {
         // Count posts
-        const postsRef = firebase.database().ref('posts').orderByChild('userId').equalTo(currentProfileUserId);
+        const postsRef = firebase.database().ref('posts').orderByChild('authorId').equalTo(currentProfileUserId);
         const postsSnapshot = await postsRef.once('value');
         const postsCount = postsSnapshot.numChildren();
         const postsCountElem = document.getElementById('postsCount');
@@ -291,9 +291,9 @@ async function loadPosts() {
             console.error('userPostsFeed element not found');
             return;
         }
-        postsContainer.innerHTML = '';
+        postsContainer.innerHTML = '<div style="text-align: center; padding: 20px; color: #999;">Loading posts...</div>';
 
-        const postsRef = firebase.database().ref('posts').orderByChild('userId').equalTo(currentProfileUserId);
+        const postsRef = firebase.database().ref('posts').orderByChild('authorId').equalTo(currentProfileUserId);
         const snapshot = await postsRef.once('value');
 
         if (!snapshot.exists()) {
@@ -335,18 +335,22 @@ async function createPostElement(post) {
     postDiv.style.boxShadow = '0 1px 3px rgba(0,0,0,0.1)';
 
     // Get user data
-    const userRef = firebase.database().ref(`users/${post.userId}`);
+    const userId = post.authorId || post.userId;
+    const userRef = firebase.database().ref(`users/${userId}`);
     const userSnapshot = await userRef.once('value');
     const userData = userSnapshot.val();
 
-    const avatar = userData?.avatar || "data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='40' height='40'%3E%3Ccircle cx='20' cy='20' r='20' fill='%23334155'/%3E%3C/svg%3E";
-    const displayName = userData?.displayName || 'User';
+    const avatar = userData?.avatar || post.authorAvatar || "data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='40' height='40'%3E%3Ccircle cx='20' cy='20' r='20' fill='%23334155'/%3E%3C/svg%3E";
+    const displayName = userData?.displayName || post.authorName || 'User';
     const timeAgo = getTimeAgo(post.timestamp);
 
     // Get likes and comments count
     const likesCount = post.likes ? Object.keys(post.likes).length : 0;
     const commentsCount = post.comments ? Object.keys(post.comments).length : 0;
     const userLiked = post.likes && post.likes[currentUser.uid];
+
+    // Get image URL - check both imageUrl and image fields
+    const postImage = post.imageUrl || post.image;
 
     postDiv.innerHTML = `
         <div class="post-header" style="display: flex; align-items: center; margin-bottom: 16px;">
@@ -357,7 +361,7 @@ async function createPostElement(post) {
             </div>
         </div>
         <div class="post-content" style="margin-bottom: 16px; line-height: 1.5;">${post.content}</div>
-        ${post.image ? `<img src="${post.image}" alt="Post image" style="width: 100%; border-radius: 8px; margin-bottom: 16px; max-height: 500px; object-fit: cover;">` : ''}
+        ${postImage ? `<img src="${postImage}" alt="Post image" style="width: 100%; border-radius: 8px; margin-bottom: 16px; max-height: 500px; object-fit: cover;">` : ''}
         <div class="post-stats" style="display: flex; gap: 16px; padding: 12px 0; border-top: 1px solid #e4e6eb; border-bottom: 1px solid #e4e6eb; margin-bottom: 8px; font-size: 14px; color: #65676b;">
             <span>${likesCount} likes</span>
             <span>${commentsCount} comments</span>
@@ -513,14 +517,16 @@ async function loadPhotos() {
         }
         photosGrid.innerHTML = '';
 
-        const postsRef = firebase.database().ref('posts').orderByChild('userId').equalTo(currentProfileUserId);
+        const postsRef = firebase.database().ref('posts').orderByChild('authorId').equalTo(currentProfileUserId);
         const snapshot = await postsRef.once('value');
 
         const photos = [];
         snapshot.forEach(postSnap => {
             const post = postSnap.val();
-            if (post.image) {
-                photos.push(post.image);
+            // Check both imageUrl and image fields
+            const postImage = post.imageUrl || post.image;
+            if (postImage) {
+                photos.push(postImage);
             }
         });
 
