@@ -1848,6 +1848,281 @@ img[loading="lazy"].loaded {
         height: 100px;
     }
     
+    /* ==================== PROFILE PAGE MOBILE OPTIMIZATIONS ==================== */
+    
+    /* Profile Page Container */
+    .profile-container {
+        padding: 12px !important;
+    }
+    
+    /* Profile Cover Photo - Reduce height on mobile */
+    .profile-cover-wrap {
+        height: 180px !important;
+        border-radius: 12px !important;
+    }
+    
+    /* Profile Avatar - Smaller and better positioned on mobile */
+    .profile-avatar-wrap {
+        width: 100px !important;
+        height: 100px !important;
+        left: 50% !important;
+        transform: translate(-50%, 50%) !important;
+        border-width: 3px !important;
+    }
+    
+    /* Profile Header Content - More top padding for centered avatar */
+    .profile-header-content {
+        padding-top: 70px !important;
+        text-align: center;
+    }
+    
+    /* Profile Name */
+    #profileDisplayName {
+        font-size: 1.5rem !important;
+        text-align: center;
+    }
+    
+    /* Profile Email/Handle */
+    #profileEmail {
+        text-align: center;
+        font-size: 0.875rem !important;
+    }
+    
+    /* Profile Bio */
+    #profileBioText {
+        text-align: center;
+        font-size: 0.875rem !important;
+        padding: 0 12px;
+    }
+    
+    /* Profile Meta Info (Location, Joined) */
+    .profile-meta-info {
+        justify-content: center !important;
+        flex-wrap: wrap;
+        gap: 16px !important;
+    }
+    
+    /* Profile Actions Buttons */
+    #profileActions {
+        justify-content: center !important;
+        width: 100%;
+    }
+    
+    #profileActions button {
+        flex: 1;
+        min-width: 120px;
+    }
+    
+    /* Profile Tabs */
+    .tab-btn {
+        padding: 0.75rem 1rem !important;
+        font-size: 0.875rem !important;
+        white-space: nowrap;
+    }
+    
+    /* Profile Tab Container - Enable horizontal scroll */
+    .profile-tabs-container {
+        overflow-x: auto !important;
+        -webkit-overflow-scrolling: touch;
+        scrollbar-width: none;
+    }
+    
+    .profile-tabs-container::-webkit-scrollbar {
+        display: none;
+    }
+    
+    /* Profile Grid - Single column on mobile */
+    .profile-content-grid {
+        grid-template-columns: 1fr !important;
+        gap: 16px !important;
+    }
+    
+    /* Profile Stats Card */
+    .profile-stats-card {
+        order: 1;
+    }
+    
+    .profile-stats-grid {
+        grid-template-columns: repeat(2, 1fr) !important;
+        gap: 12px !important;
+    }
+    
+    /* Profile Intro/About Card */
+    .profile-intro-card {
+        order: 2;
+    }
+    
+    /* Profile Main Content (Posts/Photos) */
+    .profile-main-content {
+        order: 0;
+        margin-bottom: 16px;
+    }
+    
+    /* Post Cards on Profile */
+    .post-card {
+        margin-bottom: 16px !important;
+        padding: 16px !important;
+        border-radius: 12px !important;
+    }
+    
+    /* Photos Grid on Profile */
+    .profile-photos-grid {
+        grid-template-columns: repeat(2, 1fr) !important;
+        gap: 8px !important;
+    }
+    
+    .profile-photos-grid img {
+        aspect-ratio: 1;
+        object-fit: cover;
+        border-radius: 8px !important;
+    }
+    
+    /* Friends Grid on Profile */
+    .profile-friends-grid {
+        grid-template-columns: repeat(2, 1fr) !important;
+        gap: 12px !important;
+    }
+    
+    .friend-card {
+        padding: 12px !important;
+    }
+    
+    .friend-card img {
+        width: 48px !important;
+        height: 48px !important;
+    }
+    
+    /* Edit Profile Buttons */
+    #editCoverBtn,
+    #editAvatarBtn {
+        font-size: 0.75rem !important;
+        padding: 6px 12px !important;
+    }
+    
+    #editCoverBtn {
+        top: 8px !important;
+        right: 8px !important;
+    }
+    
+    /* Profile Navigation - Hide on mobile (already have bottom nav) */
+    body nav:first-of-type {
+        display: none !important;
+    }
+    
+    /* Adjust main content for hidden sidebar */
+    body main {
+        padding: 12px !important;
+        padding-bottom: 100px !important; /* Space for bottom nav */
+    }
+    
+    /* Breadcrumb - Smaller on mobile */
+    .breadcrumb {
+        font-size: 0.75rem !important;
+        margin-bottom: 12px !important;
+    }
+    
+    /* Profile Header Card */
+    .profile-header-card {
+        border-radius: 16px !important;
+        overflow: visible !important;
+        margin-bottom: 16px !important;
+    }
+    
+    /* Profile Stats Numbers */
+    .stat-number {
+        font-size: 1.5rem !important;
+    }
+    
+    /* Glass Panels on Profile */
+    .glass-panel {
+        padding: 16px !important;
+        border-radius: 12px !important;
+    }
+    
+    /* About Section Items */
+    .about-item {
+        font-size: 0.875rem !important;
+        gap: 8px !important;
+    }
+    
+    .about-item svg {
+        width: 18px !important;
+        height: 18px !important;
+    }
+    
+    /* Post Card Adjustments for Profile Page */
+    .post-header {
+        gap: 12px !important;
+    }
+    
+    .post-avatar {
+        width: 40px !important;
+        height: 40px !important;
+        min-width: 40px !important;
+    }
+    
+    .post-author {
+        font-size: 0.9rem !important;
+        line-height: 1.2;
+    }
+    
+    .post-time {
+        font-size: 0.75rem !important;
+    }
+    
+    .post-content {
+        font-size: 0.875rem !important;
+        line-height: 1.5;
+        margin-top: 8px !important;
+    }
+    
+    .post-stats {
+        font-size: 0.8125rem !important;
+        gap: 12px !important;
+        margin: 12px 0 !important;
+    }
+    
+    .post-action-btn {
+        padding: 8px !important;
+        font-size: 0.8125rem !important;
+    }
+    
+    .post-action-btn svg {
+        width: 18px !important;
+        height: 18px !important;
+    }
+    
+    /* Prevent Text Shrinking */
+    * {
+        text-size-adjust: 100%;
+        -webkit-text-size-adjust: 100%;
+    }
+    
+    /* Profile Actions Button Sizing */
+    .btn-primary,
+    .btn-secondary {
+        padding: 10px 20px !important;
+        font-size: 0.875rem !important;
+    }
+    
+    /* Fix Overlapping Issues */
+    .profile-header-card > div {
+        position: relative;
+        z-index: 1;
+    }
+    
+    /* Ensure Proper Spacing Between Elements */
+    .profile-container > * {
+        margin-bottom: 16px;
+    }
+    
+    /* Tab Button Proper Sizing */
+    .tab-btn:not(.clickable),
+    .profile-tab:not(.clickable) {
+        min-height: auto !important;
+        padding: 12px 16px !important;
+    }
+    
     /* Spacing Utilities */
     .mb-mobile {
         margin-bottom: 16px;

@@ -322,9 +322,9 @@
     <main
       class="flex-1 min-w-0 overflow-y-auto hide-scrollbar bg-slate-900 relative"
     >
-      <div class="max-w-5xl mx-auto p-8 pb-32">
+      <div class="max-w-5xl mx-auto p-8 pb-32 profile-container">
         <!-- Breadcrumb -->
-        <div class="flex items-center gap-2 text-slate-500 text-sm mb-6">
+        <div class="flex items-center gap-2 text-slate-500 text-sm mb-6 breadcrumb">
           <a href="dashboard.html" class="hover:text-brand-blue">Dashboard</a>
           <span>/</span>
           <span class="text-slate-300">Profile</span>
@@ -332,7 +332,7 @@
 
         <!-- Profile Header Card -->
         <div
-          class="bg-slate-800 border border-slate-700/50 rounded-2xl overflow-visible mb-8 relative"
+          class="bg-slate-800 border border-slate-700/50 rounded-2xl overflow-visible mb-8 relative profile-header-card"
         >
           <!-- Cover Photo -->
           <div
@@ -402,7 +402,7 @@
             </div>
           </div>
 
-          <div class="pt-20 px-8 pb-8">
+          <div class="pt-20 px-8 pb-8 profile-header-content">
             <div
               class="flex flex-col md:flex-row justify-between items-start gap-6"
             >
@@ -424,7 +424,7 @@
                   <!-- Bio inject here -->
                 </p>
 
-                <div class="flex flex-wrap gap-6 text-sm text-slate-400">
+                <div class="flex flex-wrap gap-6 text-sm text-slate-400 profile-meta-info">
                   <div class="flex items-center gap-2" id="profileLocationMeta">
                     <svg
                       class="w-4 h-4 text-slate-500"
@@ -477,30 +477,30 @@
           </div>
 
           <!-- Tabs -->
-          <div class="px-8 flex border-t border-slate-700/50">
+          <div class="px-8 flex border-t border-slate-700/50 profile-tabs-container">
             <button
-              class="tab-btn ms-auto active"
+              class="tab-btn profile-tab ms-auto active"
               data-tab="posts"
               onclick="switchTab(`posts`)"
             >
               Posts
             </button>
             <button
-              class="tab-btn"
+              class="tab-btn profile-tab"
               data-tab="about"
               onclick="switchTab(`about`)"
             >
               About
             </button>
             <button
-              class="tab-btn"
+              class="tab-btn profile-tab"
               data-tab="friends"
               onclick="switchTab(`friends`)"
             >
               Friends
             </button>
             <button
-              class="tab-btn"
+              class="tab-btn profile-tab"
               data-tab="photos"
               onclick="switchTab(`photos`)"
             >
@@ -509,9 +509,9 @@
           </div>
         </div>
 
-        <div class="grid grid-cols-1 lg:grid-cols-3 gap-8">
+        <div class="grid grid-cols-1 lg:grid-cols-3 gap-8 profile-content-grid">
           <!-- Left Details Column -->
-          <div class="lg:col-span-1 space-y-6">
+          <div class="lg:col-span-1 space-y-6 profile-stats-card">
             <!-- Stats Card -->
             <div class="glass-panel rounded-xl p-6 border border-slate-700/50">
               <h3
@@ -519,10 +519,10 @@
               >
                 Stats
               </h3>
-              <div class="grid grid-cols-2 gap-4">
+              <div class="grid grid-cols-2 gap-4 profile-stats-grid">
                 <div class="text-center p-3 rounded-lg bg-slate-800/50">
                   <div
-                    class="text-2xl font-bold text-white mb-1"
+                    class="text-2xl font-bold text-white mb-1 stat-number"
                     id="postsCount"
                   >
                     0
@@ -531,7 +531,7 @@
                 </div>
                 <div class="text-center p-3 rounded-lg bg-slate-800/50">
                   <div
-                    class="text-2xl font-bold text-white mb-1"
+                    class="text-2xl font-bold text-white mb-1 stat-number"
                     id="friendsCount"
                   >
                     0
@@ -542,14 +542,14 @@
             </div>
 
             <!-- Intro / About Snippet -->
-            <div class="glass-panel rounded-xl p-6 border border-slate-700/50">
+            <div class="glass-panel rounded-xl p-6 border border-slate-700/50 profile-intro-card">
               <h3
                 class="text-sm font-semibold uppercase tracking-wider text-slate-500 mb-4"
               >
                 Intro
               </h3>
-              <div class="space-y-3 text-sm text-slate-300">
-                <div class="flex items-center gap-3">
+              <div class="space-y-3 text-sm text-slate-300 about-section">
+                <div class="flex items-center gap-3 about-item">
                   <svg
                     class="w-5 h-5 text-slate-500"
                     fill="none"
@@ -565,7 +565,7 @@
                   </svg>
                   Works at <span class="text-white ml-auto">Freelance</span>
                 </div>
-                <div class="flex items-center gap-3">
+                <div class="flex items-center gap-3 about-item">
                   <svg
                     class="w-5 h-5 text-slate-500"
                     fill="none"
@@ -592,7 +592,7 @@
           </div>
 
           <!-- Right Feed Column -->
-          <div class="lg:col-span-2 space-y-6">
+          <div class="lg:col-span-2 space-y-6 profile-main-content">
             <!-- Tab Panels -->
             <div id="postsTab" class="profile-tab-panel active block">
               <!-- Create Post (Optional, if self) -->
@@ -625,11 +625,24 @@
               <h3 class="text-lg font-semibold text-white mb-4">Friends</h3>
               <div
                 id="userFriendsList"
-                class="grid grid-cols-2 sm:grid-cols-3 gap-4"
+                class="grid grid-cols-2 sm:grid-cols-3 gap-4 profile-friends-grid"
               >
                 <!-- Populated by JS -->
                 <p class="text-slate-500 col-span-full py-8 text-center">
                   No friends yet.
+                </p>
+              </div>
+            </div>
+
+            <div id="photosTab" class="profile-tab-panel hidden">
+              <h3 class="text-lg font-semibold text-white mb-4">Photos</h3>
+              <div
+                id="photosGrid"
+                class="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 gap-4 profile-photos-grid"
+              >
+                <!-- Populated by JS -->
+                <p class="text-slate-500 col-span-full py-8 text-center">
+                  No photos yet.
                 </p>
               </div>
             </div>
