@@ -1439,6 +1439,8 @@ function setupMobileNavigation() {
   const mobileNotificationBtn = document.getElementById(
     "mobileNotificationBtn",
   );
+  const mobileFeaturesTab = document.getElementById("mobileFeaturesTab");
+  const mobileMenuToggle = document.getElementById("mobileMenuToggle");
 
   // Feed tab
   if (mobileFeedTab) {
@@ -1464,10 +1466,18 @@ function setupMobileNavigation() {
     });
   }
 
-  // Profile tab
-  if (mobileProfileTab) {
-    mobileProfileTab.addEventListener("click", () => {
-      window.location.href = "profile.html";
+  // Features tab
+  if (mobileFeaturesTab) {
+    mobileFeaturesTab.addEventListener("click", () => {
+      document.getElementById("featuresMenuBtn")?.click();
+      updateMobileNavActive("mobileFeaturesTab");
+    });
+  }
+
+  // Menu toggle button - opens slide-in menu
+  if (mobileMenuToggle) {
+    mobileMenuToggle.addEventListener("click", () => {
+      openMobileMenu();
     });
   }
 
@@ -1483,6 +1493,149 @@ function setupMobileNavigation() {
     mobileNotificationBtn.addEventListener("click", () => {
       document.getElementById("notificationBell")?.click();
     });
+  }
+
+  // Setup mobile slide-in menu
+  setupMobileSlideMenu();
+}
+
+// Setup mobile slide-in menu
+function setupMobileSlideMenu() {
+  const mobileSlideMenu = document.getElementById("mobileSlideMenu");
+  const mobileMenuPanel = document.getElementById("mobileMenuPanel");
+  const mobileMenuBackdrop = document.getElementById("mobileMenuBackdrop");
+  const mobileMenuClose = document.getElementById("mobileMenuClose");
+  
+  // Load user data into menu
+  if (currentUser) {
+    const userRef = database.ref(`users/${currentUser.uid}`);
+    userRef.once("value", (snapshot) => {
+      const userData = snapshot.val();
+      if (userData) {
+        const mobileMenuAvatar = document.getElementById("mobileMenuAvatar");
+        const mobileMenuUserName = document.getElementById("mobileMenuUserName");
+        
+        if (mobileMenuAvatar) {
+          mobileMenuAvatar.style.backgroundImage = `url(${userData.avatar || "data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='48' height='48'%3E%3Ccircle cx='24' cy='24' r='24' fill='%23334155'/%3E%3C/svg%3E"})`;
+        }
+        
+        if (mobileMenuUserName) {
+          mobileMenuUserName.textContent = userData.displayName || "User";
+        }
+      }
+    });
+  }
+
+  // Close menu button
+  if (mobileMenuClose) {
+    mobileMenuClose.addEventListener("click", closeMobileMenu);
+  }
+
+  // Backdrop click closes menu
+  if (mobileMenuBackdrop) {
+    mobileMenuBackdrop.addEventListener("click", closeMobileMenu);
+  }
+
+  // Menu item actions
+  const mobileMenuRooms = document.getElementById("mobileMenuRooms");
+  const mobileMenuPages = document.getElementById("mobileMenuPages");
+  const mobileMenuFriends = document.getElementById("mobileMenuFriends");
+  const mobileMenuEvents = document.getElementById("mobileMenuEvents");
+  const mobileMenuSettings = document.getElementById("mobileMenuSettings");
+  const mobileMenuLogout = document.getElementById("mobileMenuLogout");
+
+  if (mobileMenuRooms) {
+    mobileMenuRooms.addEventListener("click", () => {
+      document.getElementById("roomsTab")?.click();
+      closeMobileMenu();
+    });
+  }
+
+  if (mobileMenuPages) {
+    mobileMenuPages.addEventListener("click", () => {
+      document.getElementById("pagesTab")?.click();
+      closeMobileMenu();
+    });
+  }
+
+  if (mobileMenuFriends) {
+    mobileMenuFriends.addEventListener("click", () => {
+      document.getElementById("friendsTab")?.click();
+      closeMobileMenu();
+    });
+  }
+
+  if (mobileMenuEvents) {
+    mobileMenuEvents.addEventListener("click", () => {
+      document.getElementById("eventsTab")?.click();
+      closeMobileMenu();
+    });
+  }
+
+  if (mobileMenuSettings) {
+    mobileMenuSettings.addEventListener("click", () => {
+      if (typeof openSettings === "function") {
+        openSettings();
+        closeMobileMenu();
+      }
+    });
+  }
+
+  if (mobileMenuLogout) {
+    mobileMenuLogout.addEventListener("click", async () => {
+      if (confirm("Are you sure you want to logout?")) {
+        try {
+          await auth.signOut();
+          window.location.href = "index.html";
+        } catch (error) {
+          alert("Logout failed: " + error.message);
+        }
+      }
+    });
+  }
+}
+
+// Open mobile menu
+function openMobileMenu() {
+  const mobileSlideMenu = document.getElementById("mobileSlideMenu");
+  const mobileMenuPanel = document.getElementById("mobileMenuPanel");
+  const mobileMenuBackdrop = document.getElementById("mobileMenuBackdrop");
+
+  if (mobileSlideMenu && mobileMenuPanel && mobileMenuBackdrop) {
+    mobileSlideMenu.classList.remove("pointer-events-none");
+    mobileSlideMenu.classList.add("pointer-events-auto");
+    
+    setTimeout(() => {
+      mobileMenuBackdrop.classList.add("opacity-100");
+      mobileMenuBackdrop.classList.remove("opacity-0");
+      mobileMenuPanel.classList.remove("translate-x-full");
+      mobileMenuPanel.classList.add("translate-x-0");
+    }, 10);
+
+    // Prevent body scroll when menu is open
+    document.body.style.overflow = "hidden";
+  }
+}
+
+// Close mobile menu
+function closeMobileMenu() {
+  const mobileSlideMenu = document.getElementById("mobileSlideMenu");
+  const mobileMenuPanel = document.getElementById("mobileMenuPanel");
+  const mobileMenuBackdrop = document.getElementById("mobileMenuBackdrop");
+
+  if (mobileSlideMenu && mobileMenuPanel && mobileMenuBackdrop) {
+    mobileMenuBackdrop.classList.remove("opacity-100");
+    mobileMenuBackdrop.classList.add("opacity-0");
+    mobileMenuPanel.classList.add("translate-x-full");
+    mobileMenuPanel.classList.remove("translate-x-0");
+    
+    setTimeout(() => {
+      mobileSlideMenu.classList.add("pointer-events-none");
+      mobileSlideMenu.classList.remove("pointer-events-auto");
+    }, 300);
+
+    // Restore body scroll
+    document.body.style.overflow = "";
   }
 }
 
