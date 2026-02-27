@@ -1,0 +1,253 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>MVP Data Initializer</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+</head>
+<body class="bg-gradient-to-br from-purple-600 via-blue-600 to-indigo-700 min-h-screen flex items-center justify-center p-4">
+    <div class="bg-white rounded-2xl shadow-2xl max-w-2xl w-full p-8">
+        <div class="text-center mb-8">
+            <h1 class="text-4xl font-bold text-gray-800 mb-2">🚀 MVP Data Initializer</h1>
+            <p class="text-gray-600">Populate your database with sample data for testing</p>
+        </div>
+
+        <div class="bg-blue-50 border-l-4 border-blue-500 p-4 mb-6">
+            <p class="text-sm text-blue-700">
+                <strong>⚠️ Important:</strong> This tool creates sample data in your Firebase database. 
+                Only use this on a fresh or testing database. Make sure you've already deployed the security rules.
+            </p>
+        </div>
+
+        <div class="space-y-4 mb-6">
+            <div class="flex items-start space-x-3">
+                <div class="flex-shrink-0 mt-1">
+                    <span class="inline-flex items-center justify-center h-6 w-6 rounded-full bg-green-100 text-green-600 text-sm font-semibold">✓</span>
+                </div>
+                <div>
+                    <h3 class="font-semibold text-gray-800">What will be created:</h3>
+                    <ul class="mt-2 space-y-1 text-sm text-gray-600">
+                        <li>• 5 sample users with profiles</li>
+                        <li>• 8 communities (Technology, Gaming, Science, Cooking, etc.)</li>
+                        <li>• 15 posts with realistic content and hashtags</li>
+                        <li>• Threaded comments on all posts</li>
+                        <li>• Follow relationships between users</li>
+                        <li>• Votes and reactions on posts</li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+
+        <div class="space-y-3">
+            <button id="initBtn" 
+                    class="w-full bg-gradient-to-r from-blue-500 to-indigo-600 text-white py-3 px-6 rounded-lg font-semibold hover:from-blue-600 hover:to-indigo-700 transition-all transform hover:scale-105 shadow-lg disabled:opacity-50 disabled:cursor-not-allowed disabled:transform-none">
+                Initialize Sample Data
+            </button>
+
+            <button id="clearBtn" 
+                    class="w-full bg-red-500 text-white py-3 px-6 rounded-lg font-semibold hover:bg-red-600 transition-all disabled:opacity-50 disabled:cursor-not-allowed">
+                Clear All Data (Keep Users)
+            </button>
+
+            <button id="backBtn" 
+                    onclick="window.location.href='mvp-index.html'"
+                    class="w-full bg-gray-200 text-gray-700 py-3 px-6 rounded-lg font-semibold hover:bg-gray-300 transition-all">
+                Back to Login
+            </button>
+        </div>
+
+        <div id="progressContainer" class="mt-6 hidden">
+            <div class="bg-gray-100 rounded-lg p-4">
+                <div class="flex items-center justify-between mb-2">
+                    <span class="text-sm font-semibold text-gray-700" id="progressText">Initializing...</span>
+                    <span class="text-sm text-gray-500" id="progressPercent">0%</span>
+                </div>
+                <div class="w-full bg-gray-300 rounded-full h-2 overflow-hidden">
+                    <div id="progressBar" class="bg-gradient-to-r from-blue-500 to-indigo-600 h-2 rounded-full transition-all duration-300" style="width: 0%"></div>
+                </div>
+            </div>
+            <div class="mt-4 max-h-64 overflow-y-auto bg-gray-50 rounded-lg p-4">
+                <pre id="logOutput" class="text-xs text-gray-700 font-mono whitespace-pre-wrap"></pre>
+            </div>
+        </div>
+
+        <div id="resultContainer" class="mt-6 hidden">
+            <div id="resultContent"></div>
+        </div>
+    </div>
+
+    <!-- Firebase SDKs -->
+    <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-app-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-database-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-auth-compat.js"></script>
+    
+    <!-- Config and Data Init Script -->
+    <script src="js/config.js"></script>
+    <script src="js/mvp-data-init.js"></script>
+
+    <script>
+        const initBtn = document.getElementById('initBtn');
+        const clearBtn = document.getElementById('clearBtn');
+        const progressContainer = document.getElementById('progressContainer');
+        const progressBar = document.getElementById('progressBar');
+        const progressText = document.getElementById('progressText');
+        const progressPercent = document.getElementById('progressPercent');
+        const logOutput = document.getElementById('logOutput');
+        const resultContainer = document.getElementById('resultContainer');
+        const resultContent = document.getElementById('resultContent');
+
+        // Override console.log to capture logs
+        const originalLog = console.log;
+        const logs = [];
+
+        function captureLog(...args) {
+            logs.push(args.join(' '));
+            logOutput.textContent = logs.join('\n');
+            logOutput.scrollTop = logOutput.scrollHeight;
+            originalLog(...args);
+        }
+
+        function updateProgress(text, percent) {
+            progressText.textContent = text;
+            progressPercent.textContent = `${percent}%`;
+            progressBar.style.width = `${percent}%`;
+        }
+
+        function showResult(success, message) {
+            resultContainer.classList.remove('hidden');
+            
+            if (success) {
+                resultContent.innerHTML = `
+                    <div class="bg-green-50 border-l-4 border-green-500 p-4 rounded">
+                        <div class="flex items-center">
+                            <span class="text-2xl mr-3">✅</span>
+                            <div>
+                                <h3 class="font-semibold text-green-800">Success!</h3>
+                                <p class="text-sm text-green-700 mt-1">${message}</p>
+                            </div>
+                        </div>
+                        <button onclick="window.location.href='mvp-index.html'" 
+                                class="mt-4 w-full bg-green-500 text-white py-2 px-4 rounded-lg font-semibold hover:bg-green-600 transition-all">
+                            Go to Login Page
+                        </button>
+                    </div>
+                `;
+            } else {
+                resultContent.innerHTML = `
+                    <div class="bg-red-50 border-l-4 border-red-500 p-4 rounded">
+                        <div class="flex items-center">
+                            <span class="text-2xl mr-3">❌</span>
+                            <div>
+                                <h3 class="font-semibold text-red-800">Error</h3>
+                                <p class="text-sm text-red-700 mt-1">${message}</p>
+                            </div>
+                        </div>
+                    </div>
+                `;
+            }
+        }
+
+        initBtn.addEventListener('click', async () => {
+            // Confirm action
+            const confirmed = confirm('This will populate your database with sample data. Continue?');
+            if (!confirmed) return;
+
+            // Reset UI
+            logs.length = 0;
+            logOutput.textContent = '';
+            progressContainer.classList.remove('hidden');
+            resultContainer.classList.add('hidden');
+            initBtn.disabled = true;
+            clearBtn.disabled = true;
+            
+            // Override console.log
+            console.log = captureLog;
+
+            try {
+                updateProgress('Starting initialization...', 10);
+                
+                // Create instance
+                const initializer = new MVPDataInitializer();
+                
+                updateProgress('Creating sample users...', 20);
+                await initializer.createSampleUsers();
+                
+                updateProgress('Creating sample communities...', 40);
+                await initializer.createSampleCommunities();
+                
+                updateProgress('Creating sample posts...', 60);
+                await initializer.createSamplePosts();
+                
+                updateProgress('Adding comments...', 75);
+                await initializer.createSampleComments();
+                
+                updateProgress('Creating follow relationships...', 85);
+                await initializer.createFollowRelationships();
+                
+                updateProgress('Adding votes and reactions...', 95);
+                await initializer.addVotesAndReactions();
+                
+                updateProgress('Complete!', 100);
+                
+                showResult(true, 'Database has been populated with sample data. You can now sign in and explore the platform!');
+                
+            } catch (error) {
+                console.error('Error:', error);
+                showResult(false, error.message);
+            } finally {
+                // Restore console.log
+                console.log = originalLog;
+                initBtn.disabled = false;
+                clearBtn.disabled = false;
+            }
+        });
+
+        clearBtn.addEventListener('click', async () => {
+            // Confirm action
+            const confirmed = confirm('⚠️ WARNING: This will delete ALL posts, comments, communities, and messages. Users will be preserved. This cannot be undone. Are you sure?');
+            if (!confirmed) return;
+
+            const doubleConfirm = confirm('Are you ABSOLUTELY SURE? Type OK in the next dialog.');
+            if (!doubleConfirm) return;
+
+            // Reset UI
+            logs.length = 0;
+            logOutput.textContent = '';
+            progressContainer.classList.remove('hidden');
+            resultContainer.classList.add('hidden');
+            initBtn.disabled = true;
+            clearBtn.disabled = true;
+            
+            // Override console.log
+            console.log = captureLog;
+
+            try {
+                updateProgress('Clearing data...', 50);
+                await mvpDataInit.clearAllData();
+                updateProgress('Complete!', 100);
+                
+                showResult(true, 'All data has been cleared. Users are preserved.');
+                
+            } catch (error) {
+                console.error('Error:', error);
+                showResult(false, error.message);
+            } finally {
+                // Restore console.log
+                console.log = originalLog;
+                initBtn.disabled = false;
+                clearBtn.disabled = false;
+            }
+        });
+
+        // Check Firebase connection
+        firebase.database().ref('.info/connected').on('value', (snapshot) => {
+            if (snapshot.val() === true) {
+                console.log('✅ Firebase connected');
+            } else {
+                console.log('❌ Firebase disconnected');
+            }
+        });
+    </script>
+</body>
+</html>

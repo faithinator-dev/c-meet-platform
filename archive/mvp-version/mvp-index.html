@@ -1,0 +1,362 @@
+<!DOCTYPE html>
+<html lang="en" class="h-full">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Social MVP - Sign In</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+    <style>
+        body { font-family: "Inter", sans-serif; }
+        
+        @keyframes fadeInUp {
+            from {
+                opacity: 0;
+                transform: translateY(20px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+        
+        .animate-fade-in-up {
+            animation: fadeInUp 0.6s ease-out;
+        }
+        
+        .gradient-text {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+        }
+    </style>
+</head>
+<body class="bg-slate-900 h-full flex items-center justify-center p-4 relative overflow-hidden">
+    
+    <!-- Animated Background -->
+    <div class="absolute inset-0 overflow-hidden pointer-events-none">
+        <div class="absolute top-[-20%] left-[-10%] w-[60%] h-[60%] rounded-full bg-blue-600/10 blur-3xl animate-pulse"></div>
+        <div class="absolute bottom-[-20%] right-[-10%] w-[60%] h-[60%] rounded-full bg-purple-600/10 blur-3xl animate-pulse" style="animation-delay: 1s;"></div>
+    </div>
+    
+    <!-- Auth Container -->
+    <div class="relative z-10 w-full max-w-md animate-fade-in-up">
+        <!-- Logo & Welcome -->
+        <div class="text-center mb-8">
+            <div class="inline-flex items-center justify-center w-16 h-16 bg-gradient-to-br from-blue-600 to-purple-600 rounded-2xl shadow-2xl mb-4">
+                <svg class="w-8 h-8 text-white" fill="currentColor" viewBox="0 0 20 20">
+                    <path d="M10.894 2.553a1 1 0 00-1.788 0l-7 14a1 1 0 001.169 1.409l5-1.429A1 1 0 009 15.571V11a1 1 0 112 0v4.571a1 1 0 00.725.962l5 1.428a1 1 0 001.17-1.408l-7-14z"/>
+                </svg>
+            </div>
+            <h1 class="text-4xl font-bold mb-2">
+                <span class="gradient-text">Social MVP</span>
+            </h1>
+            <p class="text-slate-400">Connect • Share • Engage • Grow</p>
+        </div>
+        
+        <!-- Auth Card -->
+        <div class="bg-slate-800/50 backdrop-blur-xl border border-slate-700 rounded-2xl shadow-2xl overflow-hidden">
+            <!-- Tabs -->
+            <div class="flex border-b border-slate-700">
+                <button id="signInTab" class="flex-1 py-4 font-semibold text-white bg-slate-800 border-b-2 border-blue-500 transition-all">
+                    Sign In
+                </button>
+                <button id="signUpTab" class="flex-1 py-4 font-semibold text-slate-400 hover:text-white transition-all">
+                    Sign Up
+                </button>
+            </div>
+            
+            <!-- Sign In Form -->
+            <div id="signInForm" class="p-8">
+                <form id="signInFormElement" class="space-y-4">
+                    <div>
+                        <label class="block text-sm font-semibold text-slate-300 mb-2">Email</label>
+                        <input type="email" 
+                               id="signInEmail" 
+                               required
+                               class="w-full bg-slate-900 text-white placeholder-slate-500 rounded-lg px-4 py-3 border border-slate-700 focus:border-blue-500 focus:outline-none transition-all"
+                               placeholder="your.email@example.com">
+                    </div>
+                    
+                    <div>
+                        <label class="block text-sm font-semibold text-slate-300 mb-2">Password</label>
+                        <input type="password" 
+                               id="signInPassword" 
+                               required
+                               class="w-full bg-slate-900 text-white placeholder-slate-500 rounded-lg px-4 py-3 border border-slate-700 focus:border-blue-500 focus:outline-none transition-all"
+                               placeholder="••••••••">
+                    </div>
+                    
+                    <div id="signInError" class="hidden p-3 bg-red-500/20 border border-red-500 rounded-lg text-red-300 text-sm"></div>
+                    
+                    <button type="submit" 
+                            class="w-full bg-gradient-to-r from-blue-600 to-blue-500 hover:from-blue-500 hover:to-blue-400 text-white font-bold py-3 rounded-lg transition-all shadow-lg">
+                        Sign In
+                    </button>
+                </form>
+                
+                <div class="relative my-6">
+                    <div class="absolute inset-0 flex items-center">
+                        <div class="w-full border-t border-slate-700"></div>
+                    </div>
+                    <div class="relative flex justify-center text-sm">
+                        <span class="px-4 bg-slate-800/50 text-slate-400">Or continue with</span>
+                    </div>
+                </div>
+                
+                <button id="googleSignInBtn" 
+                        class="w-full bg-white hover:bg-gray-100 text-gray-800 font-semibold py-3 rounded-lg transition-all shadow-lg flex items-center justify-center gap-3">
+                    <svg class="w-5 h-5" viewBox="0 0 24 24">
+                        <path fill="#4285F4" d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92c-.26 1.37-1.04 2.53-2.21 3.31v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.09z"/>
+                        <path fill="#34A853" d="M12 23c2.97 0 5.46-.98 7.28-2.66l-3.57-2.77c-.98.66-2.23 1.06-3.71 1.06-2.86 0-5.29-1.93-6.16-4.53H2.18v2.84C3.99 20.53 7.7 23 12 23z"/>
+                        <path fill="#FBBC05" d="M5.84 14.09c-.22-.66-.35-1.36-.35-2.09s.13-1.43.35-2.09V7.07H2.18C1.43 8.55 1 10.22 1 12s.43 3.45 1.18 4.93l2.85-2.22.81-.62z"/>
+                        <path fill="#EA4335" d="M12 5.38c1.62 0 3.06.56 4.21 1.64l3.15-3.15C17.45 2.09 14.97 1 12 1 7.7 1 3.99 3.47 2.18 7.07l3.66 2.84c.87-2.6 3.3-4.53 6.16-4.53z"/>
+                    </svg>
+                    Sign in with Google
+                </button>
+            </div>
+            
+            <!-- Sign Up Form -->
+            <div id="signUpForm" class="p-8 hidden">
+                <form id="signUpFormElement" class="space-y-4">
+                    <div>
+                        <label class="block text-sm font-semibold text-slate-300 mb-2">Username</label>
+                        <input type="text" 
+                               id="signUpUsername" 
+                               required
+                               class="w-full bg-slate-900 text-white placeholder-slate-500 rounded-lg px-4 py-3 border border-slate-700 focus:border-blue-500 focus:outline-none transition-all"
+                               placeholder="cooluser123">
+                        <p class="text-xs text-slate-500 mt-1">This will be your @username</p>
+                    </div>
+                    
+                    <div>
+                        <label class="block text-sm font-semibold text-slate-300 mb-2">Email</label>
+                        <input type="email" 
+                               id="signUpEmail" 
+                               required
+                               class="w-full bg-slate-900 text-white placeholder-slate-500 rounded-lg px-4 py-3 border border-slate-700 focus:border-blue-500 focus:outline-none transition-all"
+                               placeholder="your.email@example.com">
+                    </div>
+                    
+                    <div>
+                        <label class="block text-sm font-semibold text-slate-300 mb-2">Password</label>
+                        <input type="password" 
+                               id="signUpPassword" 
+                               required
+                               minlength="6"
+                               class="w-full bg-slate-900 text-white placeholder-slate-500 rounded-lg px-4 py-3 border border-slate-700 focus:border-blue-500 focus:outline-none transition-all"
+                               placeholder="••••••••">
+                        <p class="text-xs text-slate-500 mt-1">At least 6 characters</p>
+                    </div>
+                    
+                    <div id="signUpError" class="hidden p-3 bg-red-500/20 border border-red-500 rounded-lg text-red-300 text-sm"></div>
+                    
+                    <button type="submit" 
+                            class="w-full bg-gradient-to-r from-blue-600 to-purple-600 hover:from-blue-500 hover:to-purple-500 text-white font-bold py-3 rounded-lg transition-all shadow-lg">
+                        Create Account
+                    </button>
+                </form>
+                
+                <div class="relative my-6">
+                    <div class="absolute inset-0 flex items-center">
+                        <div class="w-full border-t border-slate-700"></div>
+                    </div>
+                    <div class="relative flex justify-center text-sm">
+                        <span class="px-4 bg-slate-800/50 text-slate-400">Or continue with</span>
+                    </div>
+                </div>
+                
+                <button id="googleSignUpBtn" 
+                        class="w-full bg-white hover:bg-gray-100 text-gray-800 font-semibold py-3 rounded-lg transition-all shadow-lg flex items-center justify-center gap-3">
+                    <svg class="w-5 h-5" viewBox="0 0 24 24">
+                        <path fill="#4285F4" d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92c-.26 1.37-1.04 2.53-2.21 3.31v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.09z"/>
+                        <path fill="#34A853" d="M12 23c2.97 0 5.46-.98 7.28-2.66l-3.57-2.77c-.98.66-2.23 1.06-3.71 1.06-2.86 0-5.29-1.93-6.16-4.53H2.18v2.84C3.99 20.53 7.7 23 12 23z"/>
+                        <path fill="#FBBC05" d="M5.84 14.09c-.22-.66-.35-1.36-.35-2.09s.13-1.43.35-2.09V7.07H2.18C1.43 8.55 1 10.22 1 12s.43 3.45 1.18 4.93l2.85-2.22.81-.62z"/>
+                        <path fill="#EA4335" d="M12 5.38c1.62 0 3.06.56 4.21 1.64l3.15-3.15C17.45 2.09 14.97 1 12 1 7.7 1 3.99 3.47 2.18 7.07l3.66 2.84c.87-2.6 3.3-4.53 6.16-4.53z"/>
+                    </svg>
+                    Sign up with Google
+                </button>
+            </div>
+        </div>
+        
+        <!-- Features Showcase -->
+        <div class="mt-12 grid grid-cols-2 gap-4 text-center">
+            <div class="p-4 bg-slate-800/30 backdrop-blur rounded-lg border border-slate-700/50">
+                <div class="text-3xl mb-2">🚀</div>
+                <p class="text-white font-semibold text-sm">Fast & Real-time</p>
+                <p class="text-slate-400 text-xs mt-1">Live updates</p>
+            </div>
+            <div class="p-4 bg-slate-800/30 backdrop-blur rounded-lg border border-slate-700/50">
+                <div class="text-3xl mb-2">🏘️</div>
+                <p class="text-white font-semibold text-sm">Communities</p>
+                <p class="text-slate-400 text-xs mt-1">Join discussions</p>
+            </div>
+            <div class="p-4 bg-slate-800/30 backdrop-blur rounded-lg border border-slate-700/50">
+                <div class="text-3xl mb-2">💬</div>
+                <p class="text-white font-semibold text-sm">Direct Messaging</p>
+                <p class="text-slate-400 text-xs mt-1">Chat privately</p>
+            </div>
+            <div class="p-4 bg-slate-800/30 backdrop-blur rounded-lg border border-slate-700/50">
+                <div class="text-3xl mb-2">⬆️</div>
+                <p class="text-white font-semibold text-sm">Vote & React</p>
+                <p class="text-slate-400 text-xs mt-1">Show support</p>
+            </div>
+        </div>
+    </div>
+    
+    <!-- Firebase SDKs -->
+    <script src="https://www.gstatic.com/firebasejs/9.x/firebase-app-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/9.x/firebase-auth-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/9.x/firebase-database-compat.js"></script>
+    
+    <!-- App Scripts -->
+    <script src="js/config.js"></script>
+    <script src="js/mvp-api.js"></script>
+    
+    <script>
+        // Tab Switching
+        const signInTab = document.getElementById('signInTab');
+        const signUpTab = document.getElementById('signUpTab');
+        const signInForm = document.getElementById('signInForm');
+        const signUpForm = document.getElementById('signUpForm');
+        
+        signInTab.addEventListener('click', () => {
+            signInTab.classList.add('text-white', 'bg-slate-800', 'border-blue-500');
+            signInTab.classList.remove('text-slate-400');
+            signUpTab.classList.remove('text-white', 'bg-slate-800', 'border-blue-500');
+            signUpTab.classList.add('text-slate-400');
+            
+            signInForm.classList.remove('hidden');
+            signUpForm.classList.add('hidden');
+        });
+        
+        signUpTab.addEventListener('click', () => {
+            signUpTab.classList.add('text-white', 'bg-slate-800', 'border-blue-500');
+            signUpTab.classList.remove('text-slate-400');
+            signInTab.classList.remove('text-white', 'bg-slate-800', 'border-blue-500');
+            signInTab.classList.add('text-slate-400');
+            
+            signUpForm.classList.remove('hidden');
+            signInForm.classList.add('hidden');
+        });
+        
+        // Sign In Handler
+        document.getElementById('signInFormElement').addEventListener('submit', async (e) => {
+            e.preventDefault();
+            
+            const email = document.getElementById('signInEmail').value.trim();
+            const password = document.getElementById('signInPassword').value;
+            const errorDiv = document.getElementById('signInError');
+            const submitBtn = e.target.querySelector('button[type="submit"]');
+            
+            // Disable button
+            submitBtn.disabled = true;
+            submitBtn.textContent = 'Signing in...';
+            errorDiv.classList.add('hidden');
+            
+            const result = await mvpAPI.signIn(email, password);
+            
+            if (result.success) {
+                window.location.href = 'mvp-dashboard.html';
+            } else {
+                errorDiv.textContent = result.error;
+                errorDiv.classList.remove('hidden');
+                submitBtn.disabled = false;
+                submitBtn.textContent = 'Sign In';
+            }
+        });
+        
+        // Sign Up Handler
+        document.getElementById('signUpFormElement').addEventListener('submit', async (e) => {
+            e.preventDefault();
+            
+            const username = document.getElementById('signUpUsername').value.trim();
+            const email = document.getElementById('signUpEmail').value.trim();
+            const password = document.getElementById('signUpPassword').value;
+            const errorDiv = document.getElementById('signUpError');
+            const submitBtn = e.target.querySelector('button[type="submit"]');
+            
+            // Validate username
+            if (!/^[a-zA-Z0-9_]{3,20}$/.test(username)) {
+                errorDiv.textContent = 'Username must be 3-20 characters (letters, numbers, underscores only)';
+                errorDiv.classList.remove('hidden');
+                return;
+            }
+            
+            // Disable button
+            submitBtn.disabled = true;
+            submitBtn.textContent = 'Creating account...';
+            errorDiv.classList.add('hidden');
+            
+            const result = await mvpAPI.signUp(email, password, username);
+            
+            if (result.success) {
+                window.location.href = 'mvp-dashboard.html';
+            } else {
+                errorDiv.textContent = result.error;
+                errorDiv.classList.remove('hidden');
+                submitBtn.disabled = false;
+                submitBtn.textContent = 'Create Account';
+            }
+        });
+        
+        // Google Sign In
+        document.getElementById('googleSignInBtn').addEventListener('click', async () => {
+            const btn = document.getElementById('googleSignInBtn');
+            btn.disabled = true;
+            btn.textContent = 'Signing in...';
+            
+            const result = await mvpAPI.signInWithGoogle();
+            
+            if (result.success) {
+                window.location.href = 'mvp-dashboard.html';
+            } else {
+                alert('Failed to sign in with Google: ' + result.error);
+                btn.disabled = false;
+                btn.innerHTML = `
+                    <svg class="w-5 h-5" viewBox="0 0 24 24">
+                        <path fill="#4285F4" d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92c-.26 1.37-1.04 2.53-2.21 3.31v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.09z"/>
+                        <path fill="#34A853" d="M12 23c2.97 0 5.46-.98 7.28-2.66l-3.57-2.77c-.98.66-2.23 1.06-3.71 1.06-2.86 0-5.29-1.93-6.16-4.53H2.18v2.84C3.99 20.53 7.7 23 12 23z"/>
+                        <path fill="#FBBC05" d="M5.84 14.09c-.22-.66-.35-1.36-.35-2.09s.13-1.43.35-2.09V7.07H2.18C1.43 8.55 1 10.22 1 12s.43 3.45 1.18 4.93l2.85-2.22.81-.62z"/>
+                        <path fill="#EA4335" d="M12 5.38c1.62 0 3.06.56 4.21 1.64l3.15-3.15C17.45 2.09 14.97 1 12 1 7.7 1 3.99 3.47 2.18 7.07l3.66 2.84c.87-2.6 3.3-4.53 6.16-4.53z"/>
+                    </svg>
+                    Sign in with Google
+                `;
+            }
+        });
+        
+        // Google Sign Up
+        document.getElementById('googleSignUpBtn').addEventListener('click', async () => {
+            const btn = document.getElementById('googleSignUpBtn');
+            btn.disabled = true;
+            btn.textContent = 'Signing up...';
+            
+            const result = await mvpAPI.signInWithGoogle();
+            
+            if (result.success) {
+                window.location.href = 'mvp-dashboard.html';
+            } else {
+                alert('Failed to sign up with Google: ' + result.error);
+                btn.disabled = false;
+                btn.innerHTML = `
+                    <svg class="w-5 h-5" viewBox="0 0 24 24">
+                        <path fill="#4285F4" d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92c-.26 1.37-1.04 2.53-2.21 3.31v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.09z"/>
+                        <path fill="#34A853" d="M12 23c2.97 0 5.46-.98 7.28-2.66l-3.57-2.77c-.98.66-2.23 1.06-3.71 1.06-2.86 0-5.29-1.93-6.16-4.53H2.18v2.84C3.99 20.53 7.7 23 12 23z"/>
+                        <path fill="#FBBC05" d="M5.84 14.09c-.22-.66-.35-1.36-.35-2.09s.13-1.43.35-2.09V7.07H2.18C1.43 8.55 1 10.22 1 12s.43 3.45 1.18 4.93l2.85-2.22.81-.62z"/>
+                        <path fill="#EA4335" d="M12 5.38c1.62 0 3.06.56 4.21 1.64l3.15-3.15C17.45 2.09 14.97 1 12 1 7.7 1 3.99 3.47 2.18 7.07l3.66 2.84c.87-2.6 3.3-4.53 6.16-4.53z"/>
+                    </svg>
+                    Sign up with Google
+                `;
+            }
+        });
+        
+        // Check if already logged in
+        firebase.auth().onAuthStateChanged((user) => {
+            if (user) {
+                window.location.href = 'mvp-dashboard.html';
+            }
+        });
+    </script>
+</body>
+</html>

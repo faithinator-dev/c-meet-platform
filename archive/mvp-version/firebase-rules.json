@@ -1,0 +1,162 @@
+{
+  "rules": {
+    "users": {
+      "$uid": {
+        ".read": true,
+        ".write": "$uid === auth.uid",
+        "karma": {
+          ".write": true
+        },
+        "followers": {
+          ".write": true
+        },
+        "following": {
+          ".write": true
+        },
+        "postsCount": {
+          ".write": "auth != null"
+        }
+      }
+    },
+    "posts": {
+      ".read": true,
+      "$postId": {
+        ".write": "auth != null && (!data.exists() || data.child('authorId').val() === auth.uid)",
+        "upvotes": {
+          ".write": true
+        },
+        "downvotes": {
+          ".write": true
+        },
+        "score": {
+          ".write": true
+        },
+        "reactions": {
+          ".write": true
+        },
+        "comments": {
+          ".write": true
+        },
+        "shares": {
+          ".write": true
+        },
+        "views": {
+          ".write": true
+        }
+      }
+    },
+    "comments": {
+      "$postId": {
+        ".read": true,
+        "$commentId": {
+          ".write": "auth != null",
+          "upvotes": {
+            ".write": true
+          },
+          "downvotes": {
+            ".write": true
+          },
+          "score": {
+            ".write": true
+          },
+          "replies": {
+            ".write": true
+          }
+        }
+      }
+    },
+    "communities": {
+      ".read": true,
+      "$communityId": {
+        ".write": "auth != null",
+        "members": {
+          ".write": true
+        },
+        "posts": {
+          ".write": true
+        }
+      }
+    },
+    "communityMembers": {
+      "$communityId": {
+        ".read": true,
+        ".write": "auth != null"
+      }
+    },
+    "userCommunities": {
+      "$userId": {
+        ".read": "$userId === auth.uid",
+        ".write": "$userId === auth.uid"
+      }
+    },
+    "messages": {
+      "$conversationId": {
+        ".read": "auth != null",
+        ".write": "auth != null"
+      }
+    },
+    "conversations": {
+      "$userId": {
+        ".read": "$userId === auth.uid",
+        ".write": "auth != null"
+      }
+    },
+    "channels": {
+      ".read": true,
+      "$channelId": {
+        ".write": "auth != null",
+        "subscribers": {
+          ".write": true
+        }
+      }
+    },
+    "channelSubscribers": {
+      "$channelId": {
+        ".read": true,
+        ".write": "auth != null"
+      }
+    },
+    "channelPosts": {
+      "$channelId": {
+        ".read": true,
+        ".write": "auth != null"
+      }
+    },
+    "votes": {
+      ".read": true,
+      ".write": "auth != null"
+    },
+    "reactions": {
+      ".read": true,
+      ".write": "auth != null"
+    },
+    "following": {
+      "$userId": {
+        ".read": true,
+        ".write": "$userId === auth.uid"
+      }
+    },
+    "followers": {
+      "$userId": {
+        ".read": true,
+        ".write": "auth != null"
+      }
+    },
+    "notifications": {
+      "$userId": {
+        ".read": "$userId === auth.uid",
+        ".write": "auth != null"
+      }
+    },
+    "blocked": {
+      "$userId": {
+        ".read": "$userId === auth.uid",
+        ".write": "$userId === auth.uid"
+      }
+    },
+    "reports": {
+      ".read": "auth != null",
+      ".write": "auth != null"
+    }
+  }
+}
